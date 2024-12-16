@@ -1,6 +1,9 @@
 import { createThirdwebClient } from "thirdweb";
+import { config } from "dotenv";
 
-const clientId = '345a045b6c7bd174fa7febdb2e4739a7';
+config();
+
+const clientId = process.env.CLIENT_ID;
 
 if (!clientId) {
   throw new Error("No client ID provided");
