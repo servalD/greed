@@ -3,7 +3,7 @@ import { config } from "dotenv";
 
 config();
 
-const clientId = process.env.CLIENT_ID;
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string;
 
 if (!clientId) {
   throw new Error("No client ID provided");
