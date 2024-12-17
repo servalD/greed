@@ -1,7 +1,9 @@
+"use client"
 import { createThirdwebClient } from "thirdweb";
-import { config } from "dotenv";
-
-config();
+import { config as dotenvConf } from "dotenv";
+dotenvConf();
+import { http, createConfig } from 'wagmi'
+import { sepolia } from 'wagmi/chains'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string;
 
@@ -12,3 +14,10 @@ if (!clientId) {
 export const client = createThirdwebClient({
   clientId: clientId,
 });
+
+export const config = createConfig({
+  chains: [sepolia],
+  transports: {
+    [sepolia.id]: http(),
+  },
+})
