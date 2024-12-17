@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
+import { sepolia } from "thirdweb/chains";
 import { WagmiProvider } from 'wagmi'
 import { config } from './client'
 
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <ThirdwebProvider>
+      <ThirdwebProvider activeChain={sepolia}>
         <WagmiProvider config={config}>{children}</WagmiProvider>
       </ThirdwebProvider>
       </body>
