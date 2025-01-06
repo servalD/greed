@@ -3,26 +3,24 @@ pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
 import {Agency} from "../src/Agency.sol";
-import {Manager} from "../src/Manager.sol";
+// import {Manager} from "../src/Manager.sol";
 
-contract FactoryScript is Script {
-    Manager public manager;
-    Agency public agency;
-    address payable safe = payable(0x2eE342756969fe6a32c1990b7D9347c52e971b1C);
-    function setUp() public {}
+// contract FactoryScript is Script {
+//     // Manager public manager;
+//     Agency public agency;
+//     address payable safe = payable(0x2eE342756969fe6a32c1990b7D9347c52e971b1C);
+//     function setUp() public {}
 
-    function run() public {
-        vm.startBroadcast();
+//     function run() public {
+//         vm.startBroadcast();
 
-        manager = new Manager(msg.sender);
+//         // manager = new Manager(msg.sender);
 
-        agency = new Agency(address(manager));
+//         agency = new Agency(msg.sender);
 
-        manager.setTargetFunctionRole(address(agency), keccak256("createCollection( string memory name, string memory symbol, uint256 maximumSupply, address payable _SAFE ) external restricted"), 0);
+//         agency.createCollection("Long Court", "LC", 20, safe);
 
-        agency.createCollection("Long Court", "LC", 20, safe);
+//         vm.stopBroadcast();
 
-        vm.stopBroadcast();
-
-    }
-}
+//     }
+// }

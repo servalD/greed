@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "@openzeppelin/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/utils/structs/EnumerableMap.sol";
 import {Copro} from "./Copro.sol";
 import {AccessManaged} from "@openzeppelin/access/manager/AccessManaged.sol";
+import {Manager} from "./Manager.sol";
+import {IRoleDefinition} from "./IRoleDefinition.sol";
 
-contract Agency is AccessManaged {
+contract Agency is AccessManaged, IRoleDefinition {
+    Manager manager;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using EnumerableSet for EnumerableSet.Bytes32Set;
     // =============================================================
     //                            ERRORS
     // =============================================================
@@ -16,95 +23,95 @@ contract Agency is AccessManaged {
     error COLLECTION_SYMBOL_ALREADY_EXISTS(string);
 
     // =============================================================
-    //                     COLLECTIONS COUNTERS
+    //                     COLLECTION'S COUNTER
     // =============================================================
 
-    uint256 public nbListedCollection;
+    uint256 public nbListedCopro;
 
     // =============================================================
     //                            STRUCTS
     // =============================================================
 
-    Copro[] public collections;
+    ///////////////////////// PROPERTIES /////////////////////////
+
+    Copro[] public copros;// List of available co properties (deployed)
+
+    ///////////////////////// GUEST AND CLIENTS //////////////////
+    EnumerableSet.AddressSet private guestList;// Incoming guest (to be validated by the agent and then able to buy flat)
+    // No need to keep track of clients (handled by the access manager)
 
     // =============================================================
     //                            EVENTS
     // =============================================================
 
-    event CollectionCreated(
-        address collectionAddress,
-        string name,
-        string symbol
-    );
+    event ClientAccepted(address indexed client);// guestList address converted to Client (through the access manager)
 
-    constructor(address initialAuth) AccessManaged(initialAuth) {
-
+    constructor(Manager _manager) AccessManaged(address(_manager)){
+        manager = _manager;
+        manager.addAgency(address(this));
     }
 
-    function createCollection(
+    function hireAgent(address _agent) external restricted {// Only deployer
+        manager.addAgent(_agent);
+    }
+
+    // Guest to client process (operated by agents)
+    function GuestEntrance() public {
+        (bool isClient, uint32 delay) = manager.hasRole(CLIENT_ROLE, msg.sender);
+        if (isClient) revert();
+        guestList.add(msg.sender);
+    }
+
+    function guests() public view returns (address[] memory) {
+        return guestList.values();
+    }
+
+    function acceptClient(address _client) external restricted {// Only agents
+        guestList.remove(_client);
+        manager.grantRole(CLIENT_ROLE, _client, 0);
+        emit ClientAccepted(_client);
+    }
+
+    function createCopro(
+        
         string memory name,
         string memory symbol,
-        uint256 maximumSupply,
-        address payable _SAFE
-    ) external restricted {
-        if (isNameExists(name)) {
-            revert COLLECTION_NAME_ALREADY_EXISTS(name);
-        } else if (isSymbolExists(symbol)) {
-            revert COLLECTION_SYMBOL_ALREADY_EXISTS(symbol);
-        }
-        Copro collection = new Copro(address(this), name, symbol, maximumSupply, _SAFE); // index
-        collections.push(collection);
-        nbListedCollection++;
-        emit CollectionCreated(address(collection), name, symbol);
+        uint96 flatCount,
+        address _SAFE,
+        address promoter
+    ) external {
+        Copro copro = new Copro(manager, promoter, name, symbol, flatCount, payable(_SAFE)); // index
+        copros.push(copro);
+        nbListedCopro++;
+
+        // Role assignment
+        manager.addCopro(address(copro));
+        
     }
 
-    function isNameExists(string memory name) public view returns (bool) {
-        for (uint256 i = 0; i < nbListedCollection; i++) {
-            if (
-                keccak256(abi.encodePacked(collections[i].name)) ==
-                keccak256(abi.encodePacked(name))
-            ) {
-                return true;
-            }
-        }
-        return false;
+    function getCoproById(uint256 index) public view returns (Copro) {
+        return copros[index];
     }
 
-    function isSymbolExists(string memory symbol) public view returns (bool) {
-        for (uint256 i = 0; i < nbListedCollection; i++) {
-            if (
-                keccak256(abi.encodePacked(collections[i].symbol)) ==
-                keccak256(abi.encodePacked(symbol))
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function getCollectionById(uint256 index) public view returns (Copro) {
-        return collections[index];
-    }
-
-    function getCollectionByName(
+    function getCoproByName(
         string memory name
     ) public view returns (Copro) {
-        for (uint256 i = 0; i < nbListedCollection; i++) {
+        for (uint256 i = 0; i < nbListedCopro; i++) {
             if (
-                keccak256(abi.encodePacked(collections[i].name)) ==
+                keccak256(abi.encodePacked(copros[i].name())) ==
                 keccak256(abi.encodePacked(name))
             ) {
-                return collections[i];
+                return copros[i];
             }
         }
         revert COLLECTION_NOT_FOUND(name);
     }
 
-    function getCollections() external view returns (Copro[] memory) {
-        Copro[] memory _collections = new Copro[](nbListedCollection);
-        for (uint256 i = 0; i < nbListedCollection; i++) {
-            _collections[i] = collections[i];
+    function getCopros() external view returns (Copro[] memory) {
+        Copro[] memory _copros = new Copro[](nbListedCopro);
+        for (uint256 i = 0; i < nbListedCopro; i++) {
+            _copros[i] = copros[i];
         }
-        return _collections;
+        return _copros;
     }
 }
