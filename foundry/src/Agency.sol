@@ -93,29 +93,31 @@ contract Agency is AccessManaged, IRoleDefinition {
         
     }
 
-    function getCoproById(uint256 index) public view returns (Copro) {
-        return copros[index];
-    }
+    // That's up to the front end to handle the search as copros is public (to lower gas cost at deployment)
+    
+    // function getCoproById(uint256 index) public view returns (Copro) {
+    //     return copros[index];
+    // }
 
-    function getCoproByName(
-        string memory name
-    ) public view returns (Copro) {
-        for (uint256 i = 0; i < nbListedCopro; i++) {
-            if (
-                keccak256(abi.encodePacked(copros[i].name())) ==
-                keccak256(abi.encodePacked(name))
-            ) {
-                return copros[i];
-            }
-        }
-        revert COLLECTION_NOT_FOUND(name);
-    }
+    // function getCoproByName(
+    //     string memory name
+    // ) public view returns (Copro) {
+    //     for (uint256 i = 0; i < nbListedCopro; i++) {
+    //         if (
+    //             keccak256(abi.encodePacked(copros[i].name())) ==
+    //             keccak256(abi.encodePacked(name))
+    //         ) {
+    //             return copros[i];
+    //         }
+    //     }
+    //     revert COLLECTION_NOT_FOUND(name);
+    // }
 
-    function getCopros() external view returns (Copro[] memory) {
-        Copro[] memory _copros = new Copro[](nbListedCopro);
-        for (uint256 i = 0; i < nbListedCopro; i++) {
-            _copros[i] = copros[i];
-        }
-        return _copros;
-    }
+    // function getCopros() external view returns (Copro[] memory) {
+    //     Copro[] memory _copros = new Copro[](nbListedCopro);
+    //     for (uint256 i = 0; i < nbListedCopro; i++) {
+    //         _copros[i] = copros[i];
+    //     }
+    //     return _copros;
+    // }
 }

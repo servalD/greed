@@ -84,7 +84,12 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
         payable(ownerOf(tokenId)).transfer(msg.value * (100 - fees_ratio) / 100);
         // Update the market
         market[tokenId] = 0;
+
+        // Update the history
+        history[tokenId].push(Proposal(msg.sender, msg.value));
     }
+
+    // No getter for market and history as it's public so th'ey can be accessed directly (to lower gas cost at deployment)
 
     // Disabled code (in prod and before audits, I'll decide to comment out unneeded code in sources which is cleaner and gas free. For now it's more explicit.)
     // function safeTransferFrom(address from, address to, uint256 tokenId) public override {revert("disabled");} // Not virtual
