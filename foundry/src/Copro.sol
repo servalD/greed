@@ -10,6 +10,11 @@ import {IRoleDefinition} from "./IRoleDefinition.sol";
 contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
     // Errors
     error SoldOutError();
+    error InvalidFlatCount();
+    error ExceedsMaxBatchSize();
+    error NotFlatOwner();
+    error FlatNotForSale();
+    error InvalidAmount();
     // Static
     address payable private safe;
     uint256 public immutable flatCount;
@@ -22,7 +27,7 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
     // Variables
     mapping(uint256 => Proposal[]) public proposals;// tokenId => Proposals
     mapping(uint256 => uint256) public market;// tokenId => Owner Proposal
-    uint256 fees_ratio;// To safe
+    uint256 fees_ratio = 2;// % to safe
     mapping(uint256 => Proposal[]) public history;// tokenIzd => Successful transaction history
 
     // Events
@@ -30,8 +35,12 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
     event FlatRecovered(uint256 tokenId, address indexed previousOwner, address indexed admin);
 
     constructor(AccessManager manager,address promoter, string memory name, string memory symbol, uint96 _flatCount, address payable _SAFE) ERC721(name, symbol) AccessManaged(address(manager)) {
-        require(_flatCount > 0, "No Copro can be empty");
-        require(_flatCount < _maxBatchSize(), "Unable to create a copro with more than 5000");// See https://docs.openzeppelin.com/contracts/4.x/api/token/erc721#ERC721Consecutive
+        if (_flatCount <= 0) {
+            revert InvalidFlatCount();
+        }
+        if (_flatCount >= _maxBatchSize()) {
+            revert ExceedsMaxBatchSize();
+        }
         flatCount = _flatCount;
         safe = _SAFE;
         // Batch transfer to the promoter (the owner of all flat at Agency deployment)
@@ -41,7 +50,9 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
 
     // Modifiers
     modifier onlyTokenOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == msg.sender, "You're not the flat owner!");
+        if (ownerOf(tokenId) != msg.sender) {
+            revert NotFlatOwner();
+        }
         _;
     }
 
@@ -57,9 +68,21 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
     }
 
     function buy(uint256 tokenId) public payable restricted {
-        require(msg.value == market[tokenId], "Invalid amount");
+        if (market[tokenId] == 0) {
+            revert FlatNotForSale();
+        }
+        if (msg.value != market[tokenId]) {
+            revert InvalidAmount();
+        }
+        
         _safeTransfer(ownerOf(tokenId), msg.sender, tokenId);
         _approve(address(0), tokenId, msg.sender);
+
+        // Transfer the fees to the safe
+        safe.transfer(msg.value * fees_ratio / 100);
+        // Transfer the rest to the owner
+        payable(ownerOf(tokenId)).transfer(msg.value * (100 - fees_ratio) / 100);
+        // Update the market
         market[tokenId] = 0;
     }
 

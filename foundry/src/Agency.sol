@@ -22,6 +22,8 @@ contract Agency is AccessManaged, IRoleDefinition {
 
     error COLLECTION_SYMBOL_ALREADY_EXISTS(string);
 
+    error AlreadyClient();
+
     // =============================================================
     //                     COLLECTION'S COUNTER
     // =============================================================
@@ -58,7 +60,9 @@ contract Agency is AccessManaged, IRoleDefinition {
     // Guest to client process (operated by agents)
     function GuestEntrance() public {
         (bool isClient, uint32 delay) = manager.hasRole(CLIENT_ROLE, msg.sender);
-        if (isClient) revert();
+        if (isClient) {
+            revert AlreadyClient();
+        }
         guestList.add(msg.sender);
     }
 
