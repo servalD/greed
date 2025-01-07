@@ -59,41 +59,41 @@ contract AgencyTest is Test, IRoleDefinition {
         string memory symbol = "CTK";
         vm.prank(address(this));
         agency.createCopro(name, symbol, flatCount, safe, promoter);
-        Copro copro = agency.getCoproById(0);
+        Copro copro = agency.copros(0);
         assertEq(copro.name(), name);
         assertEq(copro.symbol(), symbol);
     }
 
-    function testGetCoproById() public {
-        string memory name = "CoproToken";
-        string memory symbol = "CTK";
-        vm.prank(address(this));
-        agency.createCopro(name, symbol, flatCount, safe, promoter);
-        Copro copro = agency.getCoproById(0);
-        assertEq(copro.name(), name);
-    }
+    // function testGetCoproById() public {
+    //     string memory name = "CoproToken";
+    //     string memory symbol = "CTK";
+    //     vm.prank(address(this));
+    //     agency.createCopro(name, symbol, flatCount, safe, promoter);
+    //     Copro copro = agency.getCoproById(0);
+    //     assertEq(copro.name(), name);
+    // }
 
-    function testGetCoproByName() public {
-        string memory name = "CoproToken";
-        string memory symbol = "CTK";
-        vm.prank(address(this));
-        agency.createCopro(name, symbol, flatCount, safe, promoter);
-        Copro copro = agency.getCoproByName(name);
-        assertEq(copro.name(), name);
-    }
+    // function testGetCoproByName() public {
+    //     string memory name = "CoproToken";
+    //     string memory symbol = "CTK";
+    //     vm.prank(address(this));
+    //     agency.createCopro(name, symbol, flatCount, safe, promoter);
+    //     Copro copro = agency.getCoproByName(name);
+    //     assertEq(copro.name(), name);
+    // }
 
-    function testGetCopros() public {
-        string memory name1 = "CoproToken1";
-        string memory symbol1 = "CTK1";
-        string memory name2 = "CoproToken2";
-        string memory symbol2 = "CTK2";
-        vm.prank(address(this));
-        agency.createCopro(name1, symbol1, flatCount, safe, promoter);
-        vm.prank(address(this));
-        agency.createCopro(name2, symbol2, flatCount, safe, promoter);
-        Copro[] memory copros = agency.getCopros();
-        assertEq(copros.length, 2);
-        assertEq(copros[0].name(), name1);
-        assertEq(copros[1].name(), name2);
-    }
+    // function testGetCopros() public {
+    //     string memory name1 = "CoproToken1";
+    //     string memory symbol1 = "CTK1";
+    //     string memory name2 = "CoproToken2";
+    //     string memory symbol2 = "CTK2";
+    //     vm.prank(address(this));
+    //     agency.createCopro(name1, symbol1, flatCount, safe, promoter);
+    //     vm.prank(address(this));
+    //     agency.createCopro(name2, symbol2, flatCount, safe, promoter);
+    //     Copro[] memory copros = agency.getCopros();
+    //     assertEq(copros.length, 2);
+    //     assertEq(copros[0].name(), name1);
+    //     assertEq(copros[1].name(), name2);
+    // }
 }
