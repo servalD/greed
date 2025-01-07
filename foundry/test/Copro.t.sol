@@ -33,10 +33,19 @@ contract CoproTest is Test, IRoleDefinition {
         manager.addCopro(address(copro));
     }
 
-    function testMinting() public {
+    function testPromoterOwnership() public view {
         for (uint256 i = 0; i < flatCount; i++) {
             assertEq(copro.ownerOf(i), promoter);
         }
+    }
+
+    function testCantBuy() public {
+        uint256 tokenId = 1;
+        vm.prank(promoter);
+        copro.sell(tokenId, 1 ether);
+        vm.prank(promoter);
+        vm.expectRevert();
+        copro.buy{value: 1 ether}(tokenId);
     }
 
     function testSell() public {
