@@ -2,25 +2,16 @@
 
 import Navbar from "@/components/ui/navbar";
 import NotConnected from "@/components/notConnected";
-import { useAccount } from 'wagmi';
 import List from "@/components/ui/list";
-import { useEffect, useState } from "react";
+import { useActiveWalletConnectionStatus } from "thirdweb/react";
+import { images } from "@/constants/moke/list";
 
 export default function Home() {
-
-  const {isConnected} = useAccount();
-
-  const [connectionStatus, setConnectionStatus] = useState(false);
-
-  useEffect(() => {
-    setConnectionStatus(isConnected);
-  }, [isConnected]);
-
+  const status = useActiveWalletConnectionStatus();
   return (
     <main>
-      <Navbar />
-      {!connectionStatus && <NotConnected />}
-      {connectionStatus && <List />}
+      <Navbar connectionStatus={status} />
+      {status === 'connected' ? <List images={images}/> : <NotConnected />}
     </main>
   );
 }

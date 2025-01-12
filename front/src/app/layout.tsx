@@ -1,18 +1,10 @@
-import type { Metadata } from "next";
+'use client';
+
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThirdwebProvider } from "thirdweb/react";
-import { sepolia } from "thirdweb/chains";
-import { WagmiProvider } from 'wagmi'
-import { config } from './client'
+import { Providers } from "./provider";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Architecture blockchain thirdweb",
-  description:
-    "Starter template for using thirdweb SDK",
-};
 
 export default function RootLayout({
   children,
@@ -22,9 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <ThirdwebProvider>
-        <WagmiProvider config={config}>{children}</WagmiProvider>
-      </ThirdwebProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

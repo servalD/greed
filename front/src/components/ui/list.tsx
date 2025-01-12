@@ -2,17 +2,9 @@
 
 import { useState } from "react";
 import { ErrorService } from "@/service/error.service";
+import { Images } from "@/types/resources";
 
-const images = [
-  { id: 1, src: "/maison1.jpg" },
-  { id: 2, src: "/maison2.jpg" },
-  { id: 3, src: "/maison3.jpg" },
-  { id: 4, src: "/maison4.jpg" },
-  { id: 5, src: "/maison5.jpg" },
-  { id: 6, src: "/maison6.jpg" },
-];
-
-export default function List() {
+export default function List({ images }: { images: Images[] }) {
   const [minted, setMinted] = useState<number[]>([]);
 
   const handleMint = (id: number) => {
