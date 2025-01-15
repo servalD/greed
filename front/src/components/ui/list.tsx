@@ -8,6 +8,11 @@ export default function List({ images }: { images: Images[] }) {
   const [minted, setMinted] = useState<number[]>([]);
 
   const handleMint = (id: number) => {
+    if (localStorage.getItem('role') === 'guest') {
+      ErrorService.mixinMessage('Vous n\'avez pas les droits pour acheter', 'error')
+      return;
+    }
+    
     ErrorService.mixinMessage(`Minting NFT for image ID: ${id}`, "info");
     setMinted((prev) => [...prev, id]);
     ErrorService.mixinMessage('NFT minted !', "success");
