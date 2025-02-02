@@ -34,7 +34,7 @@ contract ManagerTest is Test, IRoleDefinition {
         agency = new Agency(manager);
     }
 
-    function testAddAgency() public {
+    function testAddAgency() public view {
         // Dès le déploiement, l'Agency doit avoir le rôle AGENCY_ROLE
         (bool hasAgency, ) = manager.hasRole(AGENCY_ROLE, address(agency));
         assertTrue(hasAgency);// L'Agency doit avoir le rôle AGENCY_ROLE  

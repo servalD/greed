@@ -141,12 +141,12 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
      * @dev Disables ERC721 transfer functionality not required for this contract.
      */
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {revert("disabled");}
+    function safeTransferFrom(address /* from */, address /* to */, uint256 /* tokenId */, bytes memory /* data */) public pure override {revert("disabled");}
 
-    function transferFrom(address from, address to, uint256 tokenId) public override {revert("disabled");}
+    function transferFrom(address /* from */, address /* to */, uint256 /* tokenId */) public pure override {revert("disabled");}
 
-    function approve(address to, uint256 tokenId) public override {revert("disabled");}
+    function approve(address /* to */, uint256 /* tokenId */) public pure override {revert("disabled");}
 
-    function setApprovalForAll(address operator, bool approved) public override {revert("disabled");}
+    function setApprovalForAll(address /* operator */, bool /* approved */) public pure override {revert("disabled");}
 
 }
