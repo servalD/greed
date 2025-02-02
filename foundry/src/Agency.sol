@@ -30,6 +30,8 @@ contract Agency is AccessManaged, IRoleDefinition {
 
     uint256 public nbListedCopro;
 
+    address private immutable SAFE;
+
     EnumerableSet.AddressSet private guestList;// Incoming guest (to be validated by the agent and then able to buy flat)
     // No need to keep track of clients (handled by the access manager)
 
@@ -49,9 +51,10 @@ contract Agency is AccessManaged, IRoleDefinition {
     //                          CONSTRUCTOR
     // =============================================================
 
-    constructor(Manager _manager) AccessManaged(address(_manager)){
+    constructor(Manager _manager, address safe) AccessManaged(address(_manager)){
         manager = _manager;
         manager.addAgency(address(this));
+        SAFE = safe;
     }
 
     // =============================================================
@@ -102,7 +105,6 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @param name Name of the co-property.
      * @param symbol Symbol representing the co-property.
      * @param flatCount Number of flats in the co-property.
-     * @param _SAFE Address of the SAFE contract.
      * @param promoter Address of the promoter.
      */
     function createCopro(
@@ -110,16 +112,16 @@ contract Agency is AccessManaged, IRoleDefinition {
         string memory name,
         string memory symbol,
         uint96 flatCount,
-        address _SAFE,
         address promoter
-    ) external {
-        Copro copro = new Copro(manager, promoter, name, symbol, flatCount, payable(_SAFE)); // index
+    ) external returns (Copro) {
+        Copro copro = new Copro(manager, promoter, name, symbol, flatCount, payable(SAFE)); // index
         copros.push(copro);
         nbListedCopro++;
 
         // Role assignment
         manager.addCopro(address(copro));
         
+        return copro;
     }
 
     // That's up to the front end to handle the search as copros is public (to lower gas cost at deployment) Or not...
