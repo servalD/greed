@@ -115,13 +115,16 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
             revert InvalidAmount();
         }
         
-        _safeTransfer(ownerOf(tokenId), msg.sender, tokenId);
-        _approve(address(0), tokenId, msg.sender);
+        address payable lastOwner = payable(ownerOf(tokenId));
 
+        _safeTransfer(lastOwner, msg.sender, tokenId);
+        _approve(address(0), tokenId, msg.sender);
+        
+        uint fees = msg.value * fees_ratio / 100;
         // Transfer the fees to the safe
-        safe.transfer(msg.value * fees_ratio / 100);
+        safe.transfer(fees);
         // Transfer the rest to the owner
-        payable(ownerOf(tokenId)).transfer(msg.value * (100 - fees_ratio) / 100);
+        payable(lastOwner).transfer(msg.value - fees);
         // Update the market
         market[tokenId] = 0;
 
