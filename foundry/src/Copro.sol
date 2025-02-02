@@ -8,32 +8,49 @@ import {AccessManager} from "@openzeppelin/access/manager/AccessManager.sol";
 import {IRoleDefinition} from "./IRoleDefinition.sol";
 
 contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
-    // Errors
+    // =============================================================
+    //                          ERRORS
+    // =============================================================
     error SoldOutError();
     error InvalidFlatCount();
     error ExceedsMaxBatchSize();
     error NotFlatOwner();
     error FlatNotForSale();
     error InvalidAmount();
-    // Static
+    // =============================================================
+    //                          STATE VARIABLES
+    // =============================================================
     address payable private safe;
     uint256 public immutable flatCount;
-    // Structures
+    uint256 fees_ratio = 2;// % to safe
+    mapping(uint256 => Proposal[]) public proposals;// tokenId => Proposals
+    mapping(uint256 => uint256) public market;// tokenId => Owner Proposal
+    mapping(uint256 => Proposal[]) public history;// tokenIzd => Successful transaction history
+    // =============================================================
+    //                          STRUCTS
+    // =============================================================
     struct Proposal {
         address part;// The owner or a client
         uint256 amount;
     }
-
-    // Variables
-    mapping(uint256 => Proposal[]) public proposals;// tokenId => Proposals
-    mapping(uint256 => uint256) public market;// tokenId => Owner Proposal
-    uint256 fees_ratio = 2;// % to safe
-    mapping(uint256 => Proposal[]) public history;// tokenIzd => Successful transaction history
-
-    // Events
+    // =============================================================
+    //                          EVENTS
+    // =============================================================
     event FlatMinted(address indexed owner, uint256 tokenId);
     event FlatRecovered(uint256 tokenId, address indexed previousOwner, address indexed admin);
 
+    // =============================================================
+    //                          CONSTRUCTOR
+    // =============================================================
+    /**
+     * @dev Initializes the Copro contract by minting a batch of flats to the promoter (actualy the agency).
+     * @param manager Address of the AccessManager contract.
+     * @param promoter Address of the promoter to receive initial ownership of the flats.
+     * @param name Name of the ERC721 token.
+     * @param symbol Symbol of the ERC721 token.
+     * @param _flatCount Number of flats to mint.
+     * @param _SAFE Address of the safe wallet to receive fees.
+     */
     constructor(AccessManager manager,address promoter, string memory name, string memory symbol, uint96 _flatCount, address payable _SAFE) ERC721(name, symbol) AccessManaged(address(manager)) {
         if (_flatCount <= 0) {
             revert InvalidFlatCount();
@@ -48,7 +65,14 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
         for (uint256 i=0; i<_flatCount; i++) market[i] = 0;// Ensure nothing is for sale 
     }
 
-    // Modifiers
+    // =============================================================
+    //                          MODIFIERS
+    // =============================================================
+
+    /**
+     * @dev Ensures the caller is the owner of the specified token ID.
+     * @param tokenId Token ID to check ownership.
+     */
     modifier onlyTokenOwner(uint256 tokenId) {
         if (ownerOf(tokenId) != msg.sender) {
             revert NotFlatOwner();
@@ -56,17 +80,33 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
         _;
     }
 
-    // Implementation
+    // =============================================================
+    //                          FUNCTIONS
+    // =============================================================
+
+    /**
+     * @notice Lists a flat for sale at a specified price.
+     * @param tokenId Token ID of the flat to list for sale.
+     * @param amount Sale price of the flat.
+     */
     function sell(uint256 tokenId, uint256 amount) public onlyTokenOwner(tokenId){
         _approve(address(this), tokenId, msg.sender);
         market[tokenId] = amount;
     }
 
+    /**
+     * @notice Cancels the sale of a flat.
+     * @param tokenId Token ID of the flat to remove from sale.
+     */
     function cancelSale(uint256 tokenId) public onlyTokenOwner(tokenId){
         _approve(address(0), tokenId, msg.sender);
         market[tokenId] = 0;
     }
 
+    /**
+     * @notice Allows a client (only) to buy a flat listed for sale.
+     * @param tokenId Token ID of the flat to purchase.
+     */
     function buy(uint256 tokenId) public payable restricted {
         if (market[tokenId] == 0) {
             revert FlatNotForSale();
@@ -93,6 +133,10 @@ contract Copro is ERC721Consecutive, AccessManaged, IRoleDefinition {
 
     // Disabled code (in prod and before audits, I'll decide to comment out unneeded code in sources which is cleaner and gas free. For now it's more explicit.)
     // function safeTransferFrom(address from, address to, uint256 tokenId) public override {revert("disabled");} // Not virtual
+
+    /**
+     * @dev Disables ERC721 transfer functionality not required for this contract.
+     */
 
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {revert("disabled");}
 
