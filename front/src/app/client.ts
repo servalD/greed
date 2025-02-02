@@ -1,6 +1,5 @@
 "use client"
-import { createThirdwebClient, getContract } from "thirdweb";
-import { baseSepolia } from "thirdweb/chains";
+import { createThirdwebClient } from "thirdweb";
 import { config as dotenvConf } from "dotenv";
 dotenvConf();
 import { http, createConfig } from 'wagmi'
@@ -25,10 +24,3 @@ export const config = createConfig({
     [mainnet.id]: http()
   },
 })
-
-// Contract interfaces
-getContract({
-  client,
-  chain: baseSepolia,
-  address: "0x638263e3eAa3917a53630e61B1fBa685308024fa",
-});

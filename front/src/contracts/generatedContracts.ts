@@ -208,6 +208,11 @@ export const agencyAbi = [
   },
 ] as const
 
+export const agencyAddress =
+  '0xA662Ed93e6960a3cfd878cF58206fa71f93efe75' as const
+
+export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copro
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -689,6 +694,11 @@ export const coproAbi = [
   { type: 'error', inputs: [], name: 'NotFlatOwner' },
   { type: 'error', inputs: [], name: 'SoldOutError' },
 ] as const
+
+export const coproAddress =
+  '0x574EAB16A1B1A94605bb7214b0518aCEf817f6a9' as const
+
+export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Manager
@@ -1327,6 +1337,14 @@ export const managerAbi = [
   },
 ] as const
 
+export const managerAddress =
+  '0x0Ec41ED26c8184e25E59bdFF0E65483205C4Eb4C' as const
+
+export const managerConfig = {
+  address: managerAddress,
+  abi: managerAbi,
+} as const
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1336,6 +1354,7 @@ export const managerAbi = [
  */
 export const useReadAgency = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
 })
 
 /**
@@ -1343,6 +1362,7 @@ export const useReadAgency = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyAgencyRole = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'AGENCY_ROLE',
 })
 
@@ -1351,6 +1371,7 @@ export const useReadAgencyAgencyRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyAgentRole = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'AGENT_ROLE',
 })
 
@@ -1359,6 +1380,7 @@ export const useReadAgencyAgentRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyClientRole = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'CLIENT_ROLE',
 })
 
@@ -1367,6 +1389,7 @@ export const useReadAgencyClientRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyCoOwnerRole = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'CO_OWNER_ROLE',
 })
 
@@ -1375,6 +1398,7 @@ export const useReadAgencyCoOwnerRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyAuthority = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'authority',
 })
 
@@ -1383,6 +1407,7 @@ export const useReadAgencyAuthority = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyCopros = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'copros',
 })
 
@@ -1391,6 +1416,7 @@ export const useReadAgencyCopros = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyGetCoproById = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'getCoproById',
 })
 
@@ -1399,6 +1425,7 @@ export const useReadAgencyGetCoproById = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyGetCoproByName = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'getCoproByName',
 })
 
@@ -1407,6 +1434,7 @@ export const useReadAgencyGetCoproByName = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyGetCopros = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'getCopros',
 })
 
@@ -1415,6 +1443,7 @@ export const useReadAgencyGetCopros = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadAgencyGuests = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'guests',
 })
 
@@ -1424,6 +1453,7 @@ export const useReadAgencyGuests = /*#__PURE__*/ createUseReadContract({
 export const useReadAgencyIsConsumingScheduledOp =
   /*#__PURE__*/ createUseReadContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'isConsumingScheduledOp',
   })
 
@@ -1432,6 +1462,7 @@ export const useReadAgencyIsConsumingScheduledOp =
  */
 export const useReadAgencyNbListedCopro = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'nbListedCopro',
 })
 
@@ -1440,13 +1471,14 @@ export const useReadAgencyNbListedCopro = /*#__PURE__*/ createUseReadContract({
  */
 export const useWriteAgency = /*#__PURE__*/ createUseWriteContract({
   abi: agencyAbi,
+  address: agencyAddress,
 })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"GuestEntrance"`
  */
 export const useWriteAgencyGuestEntrance = /*#__PURE__*/ createUseWriteContract(
-  { abi: agencyAbi, functionName: 'GuestEntrance' },
+  { abi: agencyAbi, address: agencyAddress, functionName: 'GuestEntrance' },
 )
 
 /**
@@ -1454,6 +1486,7 @@ export const useWriteAgencyGuestEntrance = /*#__PURE__*/ createUseWriteContract(
  */
 export const useWriteAgencyAcceptClient = /*#__PURE__*/ createUseWriteContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'acceptClient',
 })
 
@@ -1462,6 +1495,7 @@ export const useWriteAgencyAcceptClient = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteAgencyCreateCopro = /*#__PURE__*/ createUseWriteContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'createCopro',
 })
 
@@ -1470,6 +1504,7 @@ export const useWriteAgencyCreateCopro = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteAgencyHireAgent = /*#__PURE__*/ createUseWriteContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'hireAgent',
 })
 
@@ -1478,6 +1513,7 @@ export const useWriteAgencyHireAgent = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteAgencySetAuthority = /*#__PURE__*/ createUseWriteContract({
   abi: agencyAbi,
+  address: agencyAddress,
   functionName: 'setAuthority',
 })
 
@@ -1486,6 +1522,7 @@ export const useWriteAgencySetAuthority = /*#__PURE__*/ createUseWriteContract({
  */
 export const useSimulateAgency = /*#__PURE__*/ createUseSimulateContract({
   abi: agencyAbi,
+  address: agencyAddress,
 })
 
 /**
@@ -1494,6 +1531,7 @@ export const useSimulateAgency = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateAgencyGuestEntrance =
   /*#__PURE__*/ createUseSimulateContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'GuestEntrance',
   })
 
@@ -1503,6 +1541,7 @@ export const useSimulateAgencyGuestEntrance =
 export const useSimulateAgencyAcceptClient =
   /*#__PURE__*/ createUseSimulateContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'acceptClient',
   })
 
@@ -1512,6 +1551,7 @@ export const useSimulateAgencyAcceptClient =
 export const useSimulateAgencyCreateCopro =
   /*#__PURE__*/ createUseSimulateContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'createCopro',
   })
 
@@ -1521,6 +1561,7 @@ export const useSimulateAgencyCreateCopro =
 export const useSimulateAgencyHireAgent =
   /*#__PURE__*/ createUseSimulateContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'hireAgent',
   })
 
@@ -1530,6 +1571,7 @@ export const useSimulateAgencyHireAgent =
 export const useSimulateAgencySetAuthority =
   /*#__PURE__*/ createUseSimulateContract({
     abi: agencyAbi,
+    address: agencyAddress,
     functionName: 'setAuthority',
   })
 
@@ -1538,6 +1580,7 @@ export const useSimulateAgencySetAuthority =
  */
 export const useWatchAgencyEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: agencyAbi,
+  address: agencyAddress,
 })
 
 /**
@@ -1546,6 +1589,7 @@ export const useWatchAgencyEvent = /*#__PURE__*/ createUseWatchContractEvent({
 export const useWatchAgencyAuthorityUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: agencyAbi,
+    address: agencyAddress,
     eventName: 'AuthorityUpdated',
   })
 
@@ -1555,6 +1599,7 @@ export const useWatchAgencyAuthorityUpdatedEvent =
 export const useWatchAgencyClientAcceptedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: agencyAbi,
+    address: agencyAddress,
     eventName: 'ClientAccepted',
   })
 
@@ -1563,6 +1608,7 @@ export const useWatchAgencyClientAcceptedEvent =
  */
 export const useReadCopro = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
 })
 
 /**
@@ -1570,6 +1616,7 @@ export const useReadCopro = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproAgencyRole = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'AGENCY_ROLE',
 })
 
@@ -1578,6 +1625,7 @@ export const useReadCoproAgencyRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproAgentRole = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'AGENT_ROLE',
 })
 
@@ -1586,6 +1634,7 @@ export const useReadCoproAgentRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproClientRole = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'CLIENT_ROLE',
 })
 
@@ -1594,6 +1643,7 @@ export const useReadCoproClientRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproCoOwnerRole = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'CO_OWNER_ROLE',
 })
 
@@ -1602,6 +1652,7 @@ export const useReadCoproCoOwnerRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproApprove = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'approve',
 })
 
@@ -1610,6 +1661,7 @@ export const useReadCoproApprove = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproAuthority = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'authority',
 })
 
@@ -1618,6 +1670,7 @@ export const useReadCoproAuthority = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'balanceOf',
 })
 
@@ -1626,6 +1679,7 @@ export const useReadCoproBalanceOf = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproFlatCount = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'flatCount',
 })
 
@@ -1634,6 +1688,7 @@ export const useReadCoproFlatCount = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproGetApproved = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'getApproved',
 })
 
@@ -1642,6 +1697,7 @@ export const useReadCoproGetApproved = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproHistory = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'history',
 })
 
@@ -1649,7 +1705,7 @@ export const useReadCoproHistory = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"isApprovedForAll"`
  */
 export const useReadCoproIsApprovedForAll = /*#__PURE__*/ createUseReadContract(
-  { abi: coproAbi, functionName: 'isApprovedForAll' },
+  { abi: coproAbi, address: coproAddress, functionName: 'isApprovedForAll' },
 )
 
 /**
@@ -1658,6 +1714,7 @@ export const useReadCoproIsApprovedForAll = /*#__PURE__*/ createUseReadContract(
 export const useReadCoproIsConsumingScheduledOp =
   /*#__PURE__*/ createUseReadContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'isConsumingScheduledOp',
   })
 
@@ -1666,6 +1723,7 @@ export const useReadCoproIsConsumingScheduledOp =
  */
 export const useReadCoproMarket = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'market',
 })
 
@@ -1674,6 +1732,7 @@ export const useReadCoproMarket = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproName = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'name',
 })
 
@@ -1682,6 +1741,7 @@ export const useReadCoproName = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproOwnerOf = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'ownerOf',
 })
 
@@ -1690,6 +1750,7 @@ export const useReadCoproOwnerOf = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproProposals = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'proposals',
 })
 
@@ -1697,7 +1758,7 @@ export const useReadCoproProposals = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"safeTransferFrom"`
  */
 export const useReadCoproSafeTransferFrom = /*#__PURE__*/ createUseReadContract(
-  { abi: coproAbi, functionName: 'safeTransferFrom' },
+  { abi: coproAbi, address: coproAddress, functionName: 'safeTransferFrom' },
 )
 
 /**
@@ -1706,6 +1767,7 @@ export const useReadCoproSafeTransferFrom = /*#__PURE__*/ createUseReadContract(
 export const useReadCoproSetApprovalForAll =
   /*#__PURE__*/ createUseReadContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'setApprovalForAll',
   })
 
@@ -1715,6 +1777,7 @@ export const useReadCoproSetApprovalForAll =
 export const useReadCoproSupportsInterface =
   /*#__PURE__*/ createUseReadContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'supportsInterface',
   })
 
@@ -1723,6 +1786,7 @@ export const useReadCoproSupportsInterface =
  */
 export const useReadCoproSymbol = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'symbol',
 })
 
@@ -1731,6 +1795,7 @@ export const useReadCoproSymbol = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproTokenUri = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'tokenURI',
 })
 
@@ -1739,6 +1804,7 @@ export const useReadCoproTokenUri = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadCoproTransferFrom = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'transferFrom',
 })
 
@@ -1747,6 +1813,7 @@ export const useReadCoproTransferFrom = /*#__PURE__*/ createUseReadContract({
  */
 export const useWriteCopro = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
+  address: coproAddress,
 })
 
 /**
@@ -1754,6 +1821,7 @@ export const useWriteCopro = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteCoproBuy = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'buy',
 })
 
@@ -1762,6 +1830,7 @@ export const useWriteCoproBuy = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteCoproCancelSale = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'cancelSale',
 })
 
@@ -1771,6 +1840,7 @@ export const useWriteCoproCancelSale = /*#__PURE__*/ createUseWriteContract({
 export const useWriteCoproSafeTransferFrom =
   /*#__PURE__*/ createUseWriteContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'safeTransferFrom',
   })
 
@@ -1779,6 +1849,7 @@ export const useWriteCoproSafeTransferFrom =
  */
 export const useWriteCoproSell = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'sell',
 })
 
@@ -1787,6 +1858,7 @@ export const useWriteCoproSell = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteCoproSetAuthority = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'setAuthority',
 })
 
@@ -1795,6 +1867,7 @@ export const useWriteCoproSetAuthority = /*#__PURE__*/ createUseWriteContract({
  */
 export const useSimulateCopro = /*#__PURE__*/ createUseSimulateContract({
   abi: coproAbi,
+  address: coproAddress,
 })
 
 /**
@@ -1802,6 +1875,7 @@ export const useSimulateCopro = /*#__PURE__*/ createUseSimulateContract({
  */
 export const useSimulateCoproBuy = /*#__PURE__*/ createUseSimulateContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'buy',
 })
 
@@ -1811,6 +1885,7 @@ export const useSimulateCoproBuy = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateCoproCancelSale =
   /*#__PURE__*/ createUseSimulateContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'cancelSale',
   })
 
@@ -1820,6 +1895,7 @@ export const useSimulateCoproCancelSale =
 export const useSimulateCoproSafeTransferFrom =
   /*#__PURE__*/ createUseSimulateContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'safeTransferFrom',
   })
 
@@ -1828,6 +1904,7 @@ export const useSimulateCoproSafeTransferFrom =
  */
 export const useSimulateCoproSell = /*#__PURE__*/ createUseSimulateContract({
   abi: coproAbi,
+  address: coproAddress,
   functionName: 'sell',
 })
 
@@ -1837,6 +1914,7 @@ export const useSimulateCoproSell = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateCoproSetAuthority =
   /*#__PURE__*/ createUseSimulateContract({
     abi: coproAbi,
+    address: coproAddress,
     functionName: 'setAuthority',
   })
 
@@ -1845,6 +1923,7 @@ export const useSimulateCoproSetAuthority =
  */
 export const useWatchCoproEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: coproAbi,
+  address: coproAddress,
 })
 
 /**
@@ -1853,6 +1932,7 @@ export const useWatchCoproEvent = /*#__PURE__*/ createUseWatchContractEvent({
 export const useWatchCoproApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'Approval',
   })
 
@@ -1862,6 +1942,7 @@ export const useWatchCoproApprovalEvent =
 export const useWatchCoproApprovalForAllEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'ApprovalForAll',
   })
 
@@ -1871,6 +1952,7 @@ export const useWatchCoproApprovalForAllEvent =
 export const useWatchCoproAuthorityUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'AuthorityUpdated',
   })
 
@@ -1880,6 +1962,7 @@ export const useWatchCoproAuthorityUpdatedEvent =
 export const useWatchCoproConsecutiveTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'ConsecutiveTransfer',
   })
 
@@ -1889,6 +1972,7 @@ export const useWatchCoproConsecutiveTransferEvent =
 export const useWatchCoproFlatMintedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'FlatMinted',
   })
 
@@ -1898,6 +1982,7 @@ export const useWatchCoproFlatMintedEvent =
 export const useWatchCoproFlatRecoveredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'FlatRecovered',
   })
 
@@ -1907,6 +1992,7 @@ export const useWatchCoproFlatRecoveredEvent =
 export const useWatchCoproTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
+    address: coproAddress,
     eventName: 'Transfer',
   })
 
@@ -1915,6 +2001,7 @@ export const useWatchCoproTransferEvent =
  */
 export const useReadManager = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
 })
 
 /**
@@ -1922,6 +2009,7 @@ export const useReadManager = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerAdminRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'ADMIN_ROLE',
 })
 
@@ -1930,6 +2018,7 @@ export const useReadManagerAdminRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerAgencyRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'AGENCY_ROLE',
 })
 
@@ -1938,6 +2027,7 @@ export const useReadManagerAgencyRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerAgentRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'AGENT_ROLE',
 })
 
@@ -1946,6 +2036,7 @@ export const useReadManagerAgentRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerClientRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'CLIENT_ROLE',
 })
 
@@ -1954,6 +2045,7 @@ export const useReadManagerClientRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerCoOwnerRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'CO_OWNER_ROLE',
 })
 
@@ -1962,6 +2054,7 @@ export const useReadManagerCoOwnerRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerPublicRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'PUBLIC_ROLE',
 })
 
@@ -1970,6 +2063,7 @@ export const useReadManagerPublicRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerCanCall = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'canCall',
 })
 
@@ -1978,6 +2072,7 @@ export const useReadManagerCanCall = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerExpiration = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'expiration',
 })
 
@@ -1986,6 +2081,7 @@ export const useReadManagerExpiration = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerGetAccess = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'getAccess',
 })
 
@@ -1994,6 +2090,7 @@ export const useReadManagerGetAccess = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerGetNonce = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'getNonce',
 })
 
@@ -2002,6 +2099,7 @@ export const useReadManagerGetNonce = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerGetRoleAdmin = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'getRoleAdmin',
 })
 
@@ -2011,6 +2109,7 @@ export const useReadManagerGetRoleAdmin = /*#__PURE__*/ createUseReadContract({
 export const useReadManagerGetRoleGrantDelay =
   /*#__PURE__*/ createUseReadContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'getRoleGrantDelay',
   })
 
@@ -2020,6 +2119,7 @@ export const useReadManagerGetRoleGrantDelay =
 export const useReadManagerGetRoleGuardian =
   /*#__PURE__*/ createUseReadContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'getRoleGuardian',
   })
 
@@ -2028,6 +2128,7 @@ export const useReadManagerGetRoleGuardian =
  */
 export const useReadManagerGetSchedule = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'getSchedule',
 })
 
@@ -2037,6 +2138,7 @@ export const useReadManagerGetSchedule = /*#__PURE__*/ createUseReadContract({
 export const useReadManagerGetTargetAdminDelay =
   /*#__PURE__*/ createUseReadContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'getTargetAdminDelay',
   })
 
@@ -2046,6 +2148,7 @@ export const useReadManagerGetTargetAdminDelay =
 export const useReadManagerGetTargetFunctionRole =
   /*#__PURE__*/ createUseReadContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'getTargetFunctionRole',
   })
 
@@ -2054,6 +2157,7 @@ export const useReadManagerGetTargetFunctionRole =
  */
 export const useReadManagerHasRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'hasRole',
 })
 
@@ -2062,6 +2166,7 @@ export const useReadManagerHasRole = /*#__PURE__*/ createUseReadContract({
  */
 export const useReadManagerHashOperation = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'hashOperation',
 })
 
@@ -2069,7 +2174,7 @@ export const useReadManagerHashOperation = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"isTargetClosed"`
  */
 export const useReadManagerIsTargetClosed = /*#__PURE__*/ createUseReadContract(
-  { abi: managerAbi, functionName: 'isTargetClosed' },
+  { abi: managerAbi, address: managerAddress, functionName: 'isTargetClosed' },
 )
 
 /**
@@ -2077,6 +2182,7 @@ export const useReadManagerIsTargetClosed = /*#__PURE__*/ createUseReadContract(
  */
 export const useReadManagerMinSetback = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'minSetback',
 })
 
@@ -2085,6 +2191,7 @@ export const useReadManagerMinSetback = /*#__PURE__*/ createUseReadContract({
  */
 export const useWriteManager = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
 })
 
 /**
@@ -2092,6 +2199,7 @@ export const useWriteManager = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerAddAgency = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'addAgency',
 })
 
@@ -2100,6 +2208,7 @@ export const useWriteManagerAddAgency = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerAddAgent = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'addAgent',
 })
 
@@ -2108,6 +2217,7 @@ export const useWriteManagerAddAgent = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerAddCopro = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'addCopro',
 })
 
@@ -2116,6 +2226,7 @@ export const useWriteManagerAddCopro = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerCancel = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'cancel',
 })
 
@@ -2125,6 +2236,7 @@ export const useWriteManagerCancel = /*#__PURE__*/ createUseWriteContract({
 export const useWriteManagerConsumeScheduledOp =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'consumeScheduledOp',
   })
 
@@ -2133,6 +2245,7 @@ export const useWriteManagerConsumeScheduledOp =
  */
 export const useWriteManagerExecute = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'execute',
 })
 
@@ -2141,6 +2254,7 @@ export const useWriteManagerExecute = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerGrantRole = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'grantRole',
 })
 
@@ -2149,6 +2263,7 @@ export const useWriteManagerGrantRole = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerLabelRole = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'labelRole',
 })
 
@@ -2157,6 +2272,7 @@ export const useWriteManagerLabelRole = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerMulticall = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'multicall',
 })
 
@@ -2164,7 +2280,7 @@ export const useWriteManagerMulticall = /*#__PURE__*/ createUseWriteContract({
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"renounceRole"`
  */
 export const useWriteManagerRenounceRole = /*#__PURE__*/ createUseWriteContract(
-  { abi: managerAbi, functionName: 'renounceRole' },
+  { abi: managerAbi, address: managerAddress, functionName: 'renounceRole' },
 )
 
 /**
@@ -2172,6 +2288,7 @@ export const useWriteManagerRenounceRole = /*#__PURE__*/ createUseWriteContract(
  */
 export const useWriteManagerRevokeRole = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'revokeRole',
 })
 
@@ -2180,6 +2297,7 @@ export const useWriteManagerRevokeRole = /*#__PURE__*/ createUseWriteContract({
  */
 export const useWriteManagerSchedule = /*#__PURE__*/ createUseWriteContract({
   abi: managerAbi,
+  address: managerAddress,
   functionName: 'schedule',
 })
 
@@ -2189,6 +2307,7 @@ export const useWriteManagerSchedule = /*#__PURE__*/ createUseWriteContract({
 export const useWriteManagerSetGrantDelay =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setGrantDelay',
   })
 
@@ -2196,7 +2315,7 @@ export const useWriteManagerSetGrantDelay =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"setRoleAdmin"`
  */
 export const useWriteManagerSetRoleAdmin = /*#__PURE__*/ createUseWriteContract(
-  { abi: managerAbi, functionName: 'setRoleAdmin' },
+  { abi: managerAbi, address: managerAddress, functionName: 'setRoleAdmin' },
 )
 
 /**
@@ -2205,6 +2324,7 @@ export const useWriteManagerSetRoleAdmin = /*#__PURE__*/ createUseWriteContract(
 export const useWriteManagerSetRoleGuardian =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setRoleGuardian',
   })
 
@@ -2214,6 +2334,7 @@ export const useWriteManagerSetRoleGuardian =
 export const useWriteManagerSetTargetAdminDelay =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetAdminDelay',
   })
 
@@ -2223,6 +2344,7 @@ export const useWriteManagerSetTargetAdminDelay =
 export const useWriteManagerSetTargetClosed =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetClosed',
   })
 
@@ -2232,6 +2354,7 @@ export const useWriteManagerSetTargetClosed =
 export const useWriteManagerSetTargetFunctionRole =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetFunctionRole',
   })
 
@@ -2241,6 +2364,7 @@ export const useWriteManagerSetTargetFunctionRole =
 export const useWriteManagerUpdateAuthority =
   /*#__PURE__*/ createUseWriteContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'updateAuthority',
   })
 
@@ -2249,6 +2373,7 @@ export const useWriteManagerUpdateAuthority =
  */
 export const useSimulateManager = /*#__PURE__*/ createUseSimulateContract({
   abi: managerAbi,
+  address: managerAddress,
 })
 
 /**
@@ -2257,6 +2382,7 @@ export const useSimulateManager = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateManagerAddAgency =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'addAgency',
   })
 
@@ -2266,6 +2392,7 @@ export const useSimulateManagerAddAgency =
 export const useSimulateManagerAddAgent =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'addAgent',
   })
 
@@ -2275,6 +2402,7 @@ export const useSimulateManagerAddAgent =
 export const useSimulateManagerAddCopro =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'addCopro',
   })
 
@@ -2282,7 +2410,7 @@ export const useSimulateManagerAddCopro =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"cancel"`
  */
 export const useSimulateManagerCancel = /*#__PURE__*/ createUseSimulateContract(
-  { abi: managerAbi, functionName: 'cancel' },
+  { abi: managerAbi, address: managerAddress, functionName: 'cancel' },
 )
 
 /**
@@ -2291,6 +2419,7 @@ export const useSimulateManagerCancel = /*#__PURE__*/ createUseSimulateContract(
 export const useSimulateManagerConsumeScheduledOp =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'consumeScheduledOp',
   })
 
@@ -2300,6 +2429,7 @@ export const useSimulateManagerConsumeScheduledOp =
 export const useSimulateManagerExecute =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'execute',
   })
 
@@ -2309,6 +2439,7 @@ export const useSimulateManagerExecute =
 export const useSimulateManagerGrantRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'grantRole',
   })
 
@@ -2318,6 +2449,7 @@ export const useSimulateManagerGrantRole =
 export const useSimulateManagerLabelRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'labelRole',
   })
 
@@ -2327,6 +2459,7 @@ export const useSimulateManagerLabelRole =
 export const useSimulateManagerMulticall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'multicall',
   })
 
@@ -2336,6 +2469,7 @@ export const useSimulateManagerMulticall =
 export const useSimulateManagerRenounceRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'renounceRole',
   })
 
@@ -2345,6 +2479,7 @@ export const useSimulateManagerRenounceRole =
 export const useSimulateManagerRevokeRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'revokeRole',
   })
 
@@ -2354,6 +2489,7 @@ export const useSimulateManagerRevokeRole =
 export const useSimulateManagerSchedule =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'schedule',
   })
 
@@ -2363,6 +2499,7 @@ export const useSimulateManagerSchedule =
 export const useSimulateManagerSetGrantDelay =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setGrantDelay',
   })
 
@@ -2372,6 +2509,7 @@ export const useSimulateManagerSetGrantDelay =
 export const useSimulateManagerSetRoleAdmin =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setRoleAdmin',
   })
 
@@ -2381,6 +2519,7 @@ export const useSimulateManagerSetRoleAdmin =
 export const useSimulateManagerSetRoleGuardian =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setRoleGuardian',
   })
 
@@ -2390,6 +2529,7 @@ export const useSimulateManagerSetRoleGuardian =
 export const useSimulateManagerSetTargetAdminDelay =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetAdminDelay',
   })
 
@@ -2399,6 +2539,7 @@ export const useSimulateManagerSetTargetAdminDelay =
 export const useSimulateManagerSetTargetClosed =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetClosed',
   })
 
@@ -2408,6 +2549,7 @@ export const useSimulateManagerSetTargetClosed =
 export const useSimulateManagerSetTargetFunctionRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'setTargetFunctionRole',
   })
 
@@ -2417,6 +2559,7 @@ export const useSimulateManagerSetTargetFunctionRole =
 export const useSimulateManagerUpdateAuthority =
   /*#__PURE__*/ createUseSimulateContract({
     abi: managerAbi,
+    address: managerAddress,
     functionName: 'updateAuthority',
   })
 
@@ -2425,6 +2568,7 @@ export const useSimulateManagerUpdateAuthority =
  */
 export const useWatchManagerEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: managerAbi,
+  address: managerAddress,
 })
 
 /**
@@ -2433,6 +2577,7 @@ export const useWatchManagerEvent = /*#__PURE__*/ createUseWatchContractEvent({
 export const useWatchManagerOperationCanceledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'OperationCanceled',
   })
 
@@ -2442,6 +2587,7 @@ export const useWatchManagerOperationCanceledEvent =
 export const useWatchManagerOperationExecutedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'OperationExecuted',
   })
 
@@ -2451,6 +2597,7 @@ export const useWatchManagerOperationExecutedEvent =
 export const useWatchManagerOperationScheduledEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'OperationScheduled',
   })
 
@@ -2460,6 +2607,7 @@ export const useWatchManagerOperationScheduledEvent =
 export const useWatchManagerRoleAdminChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleAdminChanged',
   })
 
@@ -2469,6 +2617,7 @@ export const useWatchManagerRoleAdminChangedEvent =
 export const useWatchManagerRoleGrantDelayChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleGrantDelayChanged',
   })
 
@@ -2478,6 +2627,7 @@ export const useWatchManagerRoleGrantDelayChangedEvent =
 export const useWatchManagerRoleGrantedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleGranted',
   })
 
@@ -2487,6 +2637,7 @@ export const useWatchManagerRoleGrantedEvent =
 export const useWatchManagerRoleGuardianChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleGuardianChanged',
   })
 
@@ -2496,6 +2647,7 @@ export const useWatchManagerRoleGuardianChangedEvent =
 export const useWatchManagerRoleLabelEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleLabel',
   })
 
@@ -2505,6 +2657,7 @@ export const useWatchManagerRoleLabelEvent =
 export const useWatchManagerRoleRevokedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'RoleRevoked',
   })
 
@@ -2514,6 +2667,7 @@ export const useWatchManagerRoleRevokedEvent =
 export const useWatchManagerTargetAdminDelayUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'TargetAdminDelayUpdated',
   })
 
@@ -2523,6 +2677,7 @@ export const useWatchManagerTargetAdminDelayUpdatedEvent =
 export const useWatchManagerTargetClosedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'TargetClosed',
   })
 
@@ -2532,5 +2687,6 @@ export const useWatchManagerTargetClosedEvent =
 export const useWatchManagerTargetFunctionRoleUpdatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: managerAbi,
+    address: managerAddress,
     eventName: 'TargetFunctionRoleUpdated',
   })

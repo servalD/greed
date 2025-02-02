@@ -23,7 +23,6 @@ contract ManagerTest is Test, IRoleDefinition {
         vm.deal(admin, 100 ether);
         vm.deal(agent, 100 ether);
         vm.deal(buyer, 100 ether);
-        vm.deal(promoter, 100 ether);
 
         // Déployer le Manager avec admin comme initialAdmin
         vm.prank(admin);
