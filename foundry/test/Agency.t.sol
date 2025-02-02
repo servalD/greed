@@ -23,7 +23,6 @@ contract AgencyTest is Test,IRoleDefinition {
         vm.deal(admin, 100 ether);
         vm.deal(agent, 100 ether);
         vm.deal(guest, 100 ether);
-        vm.deal(promoter, 100 ether);
 
         // Déployer le Manager avec admin comme initialAdmin
         vm.prank(admin);
@@ -31,7 +30,7 @@ contract AgencyTest is Test,IRoleDefinition {
 
         // Déployer l'Agency en lui passant le Manager
         vm.prank(admin);
-        agency = new Agency(manager);
+        agency = new Agency(manager, safeAddress);
     }
 
     function testHireAgent() public {
@@ -103,7 +102,7 @@ contract AgencyTest is Test,IRoleDefinition {
         string memory symbol = "TC";
         uint96 flatCount = 5;
         vm.prank(admin);
-        agency.createCopro(name, symbol, flatCount, safeAddress, promoter);
+        agency.createCopro(name, symbol, flatCount, promoter);
         assertEq(agency.nbListedCopro(), 1);// Il doit y avoir 1 copro créé
 
         // Vérifier les getters

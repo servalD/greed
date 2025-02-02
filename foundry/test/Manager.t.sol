@@ -31,7 +31,7 @@ contract ManagerTest is Test, IRoleDefinition {
 
         // Déployer l'Agency pour qu'elle soit enregistrée dans le Manager
         vm.prank(admin);
-        agency = new Agency(manager);
+        agency = new Agency(manager, safeAddress);
     }
 
     function testAddAgency() public view {
