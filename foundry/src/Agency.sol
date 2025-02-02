@@ -71,7 +71,7 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @dev Guests are validated later to become clients. Reverts if the caller is already a client.
      */
     function GuestEntrance() public {
-        (bool isClient, uint32 delay) = manager.hasRole(CLIENT_ROLE, msg.sender);
+        (bool isClient, ) = manager.hasRole(CLIENT_ROLE, msg.sender);
         if (isClient) {
             revert AlreadyClient();
         }
@@ -131,11 +131,11 @@ contract Agency is AccessManaged, IRoleDefinition {
     function getCoproByName(
         string memory name
     ) public view returns (Copro) {
+        // Unable to detect missing branch in test coverage !!!
+        bytes32 encodedName = keccak256(abi.encodePacked(name));
         for (uint256 i = 0; i < nbListedCopro; i++) {
-            if (
-                keccak256(abi.encodePacked(copros[i].name())) ==
-                keccak256(abi.encodePacked(name))
-            ) {
+            bytes32 encodedCoproName = keccak256(abi.encodePacked(copros[i].name()));
+            if (encodedCoproName == encodedName) {
                 return copros[i];
             }
         }

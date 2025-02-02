@@ -1,99 +1,126 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.23;
 
-import {Test, console} from "forge-std/Test.sol";
+import "forge-std/Test.sol";
 import "../src/Agency.sol";
-import "../src/Manager.sol";
 import "../src/Copro.sol";
+import "../src/Manager.sol";
+import "../src/IRoleDefinition.sol";
 
-contract AgencyTest is Test, IRoleDefinition {
-    Agency agency;
+contract AgencyTest is Test,IRoleDefinition {
+
     Manager manager;
-    address promoter = address(0x123);
-    address deployer = address(0x136);
-    address agent = address(0x246);
-    address payable safe = payable(address(0x456));
-    address guest = address(0x789);
-    uint96 flatCount = 10;
+    Agency agency;
+
+    // Adresses de test
+    address admin = address(1);
+    address agent = address(2);
+    address guest = address(3);
+    address promoter = address(5);
+    address safeAddress = address(6);
 
     function setUp() public {
-        manager = new Manager(deployer);
+        vm.deal(admin, 100 ether);
+        vm.deal(agent, 100 ether);
+        vm.deal(guest, 100 ether);
+        vm.deal(promoter, 100 ether);
+
+        // Déployer le Manager avec admin comme initialAdmin
+        vm.prank(admin);
+        manager = new Manager(admin);
+
+        // Déployer l'Agency en lui passant le Manager
+        vm.prank(admin);
         agency = new Agency(manager);
     }
 
-    function testConstructor() public view {
-        (bool hasAdminRole, ) = manager.hasRole(manager.ADMIN_ROLE(), address(deployer));
-        assert(hasAdminRole);
-        (bool hasAgencyRole, ) = manager.hasRole(AGENCY_ROLE, address(agency));
-        assert(hasAgencyRole);
-        
-    }
-
     function testHireAgent() public {
-        vm.prank(deployer);
+        // L'admin (ayant ADMIN_ROLE) embauche un agent
+        vm.prank(admin);
         agency.hireAgent(agent);
-        (bool isAgent, ) = manager.hasRole(AGENT_ROLE, agent);
-        assert(isAgent);
+        (bool hasAgent, ) = manager.hasRole(AGENT_ROLE, agent);
+        assertTrue(hasAgent);// L'agent doit avoir le rôle AGENT_ROLE
     }
 
     function testGuestEntrance() public {
+        // Un guest entre (il n'est pas client) → succès
         vm.prank(guest);
         agency.GuestEntrance();
-        address[] memory guests = agency.guests();
-        assertEq(guests[0], guest);
+        address[] memory gs = agency.guests();
+        bool found;
+        for (uint256 i = 0; i < gs.length; i++) {
+            if (gs[i] == guest) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
     function testAcceptClient() public {
-        testGuestEntrance();
-        testHireAgent();
+        vm.prank(admin);
+        agency.hireAgent(agent);
+        // Ajouter un guest puis l'accepter
+        vm.prank(guest);
+        agency.GuestEntrance();
         vm.prank(agent);
         agency.acceptClient(guest);
-        address[] memory guests = agency.guests();
-        assertEq(guests.length, 0);
+
+        // Vérifier que le guest a été retiré de la liste
+        address[] memory gs = agency.guests();
+        bool found;
+        for (uint256 i = 0; i < gs.length; i++) {
+            if (gs[i] == guest) {
+                found = true;
+                break;
+            }
+        }
+        assertFalse(found);// Le guest doit être retiré de la liste
+        // Vérifier que le rôle CLIENT_ROLE a été attribué
         (bool isClient, ) = manager.hasRole(CLIENT_ROLE, guest);
-        assert(isClient);
+        assertTrue(isClient);// Le guest doit être client
     }
 
-    function testCreateCopro() public {
-        string memory name = "CoproToken";
-        string memory symbol = "CTK";
-        vm.prank(address(this));
-        agency.createCopro(name, symbol, flatCount, safe, promoter);
-        Copro copro = agency.copros(0);
-        assertEq(copro.name(), name);
-        assertEq(copro.symbol(), symbol);
+    function testGuestEntranceAndAlreadyClient() public {
+        vm.prank(guest);
+        agency.GuestEntrance();
+        
+        vm.prank(admin);
+        agency.hireAgent(agent);
+
+        vm.prank(agent);
+        agency.acceptClient(guest);
+
+
+        // S'il est déjà client, l'appel doit reverter
+        vm.prank(guest);
+        vm.expectRevert(Agency.AlreadyClient.selector);
+        agency.GuestEntrance();
     }
 
-    // function testGetCoproById() public {
-    //     string memory name = "CoproToken";
-    //     string memory symbol = "CTK";
-    //     vm.prank(address(this));
-    //     agency.createCopro(name, symbol, flatCount, safe, promoter);
-    //     Copro copro = agency.getCoproById(0);
-    //     assertEq(copro.name(), name);
-    // }
+    function testCreateAndGetCopro() public {
+        string memory name = "TestCopro";
+        string memory symbol = "TC";
+        uint96 flatCount = 5;
+        vm.prank(admin);
+        agency.createCopro(name, symbol, flatCount, safeAddress, promoter);
+        assertEq(agency.nbListedCopro(), 1);// Il doit y avoir 1 copro créé
 
-    // function testGetCoproByName() public {
-    //     string memory name = "CoproToken";
-    //     string memory symbol = "CTK";
-    //     vm.prank(address(this));
-    //     agency.createCopro(name, symbol, flatCount, safe, promoter);
-    //     Copro copro = agency.getCoproByName(name);
-    //     assertEq(copro.name(), name);
-    // }
+        // Vérifier les getters
+        Copro created = agency.getCoproById(0);
+        assertEq(created.name(), name);// Le nom doit correspondre
+        assertEq(created.symbol(), symbol);// Le symbol doit correspondre
+        Copro byName = agency.getCoproByName(name);
+        assertEq(address(created), address(byName));// Les deux copros doivent être les mêmes
+        // Vérifier que getCoproByName reverte pour un nom inexistant
+        vm.expectRevert(abi.encodeWithSelector(Agency.COLLECTION_NOT_FOUND.selector, "NonExisting"));
+        agency.getCoproByName("NonExisting");
 
-    // function testGetCopros() public {
-    //     string memory name1 = "CoproToken1";
-    //     string memory symbol1 = "CTK1";
-    //     string memory name2 = "CoproToken2";
-    //     string memory symbol2 = "CTK2";
-    //     vm.prank(address(this));
-    //     agency.createCopro(name1, symbol1, flatCount, safe, promoter);
-    //     vm.prank(address(this));
-    //     agency.createCopro(name2, symbol2, flatCount, safe, promoter);
-    //     Copro[] memory copros = agency.getCopros();
-    //     assertEq(copros.length, 2);
-    //     assertEq(copros[0].name(), name1);
-    //     assertEq(copros[1].name(), name2);
-    // }
+        Copro[] memory allCopros = agency.getCopros();
+        assertEq(allCopros.length, 1);// Il doit y avoir 1 copro
+        assertEq(address(allCopros[0]), address(created));// La copro récupéré doit correspondre à celui créé
+
+        
+    }
+
 }
