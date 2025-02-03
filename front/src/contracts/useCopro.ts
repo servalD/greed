@@ -12,13 +12,13 @@ export const useCopro = (contractAddress: `0x${string}`) => {
 
   useEffect(() => {
     if (txHash && isConfirmed) {
-      ErrorService.infoMessage("Acheter", "L'achat a été effectué avec succès !");
+      ErrorService.successMessage("Acheter", "L'achat a été effectué avec succès !");
     }
   }, [isConfirmed, txHash]);
 
   const buy = async (id: number) => {
     if (localStorage.getItem("role") === "guest") {
-      ErrorService.mixinMessage("Vous n'avez pas les droits pour acheter", "error");
+      ErrorService.mixinMessage("You don't have the rights", "error");
       return;
     }
 

@@ -20,8 +20,8 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
     if (connectionStatus === "connected") {
       switchChain(sepolia);
     }
-    setRole("agent");
-    localStorage.setItem("role", "agent");
+    setRole("guest");
+    localStorage.setItem("role", "guest");
   }, [connectionStatus]);
 
   return (
