@@ -10,7 +10,6 @@ export default function List({ images }: { images: Images[] }) {
   const { isConnected } = useAccount();
   const contractAddress = "0x574EAB16A1B1A94605bb7214b0518aCEf817f6a9";
 
-  // Utilisation du hook useCopro
   const { buy, isPending, minted } = useCopro(contractAddress);
 
   return (
