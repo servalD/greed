@@ -9,7 +9,7 @@ export default function GuestOrClient() {
     console.log(coproAddress, error, isFetched, isLoadingError)
     return (
         <main>
-            {isFetched && <List images={coproAddress.map((_: Address, index: number) => images[index])} />}
+            {isFetched && coproAddress && <List images={coproAddress.map((_: Address, index: number) => images[index])} />}
         </main>
       );
 
