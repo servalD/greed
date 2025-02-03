@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
-import { coproAbi } from "@/contracts/generatedContracts";
+import { useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { ErrorService } from "@/service/error.service";
+import { useWriteCoproBuy } from "./generatedContracts";
 
-export const useCopro = (contractAddress: `0x${string}`) => {
-  const { data: hash, isPending, writeContractAsync } = useWriteContract();
-  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+export const useCopro = () => {
   const { isConnected, connector } = useAccount();
+  const { writeContractAsync, data: hash, isPending } = useWriteCoproBuy();
+  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
   const [txHash, setTxHash] = useState<string | null>(null);
   const [minted, setMinted] = useState<number[]>([]);
 
@@ -29,12 +30,7 @@ export const useCopro = (contractAddress: `0x${string}`) => {
     ErrorService.mixinMessage(`Minting NFT for image ID: ${id}`, "info");
 
     try {
-      const tx = await writeContractAsync({
-        address: contractAddress,
-        abi: coproAbi,
-        functionName: "buy",
-        args: [BigInt(0)],
-      });
+      const tx = await writeContractAsync({ args: [BigInt(id)] });
 
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);

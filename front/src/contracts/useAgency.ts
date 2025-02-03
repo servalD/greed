@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
-import { agencyAbi } from "@/contracts/generatedContracts";
+import { useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { ErrorService } from "@/service/error.service";
+import { useWriteAgencyGuestEntrance } from "./generatedContracts";
 
-export const useAgency = (contractAddress: `0x${string}`) => {
-  const { data: hash, isPending, writeContractAsync } = useWriteContract();
-  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+export const useAgency = () => {
   const { isConnected, connector } = useAccount();
+  const { writeContractAsync, data: hash, isPending } = useWriteAgencyGuestEntrance();
+  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
   const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,13 +22,7 @@ export const useAgency = (contractAddress: `0x${string}`) => {
     }
 
     try {
-      const tx = await writeContractAsync({
-        address: contractAddress,
-        abi: agencyAbi,
-        functionName: "GuestEntrance",
-        args: [],
-      });
-
+      const tx = await writeContractAsync({});
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
     } catch (err: any) {

@@ -7,10 +7,8 @@ import { useAccount } from "wagmi";
 import { useCopro } from "@/contracts/useCopro";
 
 export default function List({ images }: { images: Images[] }) {
-  const { isConnected } = useAccount();
-  const contractAddress = "0x574EAB16A1B1A94605bb7214b0518aCEf817f6a9";
 
-  const { buy, isPending, minted } = useCopro(contractAddress);
+  const { buy, isPending, minted } = useCopro();
 
   return (
     <div className="bg-gray-900 min-h-screen py-8">
