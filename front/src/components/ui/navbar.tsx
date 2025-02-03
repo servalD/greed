@@ -5,10 +5,17 @@ import { client } from "../../app/client";
 import { sepolia } from "thirdweb/chains";
 import { useEffect, useState } from "react";
 import { ErrorService } from "@/service/error.service";
+import { useWaitForTransactionReceipt, useWriteContract, useAccount } from 'wagmi';
+import { agencyAbi } from "@/contracts/generatedContracts";
 
 export default function Navbar({connectionStatus}: {connectionStatus: string}) {
+
+  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+  const { isSuccess: isConfirmed} = useWaitForTransactionReceipt({ hash });
+  const {isConnected, connector, address} = useAccount();
   const switchChain = useSwitchActiveWalletChain();
   const [role, setRole] = useState<string>();
+  const contractAddress = '0xA662Ed93e6960a3cfd878cF58206fa71f93efe75'
 
   useEffect(() => {
     if (connectionStatus === "connected") switchChain(sepolia);
@@ -16,8 +23,31 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
     localStorage.setItem('role', 'guest')
   }, [connectionStatus])
 
-  function handleJoin() {
-    ErrorService.infoMessage('Rejoindre', 'Votre demande a bien été soumise')
+  async function handleJoin() {
+
+    if (!isConnected) {
+      await connector?.connect();
+    }
+
+    try {
+
+      const tx = writeContractAsync({
+        address: contractAddress,
+        abi: agencyAbi,
+        functionName: 'GuestEntrance',
+        args: []
+      })
+
+      await isConfirmed;
+
+      if (isConfirmed) {
+        ErrorService.infoMessage('Rejoindre', 'Votre demande a bien été soumise')
+    }
+
+    } catch (err: any) {
+      console.log(err)
+    }
+  
   }
 
   return (
