@@ -6,7 +6,7 @@ export interface AddCoproDialogProps {
     propertyData: {
       name: string;
       symbol: string;
-      apartments: string;
-      promoterAddress: string;
+      flatCount: number;
+      promoter: string;
     };
 }

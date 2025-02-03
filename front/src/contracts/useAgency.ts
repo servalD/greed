@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
 import { useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { ErrorService } from "@/service/error.service";
-import { useWriteAgencyGuestEntrance } from "./generatedContracts";
+import { useWriteAgencyGuestEntrance, useWriteAgencyCreateCopro } from "./generatedContracts";
+import { Address } from "viem";
 
 export const useAgency = () => {
   const { isConnected, connector } = useAccount();
-  const { writeContractAsync, data: hash, isPending } = useWriteAgencyGuestEntrance();
-  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+  const { writeContractAsync: WriteGuest, data: hashGuest, isPending: isPendingGuest } = useWriteAgencyGuestEntrance();
+  const { writeContractAsync: WriteCreateCopro, data: hashCopro, isPending: isPendingCopro } = useWriteAgencyCreateCopro();
+  const { isSuccess: isConfirmedGuest } = useWaitForTransactionReceipt({ hash: hashGuest });
+  const { isSuccess: isConfirmedCopro } = useWaitForTransactionReceipt({ hash: hashCopro });
 
   const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
-    if (txHash && isConfirmed) {
+    if (txHash && isConfirmedGuest) {
       ErrorService.infoMessage("Rejoindre", "Votre demande a bien été soumise");
+    } else if (txHash && isConfirmedCopro) {
+        ErrorService.infoMessage("Creation", "Copro créée");
     }
-  }, [isConfirmed, txHash]);
+  }, [isConfirmedGuest, isConfirmedCopro, txHash]);
 
   const guestEntrance = async () => {
     if (!isConnected) {
@@ -22,7 +27,7 @@ export const useAgency = () => {
     }
 
     try {
-      const tx = await writeContractAsync({});
+      const tx = await WriteGuest({});
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
     } catch (err: any) {
@@ -30,5 +35,20 @@ export const useAgency = () => {
     }
   };
 
-  return { guestEntrance, isPending };
+  const createCopro = async (name: string, symbol: string, flatCount: number, promoter: Address) => {
+    if (!isConnected) {
+        await connector?.connect();
+    }
+
+    try {
+        const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter] })
+        console.log("Transaction envoyée:", tx);
+        setTxHash(tx);
+    } catch (err: any) {
+        console.error("Erreur lors de la transaction:", err);
+    }
+
+  }
+
+  return { guestEntrance, isPendingGuest, createCopro, isPendingCopro };
 };
