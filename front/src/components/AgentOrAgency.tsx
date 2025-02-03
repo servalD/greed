@@ -3,6 +3,8 @@ import { Button, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import MUIDataTable from 'mui-datatables';
 import AddCoproDialog from './dialog/AddCopro';
 import { ErrorService } from '@/service/error.service';
+import { Address } from 'viem';
+import { useAgency } from '@/contracts/useAgency';
 
 const darkTheme = createTheme({
   palette: {
@@ -22,9 +24,11 @@ const AgentOrAgency = () => {
   const [propertyData, setPropertyData] = useState({
     name: '',
     symbol: '',
-    apartments: '',
-    promoterAddress: '',
+    flatCount: 0,
+    promoter: '',
   });
+
+  const { createCopro, isPendingCopro } = useAgency();
 
   const guestData = [
     { id: 1, name: 'Alice Dupont', email: 'alice.dupont@example.com' },
@@ -81,10 +85,21 @@ const AgentOrAgency = () => {
     setPropertyData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    ErrorService.mixinMessage("Nouveau bien ajouté", "success");
-    setPropertyData({ name: '', symbol: '', apartments: '', promoterAddress: '' });
-    handleClose();
+  const handleSubmit = async () => {
+    try {
+      await createCopro(
+        propertyData.name,
+        propertyData.symbol,
+        Number(propertyData.flatCount),
+        propertyData.promoter as Address
+      );
+
+      setPropertyData({ name: '', symbol: '', flatCount: 0, promoter: '' });
+      handleClose();
+    } catch (error) {
+      ErrorService.mixinMessage('Erreur lors de la création du bien', 'error');
+      console.error(error);
+    }
   };
 
   const handleAccept = (id : number) => ErrorService.mixinMessage("L'invité a été accepté", "success");
@@ -96,8 +111,8 @@ const AgentOrAgency = () => {
       <CssBaseline />
       <div className="min-h-screen p-8" style={{ backgroundColor: darkTheme.palette.background.default, color: darkTheme.palette.text.primary }}>
         <h1 className="text-2xl font-bold mb-4">Agent's dashboard</h1>
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          Add a new Copro
+        <Button variant="contained" color="primary" onClick={handleClickOpen} disabled={isPendingCopro}>
+          {isPendingCopro ? "Création..." : "Add a new Copro"}
         </Button>
 
         <AddCoproDialog

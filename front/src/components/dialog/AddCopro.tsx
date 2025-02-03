@@ -7,13 +7,13 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
     <Dialog open={open} onClose={handleClose} sx={{ "& .MuiPaper-root": { backgroundColor: "#2E2E2E", color: "#fff" } }}>
       <DialogTitle>Add a new Copro</DialogTitle>
       <DialogContent>
-        {["name", "symbol", "apartments", "promoterAddress"].map((field) => (
+        {["name", "symbol", "flatCount", "promoter"].map((field) => (
           <TextField
             key={field}
             margin="dense"
             name={field}
-            label={field === "apartments" ? "Nombre d'appartements" : field.charAt(0).toUpperCase() + field.slice(1)}
-            type={field === "apartments" ? "number" : "text"}
+            label={field === "flatCount" ? "Nombre d'appartements" : field.charAt(0).toUpperCase() + field.slice(1)}
+            type={field === "flatCount" ? "number" : "text"}
             fullWidth
             variant="outlined"
             InputLabelProps={{ style: { color: '#bbb' } }}

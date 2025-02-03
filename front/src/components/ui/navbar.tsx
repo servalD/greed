@@ -13,7 +13,7 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
   const [role, setRole] = useState<string>("guest");
   const router = useRouter();
 
-  const { guestEntrance, isPending } = useAgency();
+  const { guestEntrance, isPendingGuest } = useAgency();
 
   useEffect(() => {
     if (connectionStatus === "connected") {
@@ -21,7 +21,7 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
     }
     setRole("agent");
     localStorage.setItem("role", "agent");
-  }, [connectionStatus]);
+  }, [connectionStatus]); 
 
   return (
     <nav className="w-full bg-gray-800 p-4 shadow-md">
@@ -39,9 +39,9 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
             <button
               className="w-full px-4 py-2 text-sm font-medium rounded shadow-md bg-gray-600 text-white hover:bg-gray-700 ml-4"
               onClick={guestEntrance}
-              disabled={isPending}
+              disabled={isPendingGuest}
             >
-              {isPending ? "En attente..." : "Rejoindre"}
+              {isPendingGuest ? "En attente..." : "Rejoindre"}
             </button>
           )}
           {role === "agent" && (
