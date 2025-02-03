@@ -6,10 +6,13 @@ import { sepolia } from "thirdweb/chains";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAgency } from "@/contracts/useAgency";
+import { useReadManagerHasRole } from "@/contracts/generatedContracts";
 
-export default function Navbar({connectionStatus}: {connectionStatus: string}) {
+export default function Navbar({ connectionStatus }: { connectionStatus: string }) {
 
   const switchChain = useSwitchActiveWalletChain();
+  // const { data: isAgent } = useReadManagerHasRole()
+  // const { data: isCalient } = useReadManagerHasRole()
   const [role, setRole] = useState<string>("guest");
   const router = useRouter();
 
@@ -21,7 +24,7 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
     }
     setRole("agent");
     localStorage.setItem("role", "agent");
-  }, [connectionStatus]); 
+  }, [connectionStatus]);
 
   return (
     <nav className="w-full bg-gray-800 p-4 shadow-md">

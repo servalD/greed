@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-abstract contract IRoleDefinition {
+library IRoleDefinition {
     // Role definitions
     uint64 public constant AGENCY_ROLE = 1;
     uint64 public constant AGENT_ROLE = 2;
