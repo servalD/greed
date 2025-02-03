@@ -11,17 +11,16 @@ export default function Navbar({connectionStatus}: {connectionStatus: string}) {
 
   const switchChain = useSwitchActiveWalletChain();
   const [role, setRole] = useState<string>("guest");
-  const contractAddress = '0xA662Ed93e6960a3cfd878cF58206fa71f93efe75';
   const router = useRouter();
 
-  const { guestEntrance, isPending } = useAgency(contractAddress);
+  const { guestEntrance, isPending } = useAgency();
 
   useEffect(() => {
     if (connectionStatus === "connected") {
       switchChain(sepolia);
     }
-    setRole("guest");
-    localStorage.setItem("role", "guest");
+    setRole("agent");
+    localStorage.setItem("role", "agent");
   }, [connectionStatus]);
 
   return (
