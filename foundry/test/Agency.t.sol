@@ -7,8 +7,7 @@ import "../src/Copro.sol";
 import "../src/Manager.sol";
 import "../src/IRoleDefinition.sol";
 
-contract AgencyTest is Test,IRoleDefinition {
-
+contract AgencyTest is Test {
     Manager manager;
     Agency agency;
 
@@ -37,8 +36,8 @@ contract AgencyTest is Test,IRoleDefinition {
         // L'admin (ayant ADMIN_ROLE) embauche un agent
         vm.prank(admin);
         agency.hireAgent(agent);
-        (bool hasAgent, ) = manager.hasRole(AGENT_ROLE, agent);
-        assertTrue(hasAgent);// L'agent doit avoir le rôle AGENT_ROLE
+        (bool hasAgent, ) = manager.hasRole(IRoleDefinition.AGENT_ROLE, agent);
+        assertTrue(hasAgent); // L'agent doit avoir le rôle AGENT_ROLE
     }
 
     function testGuestEntrance() public {
@@ -74,22 +73,21 @@ contract AgencyTest is Test,IRoleDefinition {
                 break;
             }
         }
-        assertFalse(found);// Le guest doit être retiré de la liste
+        assertFalse(found); // Le guest doit être retiré de la liste
         // Vérifier que le rôle CLIENT_ROLE a été attribué
-        (bool isClient, ) = manager.hasRole(CLIENT_ROLE, guest);
-        assertTrue(isClient);// Le guest doit être client
+        (bool isClient, ) = manager.hasRole(IRoleDefinition.CLIENT_ROLE, guest);
+        assertTrue(isClient); // Le guest doit être client
     }
 
     function testGuestEntranceAndAlreadyClient() public {
         vm.prank(guest);
         agency.GuestEntrance();
-        
+
         vm.prank(admin);
         agency.hireAgent(agent);
 
         vm.prank(agent);
         agency.acceptClient(guest);
-
 
         // S'il est déjà client, l'appel doit reverter
         vm.prank(guest);
@@ -103,23 +101,25 @@ contract AgencyTest is Test,IRoleDefinition {
         uint96 flatCount = 5;
         vm.prank(admin);
         agency.createCopro(name, symbol, flatCount, promoter);
-        assertEq(agency.nbListedCopro(), 1);// Il doit y avoir 1 copro créé
+        assertEq(agency.nbListedCopro(), 1); // Il doit y avoir 1 copro créé
 
         // Vérifier les getters
         Copro created = agency.getCoproById(0);
-        assertEq(created.name(), name);// Le nom doit correspondre
-        assertEq(created.symbol(), symbol);// Le symbol doit correspondre
+        assertEq(created.name(), name); // Le nom doit correspondre
+        assertEq(created.symbol(), symbol); // Le symbol doit correspondre
         Copro byName = agency.getCoproByName(name);
-        assertEq(address(created), address(byName));// Les deux copros doivent être les mêmes
+        assertEq(address(created), address(byName)); // Les deux copros doivent être les mêmes
         // Vérifier que getCoproByName reverte pour un nom inexistant
-        vm.expectRevert(abi.encodeWithSelector(Agency.COLLECTION_NOT_FOUND.selector, "NonExisting"));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                Agency.COLLECTION_NOT_FOUND.selector,
+                "NonExisting"
+            )
+        );
         agency.getCoproByName("NonExisting");
 
         Copro[] memory allCopros = agency.getCopros();
-        assertEq(allCopros.length, 1);// Il doit y avoir 1 copro
-        assertEq(address(allCopros[0]), address(created));// La copro récupéré doit correspondre à celui créé
-
-        
+        assertEq(allCopros.length, 1); // Il doit y avoir 1 copro
+        assertEq(address(allCopros[0]), address(created)); // La copro récupéré doit correspondre à celui créé
     }
-
 }

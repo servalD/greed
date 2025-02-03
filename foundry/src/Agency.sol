@@ -8,7 +8,7 @@ import {AccessManaged} from "@openzeppelin/access/manager/AccessManaged.sol";
 import {Manager} from "./Manager.sol";
 import {IRoleDefinition} from "./IRoleDefinition.sol";
 
-contract Agency is AccessManaged, IRoleDefinition {
+contract Agency is AccessManaged {
     Manager manager;
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -32,26 +32,29 @@ contract Agency is AccessManaged, IRoleDefinition {
 
     address private immutable SAFE;
 
-    EnumerableSet.AddressSet private guestList;// Incoming guest (to be validated by the agent and then able to buy flat)
+    EnumerableSet.AddressSet private guestList; // Incoming guest (to be validated by the agent and then able to buy flat)
     // No need to keep track of clients (handled by the access manager)
 
     // =============================================================
     //                            STRUCTS
     // =============================================================
 
-    Copro[] public copros;// List of available co properties (deployed)
+    Copro[] public copros; // List of available co properties (deployed)
 
     // =============================================================
     //                            EVENTS
     // =============================================================
 
-    event ClientAccepted(address indexed client);// guestList address converted to Client (through the access manager)
+    event ClientAccepted(address indexed client); // guestList address converted to Client (through the access manager)
 
     // =============================================================
     //                          CONSTRUCTOR
     // =============================================================
 
-    constructor(Manager _manager, address safe) AccessManaged(address(_manager)){
+    constructor(
+        Manager _manager,
+        address safe
+    ) AccessManaged(address(_manager)) {
         manager = _manager;
         manager.addAgency(address(this));
         SAFE = safe;
@@ -65,7 +68,8 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @dev Restricted to AccessManager Admin and other agent.
      * @param _agent Address to be assigned as an agent.
      */
-    function hireAgent(address _agent) external restricted {// Only deployer
+    function hireAgent(address _agent) external restricted {
+        // Only deployer
         manager.addAgent(_agent);
     }
 
@@ -74,7 +78,10 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @dev Guests are validated later to become clients. Reverts if the caller is already a client.
      */
     function GuestEntrance() public {
-        (bool isClient, ) = manager.hasRole(CLIENT_ROLE, msg.sender);
+        (bool isClient, ) = manager.hasRole(
+            IRoleDefinition.CLIENT_ROLE,
+            msg.sender
+        );
         if (isClient) {
             revert AlreadyClient();
         }
@@ -95,7 +102,7 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @param _client Address of the guest to be accepted as a client.
      */
     function acceptClient(address _client) external restricted {
-        manager.grantRole(CLIENT_ROLE, _client, 0);
+        manager.grantRole(IRoleDefinition.CLIENT_ROLE, _client, 0);
         guestList.remove(_client);
         emit ClientAccepted(_client);
     }
@@ -108,35 +115,41 @@ contract Agency is AccessManaged, IRoleDefinition {
      * @param promoter Address of the promoter.
      */
     function createCopro(
-        
         string memory name,
         string memory symbol,
         uint96 flatCount,
         address promoter
     ) external returns (Copro) {
-        Copro copro = new Copro(manager, promoter, name, symbol, flatCount, payable(SAFE)); // index
+        Copro copro = new Copro(
+            manager,
+            promoter,
+            name,
+            symbol,
+            flatCount,
+            payable(SAFE)
+        ); // index
         copros.push(copro);
         nbListedCopro++;
 
         // Role assignment
         manager.addCopro(address(copro));
-        
+
         return copro;
     }
 
     // That's up to the front end to handle the search as copros is public (to lower gas cost at deployment) Or not...
-    
+
     function getCoproById(uint256 index) public view returns (Copro) {
         return copros[index];
     }
 
-    function getCoproByName(
-        string memory name
-    ) public view returns (Copro) {
+    function getCoproByName(string memory name) public view returns (Copro) {
         // Unable to detect missing branch in test coverage !!!
         bytes32 encodedName = keccak256(abi.encodePacked(name));
         for (uint256 i = 0; i < nbListedCopro; i++) {
-            bytes32 encodedCoproName = keccak256(abi.encodePacked(copros[i].name()));
+            bytes32 encodedCoproName = keccak256(
+                abi.encodePacked(copros[i].name())
+            );
             if (encodedCoproName == encodedName) {
                 return copros[i];
             }

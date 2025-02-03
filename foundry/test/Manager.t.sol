@@ -7,8 +7,7 @@ import "../src/Agency.sol";
 import "../src/Copro.sol";
 import "../src/IRoleDefinition.sol";
 
-contract ManagerTest is Test, IRoleDefinition {
-
+contract ManagerTest is Test {
     Manager manager;
     Agency agency;
 
@@ -35,21 +34,31 @@ contract ManagerTest is Test, IRoleDefinition {
 
     function testAddAgency() public view {
         // Dès le déploiement, l'Agency doit avoir le rôle AGENCY_ROLE
-        (bool hasAgency, ) = manager.hasRole(AGENCY_ROLE, address(agency));
-        assertTrue(hasAgency);// L'Agency doit avoir le rôle AGENCY_ROLE  
+        (bool hasAgency, ) = manager.hasRole(
+            IRoleDefinition.AGENCY_ROLE,
+            address(agency)
+        );
+        assertTrue(hasAgency); // L'Agency doit avoir le rôle AGENCY_ROLE
     }
 
     function testAddAgent() public {
         vm.prank(admin);
         manager.addAgent(agent);
-        (bool hasAgent, ) = manager.hasRole(AGENT_ROLE, agent);
-        assertTrue(hasAgent);// L'agent doit avoir le rôle AGENT_ROLE
+        (bool hasAgent, ) = manager.hasRole(IRoleDefinition.AGENT_ROLE, agent);
+        assertTrue(hasAgent); // L'agent doit avoir le rôle AGENT_ROLE
     }
 
     function testAddCopro() public {
         uint96 flatCount = 5;
         vm.prank(admin);
-        Copro localCopro = new Copro(manager, promoter, "CoproTest", "CT", flatCount, payable(safeAddress));
+        Copro localCopro = new Copro(
+            manager,
+            promoter,
+            "CoproTest",
+            "CT",
+            flatCount,
+            payable(safeAddress)
+        );
         vm.prank(admin);
         manager.addCopro(address(localCopro));
 
@@ -71,6 +80,6 @@ contract ManagerTest is Test, IRoleDefinition {
         localCopro.sell(0, 1 ether);
         vm.prank(buyer);
         localCopro.buy{value: 1 ether}(0);
-        assertEq(localCopro.ownerOf(0), buyer);// Le buyer doit être le nouveau propriétaire
+        assertEq(localCopro.ownerOf(0), buyer); // Le buyer doit être le nouveau propriétaire
     }
 }
