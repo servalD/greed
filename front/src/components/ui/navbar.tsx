@@ -6,24 +6,24 @@ import { sepolia } from "thirdweb/chains";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAgency } from "@/contracts/useAgency";
-import { useReadManagerHasRole } from "@/contracts/generatedContracts";
+import { useReadDataContract } from "@/contracts/useReadDataContract";
 
 export default function Navbar({ connectionStatus }: { connectionStatus: string }) {
 
   const switchChain = useSwitchActiveWalletChain();
-  // const { data: isAgent } = useReadManagerHasRole()
-  // const { data: isCalient } = useReadManagerHasRole()
   const [role, setRole] = useState<string>("guest");
   const router = useRouter();
 
   const { guestEntrance, isPendingGuest } = useAgency();
+  const {userRole} = useReadDataContract();
 
   useEffect(() => {
+    console.log('Role', userRole)
     if (connectionStatus === "connected") {
       switchChain(sepolia);
     }
-    setRole("agent");
-    localStorage.setItem("role", "agent");
+    setRole(userRole);
+    localStorage.setItem("role", userRole);
   }, [connectionStatus]);
 
   return (
