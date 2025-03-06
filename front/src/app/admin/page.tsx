@@ -20,18 +20,19 @@ export default function Home() {
       setRole(localStorage.getItem("role"));
     }
 
+    console.log('status :', status)
     console.log(role)
 
-    // if (role != "agent") {
-    //     ErrorService.mixinMessage("You don't have the rights", "error");
-    //     router.push("/")
-    // }
+    if (role == "client" || role == "guest") {
+        ErrorService.mixinMessage("You don't have the rights", "error");
+        router.push("/")
+    }
   }, []);
 
   return (
     <main>
       <Navbar connectionStatus={status} />
-      {status === "connected" && role === "agent" ? (
+      {status === "connected" && (role === "agent" || role === 'agency') ? (
         <AgentOrAgency />
       ) : (
         <NotConnected />

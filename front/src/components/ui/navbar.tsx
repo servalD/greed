@@ -47,7 +47,7 @@ export default function Navbar({ connectionStatus }: { connectionStatus: string 
               {isPendingGuest ? "En attente..." : "Rejoindre"}
             </button>
           )}
-          {role === "agent" && (
+          {(role === "agent" || role === "agency") && (
             <button
               className="px-4 py-2 ml-3 text-sm font-medium rounded-lg shadow-md bg-indigo-600 text-white hover:bg-indigo-700 transition-all"
               onClick={() => router.push("/admin")}

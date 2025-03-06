@@ -1,4 +1,4 @@
-import { useReadManagerHasRole } from "./generatedContracts";
+import { useReadManagerHasRole, useReadAgencyGuests, useReadAgencyClientRole } from "./generatedContracts";
 import { useAccount } from "wagmi";
 import { useMemo } from "react";
 
@@ -10,6 +10,7 @@ const CO_OWNER_ROLE = 4;
 export const useReadDataContract = () => {
   const { address } = useAccount();
 
+  // Role verification
   const { data: isAgency } = useReadManagerHasRole({ args: [BigInt(AGENCY_ROLE), address as `0x${string}`] });
   const { data: isAgent } = useReadManagerHasRole({ args: [BigInt(AGENT_ROLE), address as `0x${string}`] });
   const { data: isClient } = useReadManagerHasRole({ args: [BigInt(CLIENT_ROLE), address as `0x${string}`] });
@@ -23,5 +24,11 @@ export const useReadDataContract = () => {
     return "guest";
   }, [isAgency, isAgent, isClient, isCoOwner]);
 
-  return { userRole };
+  /*  */
+
+  const { data: guests } = useReadAgencyGuests();
+  const { data: clients } = useReadAgencyClientRole();
+
+
+  return { userRole, guests, clients };
 };
