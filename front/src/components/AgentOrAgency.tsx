@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import MUIDataTable from 'mui-datatables';
 import AddCoproDialog from './dialog/AddCopro';
 import { ErrorService } from '@/service/error.service';
 import { Address } from 'viem';
 import { useAgency } from '@/contracts/useAgency';
+import { useReadDataContract } from '@/contracts/useReadDataContract';
 
 const darkTheme = createTheme({
   palette: {
@@ -29,12 +30,19 @@ const AgentOrAgency = () => {
   });
 
   const { createCopro, isPendingCopro } = useAgency();
+  const { guests, clients } = useReadDataContract();
 
+  useEffect(() => {
+    console.log("GUESTS :", guests, "CLIENTS", clients)
+  })
+
+  // todo : Récupérer les vrais guest entrance
   const guestData = [
     { id: 1, name: 'Alice Dupont', email: 'alice.dupont@example.com' },
     { id: 2, name: 'Bob Martin', email: 'bob.martin@example.com' },
   ];
 
+  // todo : récupérer les vrais clients
   const clientData = [
     { id: 1, name: 'Charlie Durand', email: 'charlie.durand@example.com' },
     { id: 2, name: 'Diane Petit', email: 'diane.petit@example.com' },
