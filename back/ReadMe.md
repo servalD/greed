@@ -3,8 +3,21 @@
 Ce projet est un serveur HTTP asynchrone pour gérer (créer, récupérer, mettre à jour) des resources web3 comme les images de collections nft. Une collection **Postman** est incluse pour tester facilement l'API.
 
 ## Démarrage
+1. **Lancer la base de donnée**
+   Utiliser le `.env.template` comme model pour votre `.env`.
+   ```bash
+   source .env
+   docker compose up -d
+   ```
 
-1. **Lancer le serveur** :
+   Supprimer le volume pour partir d'une DB clean:
+   ```bash
+   docker compose down
+   docker volume rm back_pgdata
+   docker compose up -d
+   ```
+
+2. **Lancer le serveur** :
    ```bash
    cargo run
    ```
