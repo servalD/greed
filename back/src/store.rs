@@ -4,8 +4,8 @@ use std::ops::{Index, IndexMut};
 use serde::{Deserialize, Serialize};
 
 use crate::status::Status;
-use crate::title::ImageTitle;
-use crate::description::ImageDescription;
+use crate::title::Title;
+use crate::description::Description;
 
 #[derive(Clone)]
 pub struct ImageStore {
@@ -19,21 +19,21 @@ pub struct ImageId(u64);
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Image {
     pub id: ImageId,
-    pub title: ImageTitle,
-    pub description: ImageDescription,
+    pub title: Title,
+    pub description: Description,
     pub status: Status,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ImageDraft {
-    pub title: ImageTitle,
-    pub description: ImageDescription,
+    pub title: Title,
+    pub description: Description,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 pub struct ImagePatch {
-    pub title: Option<ImageTitle>,
-    pub description: Option<ImageDescription>,
+    pub title: Option<Title>,
+    pub description: Option<Description>,
     pub status: Option<Status>,
 }
 

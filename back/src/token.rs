@@ -1,32 +1,47 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NFT {
-    pub id: String,
-    pub name: String,
-    pub description: Option<String>,
-    pub image_url: String,
-    pub owner: String,
-    pub attributes: Vec<Attribute>,
-}
+use crate::description::Description;
+use crate::title::Title;
+use crate::address::Address;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Attribute {
-    pub trait_type: String,
-    pub value: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NFTCollection {
-    pub name: String,
+pub struct Copro {
+    pub contract_address: Address,
+    pub geo_address: String,
+    pub name: Title,
     pub symbol: String,
-    pub creator: String,
-    pub nfts: Vec<NFT>,
+    pub creator: Address,
+    pub description: Option<Description>,
+    pub image_url: String,
+    pub owner: Address,
+    pub flats: Vec<Flat>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ApiResponse<T> {
-    pub status: String,
-    pub data: Option<T>,
-    pub message: Option<String>,
+pub struct Flat {
+    pub image_url: String,
+    pub owner: Address,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Agency {
+    pub name: Title,
+    pub agents: Vec<Agent>,
+    pub creator: Address,
+    pub copros: Vec<Copro>,
+    pub clients: Vec<Client>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Agent {
+    pub name: Title,
+    pub address: Address,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Client {
+    pub name: Title,
+    pub address: Address,
+    pub accepted: bool,
+    pub suspicious: bool,
 }
