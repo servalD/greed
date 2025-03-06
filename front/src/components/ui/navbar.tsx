@@ -6,24 +6,24 @@ import { sepolia } from "thirdweb/chains";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAgency } from "@/contracts/useAgency";
-import { useReadManagerHasRole } from "@/contracts/generatedContracts";
+import { useReadDataContract } from "@/contracts/useReadDataContract";
 
 export default function Navbar({ connectionStatus }: { connectionStatus: string }) {
 
   const switchChain = useSwitchActiveWalletChain();
-  // const { data: isAgent } = useReadManagerHasRole()
-  // const { data: isCalient } = useReadManagerHasRole()
   const [role, setRole] = useState<string>("guest");
   const router = useRouter();
 
   const { guestEntrance, isPendingGuest } = useAgency();
+  const {userRole} = useReadDataContract();
 
   useEffect(() => {
+    console.log('Role', userRole)
     if (connectionStatus === "connected") {
       switchChain(sepolia);
     }
-    setRole("agent");
-    localStorage.setItem("role", "agent");
+    setRole(userRole);
+    localStorage.setItem("role", userRole);
   }, [connectionStatus]);
 
   return (
@@ -47,7 +47,7 @@ export default function Navbar({ connectionStatus }: { connectionStatus: string 
               {isPendingGuest ? "En attente..." : "Rejoindre"}
             </button>
           )}
-          {role === "agent" && (
+          {(role === "agent" || role === "agency") && (
             <button
               className="px-4 py-2 ml-3 text-sm font-medium rounded-lg shadow-md bg-indigo-600 text-white hover:bg-indigo-700 transition-all"
               onClick={() => router.push("/admin")}
