@@ -7,7 +7,7 @@ import {Manager} from "../src/Manager.sol";
 import {Copro} from "../src/Copro.sol";
 
 contract DemoScript is Script {
-  // DemoScript to setup the environment for the blockchain architecture demo
+  // DemoScript to setup the environment
   Manager public manager;
   Agency public agency;
 
@@ -22,38 +22,59 @@ contract DemoScript is Script {
   uint256 promoterPk = vm.envUint("PROMOTER_PRIVATE_KEY");
   address promoter = vm.addr(vm.envUint("PROMOTER_PRIVATE_KEY"));
 
+  uint256 clientPk = vm.envUint("CLIENT_PRIVATE_KEY");
+  address client = vm.addr(vm.envUint("CLIENT_PRIVATE_KEY"));
+
+  uint256 guestPk = vm.envUint("GUEST_PRIVATE_KEY");
+  address guest = vm.addr(vm.envUint("GUEST_PRIVATE_KEY"));
+
   function run() public {
       vm.startBroadcast(adminPk);
       
       manager = new Manager(admin);
 
       agency = new Agency(manager, safe);
-
-      console.log("Admin address: ", address(admin));
-      console.log("Manager address: ", address(manager));
-      console.log("Agency address: ", address(agency));
+      
+      console.log("NEXT_PUBLIC_ADMIN=", admin);
+      console.log("NEXT_PUBLIC_MANAGER=", address(manager));
+      console.log("NEXT_PUBLIC_AGENCY=", address(agency));
 
       agency.hireAgent(agent);
 
-      console.log("Agent address: ", agent);
+      console.log("NEXT_PUBLIC_AGENT=", agent);
 
       vm.stopBroadcast();
       vm.startBroadcast(agentPk);
 
       Copro sepoliaCopro = agency.createCopro("Long Court", "LC", 10, promoter);
 
-      console.log("Sepolia Copro address: ", address(sepoliaCopro));
+      console.log("NEXT_PUBLIC_COPRO=", address(sepoliaCopro));
 
       vm.stopBroadcast();
       vm.startBroadcast(promoterPk);
 
-      console.log("Promoter address: ", promoter);
+      console.log("NEXT_PUBLIC_PROMOTER=", promoter);
       for (uint96 i = 0; i < 10; i++) {
         uint price = (0.0001 ether) + (i * 0.0001 ether);
         sepoliaCopro.sell(i, price);
       }
 
       vm.stopBroadcast();
+
+      vm.startBroadcast(clientPk);
+      agency.GuestEntrance();
+      vm.stopBroadcast();
+      vm.startBroadcast(agentPk);
+      agency.acceptClient(client);
+      vm.stopBroadcast();
+
+      console.log("NEXT_PUBLIC_CLIENT=", client);
+      
+      vm.startBroadcast(guestPk);
+      agency.GuestEntrance();
+      vm.stopBroadcast();
+
+      console.log("NEXT_PUBLIC_GUEST=", guest);
 
   }
 }
