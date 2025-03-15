@@ -6,6 +6,7 @@ import {ERC721Consecutive} from "@openzeppelin/token/ERC721/extensions/ERC721Con
 import {AccessManaged} from "@openzeppelin/access/manager/AccessManaged.sol";
 import {AccessManager} from "@openzeppelin/access/manager/AccessManager.sol";
 import {IRoleDefinition} from "./IRoleDefinition.sol";
+import {FractionalToken} from "./FractionalToken.sol";
 
 contract Copro is ERC721Consecutive, AccessManaged {
     // =============================================================
@@ -17,6 +18,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
     error NotFlatOwner();
     error FlatNotForSale();
     error InvalidAmount();
+    error AlreadyFractionalized();
     // =============================================================
     //                          STATE VARIABLES
     // =============================================================
@@ -26,6 +28,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
     mapping(uint256 => Proposal[]) public proposals; // tokenId => Proposals
     mapping(uint256 => uint256) public market; // tokenId => Owner Proposal
     mapping(uint256 => Proposal[]) public history; // tokenIzd => Successful transaction history
+    mapping(uint256 => address) public fractionalTokenForNFT; // Associate each NFT to his ERC20 address
     // =============================================================
     //                          STRUCTS
     // =============================================================
@@ -41,6 +44,10 @@ contract Copro is ERC721Consecutive, AccessManaged {
         uint256 tokenId,
         address indexed previousOwner,
         address indexed admin
+    );
+    event Fractionalized(
+        uint256 indexed tokenId,
+        address fractionalTokenAddress
     );
 
     // =============================================================
@@ -144,6 +151,32 @@ contract Copro is ERC721Consecutive, AccessManaged {
 
         // Update the history
         history[tokenId].push(Proposal(msg.sender, msg.value));
+    }
+
+    /**
+     * @notice Fractionalize an NFT by deploying an ERC20 contract
+     * @param tokenId TokenId to fractionalize
+     * @param ftName Name of token
+     * @param ftSymbol Symbol of token
+     * @param coOwners co-owners of NFT
+     * @param totalSupply Total supply to represent the fractionalized NFT
+     */
+    function fractionalize(
+        uint256 tokenId,
+        string memory ftName,
+        string memory ftSymbol,
+        address[] memory coOwners,
+        uint256 totalSupply
+    ) external onlyTokenOwner(tokenId) {
+        if(fractionalTokenForNFT[tokenId] != address(0)) revert AlreadyFractionalized();
+
+        FractionalToken ft = new FractionalToken(ftName, ftSymbol, coOwners, totalSupply);
+
+        _transfer(msg.sender, address(ft), tokenId);
+
+        fractionalTokenForNFT[tokenId] = address(ft);
+
+        emit Fractionalized(tokenId, address(ft));
     }
 
     // No getter for market and history as it's public so th'ey can be accessed directly (to lower gas cost at deployment)
