@@ -14,6 +14,12 @@ contract FractionalToken is ERC20, Ownable, IERC721Receiver {
     event ReceivedNFT(address operator, address from, uint256 tokenId, bytes data);
 
     // =============================================================
+    //                          MAPPINGS
+    // =============================================================
+
+    mapping(address => uint256) supply;
+
+    // =============================================================
     //                          CONSTRUCTOR
     // =============================================================
 
@@ -30,8 +36,10 @@ contract FractionalToken is ERC20, Ownable, IERC721Receiver {
         address[] memory coOwners,
         uint256 totalSupply
     ) ERC20(name, symbol) Ownable(msg.sender) {
+        uint256 supplyByCoOwner = totalSupply / coOwners.length;
         for(uint8 i = 0; i < coOwners.length; i ++) {
-            _mint(coOwners[i], (totalSupply / coOwners.length));
+            _mint(coOwners[i], supplyByCoOwner);
+            supply[coOwners[i]] = supplyByCoOwner;
         }
     }
     
