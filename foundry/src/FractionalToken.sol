@@ -8,16 +8,37 @@ import "@openzeppelin/token/ERC721/IERC721Receiver.sol";
 contract FractionalToken is ERC20, Ownable, IERC721Receiver {
 
     // =============================================================
+    //                          ERRORS
+    // =============================================================
+
+    error NoSaleActive();
+    error InsufficientFunds();
+    error NoTokenToList();
+
+    // =============================================================
     //                          EVENTS
     // =============================================================
 
     event ReceivedNFT(address operator, address from, uint256 tokenId, bytes data);
+    event TokensListed(address indexed seller, uint256 amount, uint256 pricePerToken);
+    event TokensPurchasedFromSeller(address indexed seller, address indexed buyer, uint256 amount, uint256 totalPrice);
+    event SaleOrderCanceled(address indexed seller, uint256 amount);
 
     // =============================================================
     //                          MAPPINGS
     // =============================================================
 
-    mapping(address => uint256) supply;
+    mapping(address => SaleOrder) public saleOrders;
+    mapping(address => uint256) public supply;
+
+    // =============================================================
+    //                          STRUCTS
+    // =============================================================
+
+    struct SaleOrder {
+        uint256 amount;         // Number of tokens for sale
+        uint256 pricePerToken;  // price in wei
+    }
 
     // =============================================================
     //                          CONSTRUCTOR
@@ -52,6 +73,67 @@ contract FractionalToken is ERC20, Ownable, IERC721Receiver {
      */
     function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
+    }
+
+    /**
+    * @notice Permits to a owner to list all his tokens for sale.
+    * Listed tokens are transferred to the contract
+    * The price is specified in ether and converted in wei
+    * @param pricePerTokenInEther Price asked by owner
+    */
+    function listAllTokensForSale(uint256 pricePerTokenInEther) external {
+        uint256 sellerBalance = balanceOf(msg.sender);
+        if (sellerBalance == 0) revert NoTokenToList();
+
+        _transfer(msg.sender, address(this), sellerBalance);
+        uint256 pricePerTokenWei = pricePerTokenInEther * 1 ether;
+
+        saleOrders[msg.sender] = SaleOrder({
+            amount: sellerBalance,
+            pricePerToken: pricePerTokenWei
+        });
+
+        emit TokensListed(msg.sender, sellerBalance, pricePerTokenWei);
+    }
+
+    /**
+    * @notice Permits to a buyer to buy all the token listed by a seller.
+    * @param seller seller address
+    */
+    function purchaseAllTokensFromSeller(address seller) external payable {
+        SaleOrder storage order = saleOrders[seller];
+        uint256 amount = order.amount;
+        if (amount == 0) revert NoSaleActive();
+
+        uint256 totalPrice = order.pricePerToken * amount;
+        if (msg.value <= totalPrice) revert InsufficientFunds();
+
+        _transfer(address(this), msg.sender, amount);
+        delete saleOrders[seller];
+
+        payable(seller).transfer(totalPrice);
+        if (msg.value > totalPrice) {
+            payable(msg.sender).transfer(msg.value - totalPrice);
+        }
+
+        emit TokensPurchasedFromSeller(seller, msg.sender, amount, totalPrice);
+    }
+
+
+    /**
+    * @notice Permits to a seller to cancel his sell and get back his tokens.
+    */
+    function cancelSaleOrder() external {
+        SaleOrder storage order = saleOrders[msg.sender];
+        if (order.amount == 0) revert NoSaleActive();
+
+        uint256 amount = order.amount;
+
+        delete saleOrders[msg.sender];
+
+        _transfer(address(this), msg.sender, amount);
+
+        emit SaleOrderCanceled(msg.sender, amount);
     }
 
     /**

@@ -9,11 +9,11 @@ export const useCopro = () => {
   const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [minted, setMinted] = useState<number[]>([]);
+  const [bought, setBought] = useState<number[]>([]);
 
   useEffect(() => {
     if (txHash && isConfirmed) {
-      ErrorService.successMessage("Acheter", "L'achat a été effectué avec succès !");
+      ErrorService.successMessage("Buy", "Buy done with success !");
     }
   }, [isConfirmed, txHash]);
 
@@ -27,19 +27,19 @@ export const useCopro = () => {
       await connector?.connect();
     }
 
-    ErrorService.mixinMessage(`Minting NFT for image ID: ${id}`, "info");
+    ErrorService.mixinMessage(`Buying NFT for image ID: ${id}`, "info");
 
     try {
       const tx = await writeContractAsync({ args: [BigInt(id)] });
 
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
-      setMinted((prev) => [...prev, id]);
+      setBought((prev) => [...prev, id]);
 
     } catch (err: any) {
-      console.error("Erreur lors de la transaction:", err);
+      ErrorService.errorMessage("Erreur lors de la transaction:", err);
     }
   };
 
-  return { buy, isPending, minted };
+  return { buy, isPending, bought };
 };

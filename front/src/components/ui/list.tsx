@@ -8,7 +8,7 @@ import { useCopro } from "@/contracts/useCopro";
 
 export default function List({ images }: { images: Images[] }) {
 
-  const { buy, isPending, minted } = useCopro();
+  const { buy, isPending, bought } = useCopro();
 
   return (
     <div className="bg-gray-900 min-h-screen py-8">
@@ -26,14 +26,14 @@ export default function List({ images }: { images: Images[] }) {
               />
               <button
                 onClick={() => buy(image.id)}
-                disabled={minted.includes(image.id) || isPending}
+                disabled={bought.includes(image.id) || isPending}
                 className={`w-full px-4 py-2 text-sm font-medium rounded shadow-md ${
-                  minted.includes(image.id)
+                  bought.includes(image.id)
                     ? "bg-gray-600 text-gray-300 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600 text-white"
                 }`}
               >
-                {minted.includes(image.id) ? "Minted" : isPending ? "En attente..." : "Mint"}
+                {bought.includes(image.id) ? "Bought" : isPending ? "En attente..." : "Buy"}
               </button>
             </div>
           ))}
