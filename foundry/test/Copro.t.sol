@@ -15,6 +15,8 @@ contract CoproTest is Test {
     address buyer = address(4);
     address safeAddress = address(6);
 
+    event ApartmentsAdded(uint256 startTokenId, uint256 additionalCount);
+
     function setUp() public {
         vm.deal(admin, 100 ether);
         vm.deal(promoter, 100 ether);
@@ -176,11 +178,9 @@ contract CoproTest is Test {
         coOwners[0] = address(10);
         uint256 totalSupply = 1000 ether;
 
-        console.log("1", localCopro.ownerOf(0));
         vm.prank(promoter);
         FractionalToken ft = localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
 
-        console.log("2", localCopro.ownerOf(0));
         // owner of token change
         vm.prank(address(ft));
         vm.expectRevert(Copro.AlreadyFractionalized.selector);
@@ -198,5 +198,43 @@ contract CoproTest is Test {
         vm.prank(admin);
         vm.expectRevert(Copro.NotFlatOwner.selector);
         localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
+    }
+
+    function testAddApartmentsSuccess() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+        
+        uint96 additionalCount = 3;
+        vm.prank(promoter);
+
+        vm.expectEmit(true, false, false, true);
+        emit ApartmentsAdded(flatCount, additionalCount);
+        localCopro.addApartments(additionalCount);
+        
+        assertEq(localCopro.additionalFlats(), additionalCount);
+        
+        uint256 startTokenId = flatCount;
+        for (uint256 tokenId = startTokenId; tokenId < startTokenId + additionalCount; tokenId++) {
+            assertEq(localCopro.ownerOf(tokenId), promoter);
+            assertEq(localCopro.market(tokenId), 0);
+        }
+    }
+
+    function testAddApartmentsNotAuthorized() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+        
+        vm.prank(buyer);
+        vm.expectRevert(Copro.NotAuthorized.selector);
+        localCopro.addApartments(2);
+    }
+
+    function testAddApartmentsZeroRevert() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+        
+        vm.prank(promoter);
+        vm.expectRevert(Copro.MustBeGreaterThan0.selector);
+        localCopro.addApartments(0);
     }
 }
