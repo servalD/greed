@@ -21,21 +21,18 @@ contract FractionalTokenTest is Test {
         coOwner2 = address(3);
         coOwner3 = address(4);
 
-        // On crée un tableau de coOwners
         address[] memory coOwners = new address[](3);
         coOwners[0] = coOwner1;
         coOwners[1] = coOwner2;
         coOwners[2] = coOwner3;
 
-        uint256 totalSupply = 3000 ether; // Exemple de supply totale
+        uint256 totalSupply = 3000 ether;
 
-        // Déployer le contrat FractionalToken en tant que owner
         vm.prank(owner);
         ft = new FractionalToken("FractionalToken", "FT", coOwners, totalSupply);
     }
 
     function testInitialDistribution() public view {
-        // Chaque coOwner doit recevoir 1/3 de la supply totale
         uint256 expectedShare = 3000 ether / 3;
         assertEq(ft.balanceOf(coOwner1), expectedShare, "coOwner1 n'a pas la bonne part");
         assertEq(ft.balanceOf(coOwner2), expectedShare, "coOwner2 n'a pas la bonne part");
@@ -43,7 +40,6 @@ contract FractionalTokenTest is Test {
     }
 
     function testMintByOwner() public {
-        // Le propriétaire (owner) peut mint des tokens supplémentaires
         uint256 mintAmount = 100 ether;
         vm.prank(owner);
         ft.mint(coOwner1, mintAmount);
@@ -53,7 +49,6 @@ contract FractionalTokenTest is Test {
     }
 
     function testMintByNonOwnerReverts() public {
-        // Un appel à mint par un non-propriétaire doit échouer
         vm.prank(coOwner1);
         vm.expectRevert();
         ft.mint(coOwner1, 100 ether);

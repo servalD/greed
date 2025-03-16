@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../src/Copro.sol";
 import "../src/Manager.sol";
 import "../src/IRoleDefinition.sol";
+import "forge-std/console.sol";
 
 contract CoproTest is Test {
     Manager manager;
@@ -15,6 +16,7 @@ contract CoproTest is Test {
 
     function setUp() public {
         vm.deal(admin, 100 ether);
+        vm.deal(promoter, 100 ether);
         vm.deal(buyer, 100 ether);
         vm.prank(admin);
         manager = new Manager(admin);
@@ -145,5 +147,55 @@ contract CoproTest is Test {
         vm.prank(promoter);
         vm.expectRevert("disabled");
         localCopro.setApprovalForAll(buyer, true);
+    }
+
+    function testFractionalizeSuccess() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+
+        address[] memory coOwners = new address[](2);
+        coOwners[0] = address(10);
+        coOwners[1] = address(11);
+        uint256 totalSupply = 1000 ether;
+
+        vm.prank(promoter);
+        localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
+
+        address ftAddress = localCopro.fractionalTokenForNFT(0);
+        assertTrue(ftAddress != address(0), "L adresse du FractionalToken doit etre non nulle");
+
+        assertEq(localCopro.ownerOf(0), ftAddress, "Le NFT doit etre detenu par le contrat FractionalToken");
+    }
+
+    function testFractionalizeAlreadyFractionalized() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+
+        address[] memory coOwners = new address[](1);
+        coOwners[0] = address(10);
+        uint256 totalSupply = 1000 ether;
+
+        console.log("1", localCopro.ownerOf(0));
+        vm.prank(promoter);
+        address ft = localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
+
+        console.log("2", localCopro.ownerOf(0));
+        // owner of token change
+        vm.prank(address(ft));
+        vm.expectRevert(Copro.AlreadyFractionalized.selector);
+        localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
+    }
+
+    function testFractionalizeNotOwnerRevert() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+
+        address[] memory coOwners = new address[](1);
+        coOwners[0] = address(10);
+        uint256 totalSupply = 1000 ether;
+
+        vm.prank(admin);
+        vm.expectRevert(Copro.NotFlatOwner.selector);
+        localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
     }
 }
