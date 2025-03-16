@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../src/Copro.sol";
 import "../src/Manager.sol";
 import "../src/IRoleDefinition.sol";
+import "../src/FractionalToken.sol";
 import "forge-std/console.sol";
 
 contract CoproTest is Test {
@@ -177,7 +178,7 @@ contract CoproTest is Test {
 
         console.log("1", localCopro.ownerOf(0));
         vm.prank(promoter);
-        address ft = localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
+        FractionalToken ft = localCopro.fractionalize(0, "FracToken", "FTK", coOwners, totalSupply);
 
         console.log("2", localCopro.ownerOf(0));
         // owner of token change
