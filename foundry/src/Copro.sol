@@ -167,7 +167,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
         string memory ftSymbol,
         address[] memory coOwners,
         uint256 totalSupply
-    ) external onlyTokenOwner(tokenId) returns (address) {
+    ) external onlyTokenOwner(tokenId) returns (FractionalToken) {
         if(fractionalTokenForNFT[tokenId] != address(0)) revert AlreadyFractionalized();
 
         FractionalToken ft = new FractionalToken(ftName, ftSymbol, coOwners, totalSupply);
@@ -178,7 +178,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
 
         emit Fractionalized(tokenId, address(ft));
 
-        return address(ft);
+        return ft;
     }
 
     // No getter for market and history as it's public so th'ey can be accessed directly (to lower gas cost at deployment)
