@@ -17,11 +17,8 @@ contract Agency is AccessManaged {
     // =============================================================
 
     error COLLECTION_NOT_FOUND(string);
-
     error COLLECTION_NAME_ALREADY_EXISTS(string);
-
     error COLLECTION_SYMBOL_ALREADY_EXISTS(string);
-
     error AlreadyClient();
 
     // =============================================================
