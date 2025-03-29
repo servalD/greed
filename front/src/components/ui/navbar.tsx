@@ -2,7 +2,7 @@
 
 import { ConnectButton, useSwitchActiveWalletChain } from "thirdweb/react";
 import { client } from "../../app/client";
-import { sepolia } from "thirdweb/chains";
+import { sepolia, anvil } from "thirdweb/chains";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAgency } from "@/contracts/useAgency";
@@ -20,7 +20,9 @@ export default function Navbar({ connectionStatus }: { connectionStatus: string 
   useEffect(() => {
     console.log('Role', userRole)
     if (connectionStatus === "connected") {
-      switchChain(sepolia);
+      if (process.env.NEXT_PUBLIC_ANVIL === "true") switchChain(anvil);
+      else switchChain(sepolia);
+      
     }
     setRole(userRole);
     localStorage.setItem("role", userRole);
