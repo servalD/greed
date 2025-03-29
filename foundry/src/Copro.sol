@@ -84,12 +84,8 @@ contract Copro is ERC721Consecutive, AccessManaged {
         uint96 _flatCount,
         address payable _SAFE
     ) ERC721(name, symbol) AccessManaged(address(_manager)) {
-        if (_flatCount <= 0) {
-            revert InvalidFlatCount();
-        }
-        if (_flatCount >= _maxBatchSize()) {
-            revert ExceedsMaxBatchSize();
-        }
+        if (_flatCount <= 0) revert InvalidFlatCount();
+        if (_flatCount >= _maxBatchSize()) revert ExceedsMaxBatchSize();
         initialFlats = _flatCount;
         safe = _SAFE;
         promoter = _promoter;
@@ -107,9 +103,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
      * @param tokenId Token ID to check ownership.
      */
     modifier onlyTokenOwner(uint256 tokenId) {
-        if (ownerOf(tokenId) != msg.sender) {
-            revert NotFlatOwner();
-        }
+        if (ownerOf(tokenId) != msg.sender) revert NotFlatOwner();
         _;
     }
 
@@ -117,9 +111,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
      * @dev Ensures the caller is the promoter of the CoPro.
      */
     modifier onlyPromoter() {
-        if (msg.sender != promoter) {
-            revert NotAuthorized();
-        }
+        if (msg.sender != promoter) revert NotAuthorized();
         _;
     }
 
@@ -154,12 +146,8 @@ contract Copro is ERC721Consecutive, AccessManaged {
      * @param tokenId Token ID of the flat to purchase.
      */
     function buy(uint256 tokenId) public payable restricted {
-        if (market[tokenId] == 0) {
-            revert FlatNotForSale();
-        }
-        if (msg.value != market[tokenId]) {
-            revert InvalidAmount();
-        }
+        if (market[tokenId] == 0) revert FlatNotForSale();
+        if (msg.value != market[tokenId]) revert InvalidAmount();
 
         address payable lastOwner = payable(ownerOf(tokenId));
 
