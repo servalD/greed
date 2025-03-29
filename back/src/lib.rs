@@ -4,6 +4,7 @@ pub mod status;
 pub mod store;
 pub mod request;
 pub mod db;
+pub mod contract_interfaces;
 
 use std::sync::Arc;
 use request::handle_client;
