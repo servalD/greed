@@ -8,9 +8,12 @@ tokio = { version = "1", features = ["full"] }
 thiserror = "1.0.59"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-hyper = "*"
 sqlx = { version = "=0.8.1", features = ["sqlite"] }
 rusqlite = "=0.32.1"
 diesel = { version = "2.0.0", features = ["postgres", "r2d2"] }
 dotenv = "0.15"
 alloy = { version = "0.13.0", features = ["full"] }
+jsonwebtoken = "9.3.1"
+chrono = "0.4.40"
+lazy_static = "1.5.0"
+bcrypt = "0.17.0"

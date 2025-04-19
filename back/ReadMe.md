@@ -31,3 +31,49 @@ Ce projet est un serveur HTTP asynchrone pour gérer (créer, récupérer, mettr
    - `POST /image` : Créer une image.
    - `GET /image/:id` : Récupérer une image.
    - `PATCH /image/:id` : Mettre à jour une image.
+
+## Créé une table avec diesel
+
+Pour créer ta table `users` avec Diesel, voici ce que tu dois faire :
+
+1. Créer un fichier de migration
+
+   ```bash
+   diesel migration generate create_users
+   ```
+   
+   Cela crée deux fichiers :
+   ```
+   migrations/
+   └── {timestamp}_create_users/
+      ├── up.sql
+      └── down.sql
+   ```
+
+2. Éditer `up.sql`
+
+   ```sql
+   CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR NOT NULL UNIQUE,
+      password_hash VARCHAR NOT NULL
+   );
+   ```
+
+3. Éditer `down.sql`
+
+   ```sql
+   DROP TABLE users;
+   ```
+
+4. Appliquer la migration
+
+   ```bash
+   diesel migration run
+   ```
+
+   Après ça, tu pourras faire :
+
+   ```bash
+   diesel print-schema > src/schema.rs
+   ```
