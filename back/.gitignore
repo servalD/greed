@@ -1,3 +1,5 @@
 /target
 /build
 .env
+server.log
+Cargo.lock
