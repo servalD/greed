@@ -50,8 +50,23 @@ impl HttpResponse {
             .header("Content-Type", "text/plain")
     }
 
+    pub fn forbidden() -> Self {
+        HttpResponse::new(403, "Forbidden", Some("Forbidden".to_string()))
+            .header("Content-Type", "text/plain")
+    }
+
     pub fn not_found() -> Self {
         HttpResponse::new(404, "Not Found", Some("Not Found".to_string()))
+            .header("Content-Type", "text/plain")
+    }
+
+    pub fn method_not_allowed() -> Self {
+        HttpResponse::new(405, "Method Not Allowed", Some("Method Not Allowed".to_string()))
+            .header("Content-Type", "text/plain")
+    }
+
+    pub fn conflict() -> Self {
+        HttpResponse::new(409, "Conflict", Some("Conflict".to_string()))
             .header("Content-Type", "text/plain")
     }
 

@@ -1,12 +1,27 @@
 {
 	"info": {
-		"name": "Rust Auth API",
-		"_postman_id": "rust-auth-api",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "a52c8d4c-7c14-4662-8b3e-3296c35457a3",
+		"name": "Greed API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34310812"
 	},
 	"item": [
 		{
 			"name": "Signup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User créé\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -17,22 +32,40 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"gaetan\",\n  \"email\": \"gaetan@example.com\",\n  \"password\": \"monmotdepasse\"\n}"
+					"raw": "{\"username\": \"bob\", \"email\": \"bob@example.com\", \"password\": \"bob123\"}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/signup",
+					"raw": "{{URL}}/signup",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"signup"
 					]
 				}
-			}
+			},
+			"response": []
 		},
 		{
 			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"JWT reçu\", function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json.token).to.be.a(\"string\");",
+							"    pm.expect(json.refresh_token).to.be.a(\"string\");",
+							"    pm.environment.set(\"jwt\", json.token);",
+							"    pm.environment.set(\"refresh_token\", json.refresh_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -43,131 +76,285 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"gaetan\",\n  \"password\": \"monmotdepasse\"\n}"
+					"raw": "{\"username\": \"bob\", \"password\": \"bob123\"}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/login",
+					"raw": "{{URL}}/login",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"login"
 					]
 				}
-			}
+			},
+			"response": []
 		},
 		{
-			"name": "Get Me (auth)",
+			"name": "Get Me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Infos utilisateur reçues\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer {{token}}"
+						"value": "Bearer {{jwt}}"
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/user",
+					"raw": "{{URL}}/user",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"user"
 					]
 				}
-			}
+			},
+			"response": []
 		},
 		{
-			"name": "Get User by ID or Username (auth)",
+			"name": "Refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token refresh OK\", function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json.token).to.be.a(\"string\");",
+							"    pm.expect(json.refresh_token).to.be.a(\"string\");",
+							"    pm.environment.set(\"jwt\", json.token);",
+							"    pm.environment.set(\"refresh_token\", json.refresh_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
 					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
+						"key": "Authorization",
+						"value": "Bearer {{refresh_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/refresh",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Déconnexion OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer {{token}}"
+						"value": "Bearer {{refresh_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/logout",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by ID/Username/Email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User trouvé\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": 1\n}"
+					"raw": "{\"id\": 1}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/user",
+					"raw": "{{URL}}/user",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"user"
 					]
 				}
-			}
+			},
+			"response": []
 		},
 		{
-			"name": "Update User (auth)",
+			"name": "Update User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User mis à jour\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PUT",
 				"header": [
 					{
-						"key": "Content-Type",
-						"value": "application/json"
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
 					},
 					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}"
+						"key": "Content-Type",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": 1,\n  \"email\": \"new@example.com\"\n}"
+					"raw": "{\"id\": 1, \"username\": \"bob_updated\", \"email\": \"bob.updated@example.com\", \"password\": \"newpassword\"}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/user",
+					"raw": "{{URL}}/user",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"user"
 					]
 				}
-			}
+			},
+			"response": []
 		},
 		{
-			"name": "Delete User (auth)",
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User supprimé\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "Content-Type",
-						"value": "application/json"
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
 					},
 					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}"
+						"key": "Content-Type",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": 1\n}"
+					"raw": "{\"id\": 1}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/user",
+					"raw": "{{URL}}/user",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "3000",
 					"path": [
 						"user"
 					]
 				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
 			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "localhost:3000",
+			"type": "string"
 		}
 	]
 }
