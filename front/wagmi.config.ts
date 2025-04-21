@@ -1,5 +1,6 @@
 import { defineConfig } from '@wagmi/cli'
 import { react } from '@wagmi/cli/plugins'
+import { Abi } from 'viem';
 
 import { config as dotenvConf } from "dotenv";
 dotenvConf();
@@ -8,7 +9,6 @@ import ManagerABI from '../foundry/out/Manager.sol/Manager.json';
 import AgencyABI from '../foundry/out/Agency.sol/Agency.json';
 import CoproABI from '../foundry/out/Copro.sol/Copro.json';
 import FractionalABI from '../foundry/out/FractionalToken.sol/FractionalToken.json';
-import { type Abi } from 'viem';
 
 export default defineConfig({
   out: 'src/contracts/generatedContracts.ts',

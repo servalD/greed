@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { ErrorService } from "@/service/error.service";
 import { useWriteAgencyGuestEntrance, useWriteAgencyCreateCopro } from "./generatedContracts";
-import { Address } from "viem";
+import { Address, UnknownNodeError } from "viem";
 
 export const useAgency = () => {
   const { isConnected, connector } = useAccount();
@@ -30,8 +30,8 @@ export const useAgency = () => {
       const tx = await WriteGuest({});
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
-    } catch (err: any) {
-      console.error("Erreur lors de la transaction:", err);
+    } catch (err: unknown) {
+      console.error("Erreur lors de la transaction:", err as string);
     }
   };
 
@@ -44,8 +44,8 @@ export const useAgency = () => {
         const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter] })
         console.log("Transaction envoyée:", tx);
         setTxHash(tx);
-    } catch (err: any) {
-        console.error("Erreur lors de la transaction:", err);
+    } catch (err: unknown) {
+      console.error("Erreur lors de la transaction:", err as string);
     }
 
   }

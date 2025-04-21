@@ -36,8 +36,8 @@ export const useCopro = () => {
       setTxHash(tx);
       setBought((prev) => [...prev, id]);
 
-    } catch (err: any) {
-      ErrorService.errorMessage("Erreur lors de la transaction:", err);
+    } catch (err: unknown) {
+      ErrorService.errorMessage("Erreur lors de la transaction:", err as string);
     }
   };
 
