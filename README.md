@@ -1,4 +1,4 @@
-# 🛠️ ESGI Blockchain Architecture Project
+# 🛠️ ESGI Blockchain
 
 Ce projet regroupe plusieurs composants : un backend Rust, un frontend TypeScript, et des smart contracts via Foundry.
 
