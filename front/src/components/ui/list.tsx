@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ErrorService } from "@/service/error.service";
 import { Images } from "@/types/resources";
-import { useAccount } from "wagmi";
 import { useCopro } from "@/contracts/useCopro";
 import { motion } from "framer-motion";
 

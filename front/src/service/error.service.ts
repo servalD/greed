@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2'
+import Swal, { SweetAlertIcon } from 'sweetalert2'
 
 
 export class ErrorService {
@@ -40,7 +40,7 @@ export class ErrorService {
       }
     });
     return Toast.fire({
-      icon: icon as any,
+      icon: icon as SweetAlertIcon | undefined,
       title: msg
     });
   }
