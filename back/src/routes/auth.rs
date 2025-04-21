@@ -1,15 +1,15 @@
 use crate::repositories::{user_repo, refresh_token_repo as rt_repo};
 use crate::models::user::{NewUser, NewUserPayload, UpdateUserPayload, UpdateUserData, FindUserPayload, DeleteUserPayload, LoginPayload};
-use crate::http::{HttpResponse, extract_payload};
+use crate::http::{HttpResponse, RequestContext};
 use crate::utils::logger;
 use crate::services::auth_service::AuthService;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use diesel::pg::PgConnection;
 
-pub async fn handle_signup(conn: &mut PgConnection, request: &str) -> HttpResponse {
-    let payload = match extract_payload::<NewUserPayload>(request) {
-        Ok(p) => p,
-        Err(resp) => return resp,
+pub async fn handle_signup(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    let payload = match ctx.parse_body::<NewUserPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
     };
 
     let password_hash = match hash(&payload.password, DEFAULT_COST) {
@@ -31,12 +31,12 @@ pub async fn handle_signup(conn: &mut PgConnection, request: &str) -> HttpRespon
     }
 }
 
-pub async fn handle_login(conn: &mut PgConnection, request: &str, auth_service: &AuthService) -> HttpResponse {
+pub async fn handle_login(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
     logger::debug("Requête de login reçue");
 
-    let payload = match extract_payload::<LoginPayload>(request) {
-        Ok(p) => p,
-        Err(resp) => return resp,
+    let payload = match ctx.parse_body::<LoginPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
     };
 
     let user = match user_repo::find_user(conn, None, payload.username.as_deref(), payload.email.as_deref()) {
@@ -79,10 +79,10 @@ pub async fn handle_login(conn: &mut PgConnection, request: &str, auth_service: 
     HttpResponse::ok(Some(json))
 }
 
-pub async fn handle_refresh(conn: &mut PgConnection, request: &str, auth_service: &AuthService) -> HttpResponse {
+pub async fn handle_refresh(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
 
     // Vérifie le refresh token transmis dans l'Authorization header
-    let refresh_token = match auth_service.validate_refresh_token(conn, request) {
+    let refresh_token = match auth_service.validate_refresh_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
         Ok(rt) => rt,
         Err(_) => return HttpResponse::unauthorized(),
     };
@@ -111,8 +111,8 @@ pub async fn handle_refresh(conn: &mut PgConnection, request: &str, auth_service
 }
 
 
-pub async fn handle_logout(conn: &mut PgConnection, request: &str, auth_service: &AuthService) -> HttpResponse {
-    let refresh_token = match auth_service.validate_refresh_token(conn, request) {
+pub async fn handle_logout(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
+    let refresh_token = match auth_service.validate_refresh_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
         Ok(c) => c,
         Err(_) => return HttpResponse::unauthorized(),
     };
@@ -123,10 +123,10 @@ pub async fn handle_logout(conn: &mut PgConnection, request: &str, auth_service:
     }
 }
 
-pub async fn handle_update_user(conn: &mut PgConnection, request: &str) -> HttpResponse {
-    let payload = match extract_payload::<UpdateUserPayload>(request) {
-        Ok(p) => p,
-        Err(resp) => return resp,
+pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    let payload = match ctx.parse_body::<UpdateUserPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
     };
 
     let password_hash = match payload.password {
@@ -152,12 +152,11 @@ pub async fn handle_update_user(conn: &mut PgConnection, request: &str) -> HttpR
     }
 }
 
-pub async fn handle_delete_user(conn: &mut PgConnection, request: &str) -> HttpResponse {
-    let payload = match extract_payload::<DeleteUserPayload>(request) {
-        Ok(p) => p,
-        Err(resp) => return resp,
+pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    let payload = match ctx.parse_body::<DeleteUserPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
     };
-
     match user_repo::delete_user(conn, payload.id) {
         Ok(size) => match size{
             1 => HttpResponse::ok(Some("User deleted".to_string())),
@@ -167,10 +166,10 @@ pub async fn handle_delete_user(conn: &mut PgConnection, request: &str) -> HttpR
     }
 }
 
-pub async fn handle_find_user(conn: &mut PgConnection, request: &str) -> HttpResponse {
-    let payload = match extract_payload::<FindUserPayload>(request) {
-        Ok(p) => p,
-        Err(resp) => return resp,
+pub async fn handle_find_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    let payload = match ctx.parse_body::<FindUserPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
     };
 
     match user_repo::find_user(conn, payload.id, payload.username.as_deref(), payload.email.as_deref()) {
@@ -183,8 +182,11 @@ pub async fn handle_find_user(conn: &mut PgConnection, request: &str) -> HttpRes
     }
 }
 
-pub async fn handle_get_user(conn: &mut PgConnection, id: i32) -> HttpResponse {
-    match user_repo::find_user(conn, Some(id), None, None) {
+pub async fn handle_get_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+
+    let user_id = ctx.param::<i32>("id").or(ctx.user_id);
+
+    match user_repo::find_user(conn, user_id, None, None) {
         Ok(Some(user)) => match user.safe_json() {
             Ok(json) => HttpResponse::ok(Some(json)),
             Err(_) => HttpResponse::internal_server_error(),

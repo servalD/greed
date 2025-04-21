@@ -1,5 +1,6 @@
 /// Ce module gère la dé-construction puis la construction de réponses HTTP.
 use serde::de::DeserializeOwned;
+use std::collections::HashMap;
 
 pub struct HttpResponse {
     pub status_code: u16,
@@ -81,14 +82,91 @@ impl HttpResponse {
     }
 }
 
-// Prise en charge des structures des payload de manière générique
-pub fn extract_payload<T: DeserializeOwned>(request: &str) -> Result<T, HttpResponse> {
-    if let Some(index) = request.find("\r\n\r\n") {
-        let body = &request[index + 4..];
-        serde_json::from_str::<T>(body).map_err(|_| {
-            HttpResponse::bad_request("Invalid JSON payload".into())
+fn parse_first_line(line: &str) -> Option<(&str, &str)> {
+    let mut parts = line.split_whitespace();
+    Some((parts.next()?, parts.next()?))
+}
+
+#[derive(Clone)]
+pub struct RequestContext {
+    pub method: String,
+    pub path: String,
+    pub path_segments: Vec<String>,
+    pub query_params: HashMap<String, String>,
+    pub headers: HashMap<String, String>,
+    pub user_id: Option<i32>,
+    pub raw_body: Option<String>,
+    pub path_params: HashMap<String, String>,
+}
+
+impl RequestContext {
+    pub fn new(first_line: &str, request: &str, user_id: Option<i32>) -> Option<Self> {
+        let (method, full_path) = parse_first_line(first_line)?;
+        let (path, query_str) = full_path.split_once('?').unwrap_or((full_path, ""));
+        let path_segments = path.trim_start_matches('/').split('/').map(|s| s.to_string()).collect();
+
+        let query_params = query_str
+            .split('&')
+            .filter_map(|pair| pair.split_once('='))
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+
+        let headers = request
+            .lines()
+            .skip(1)
+            .take_while(|l| !l.trim().is_empty())
+            .filter_map(|line| line.split_once(':'))
+            .map(|(k, v)| (k.trim().to_string(), v.trim().to_string()))
+            .collect();
+
+        let raw_body = request.find("\r\n\r\n").map(|idx| request[idx + 4..].trim().to_string());
+
+        Some(Self {
+            method: method.to_string(),
+            path: path.to_string(),
+            path_segments,
+            query_params,
+            headers,
+            user_id,
+            raw_body,
+            path_params: HashMap::new(),
         })
-    } else {
-        Err(HttpResponse::bad_request("Missing body".into()))
+    }
+
+    pub fn parse_body<T: DeserializeOwned>(&self) -> Option<T> {
+        self.raw_body
+            .as_ref()
+            .and_then(|b| serde_json::from_str::<T>(b).ok())
+    }
+
+    pub fn match_route(&mut self, method: &str, pattern: &str) -> bool {
+        if self.method != method {
+            return false;
+        }
+
+        let pattern_parts: Vec<&str> = pattern.trim_start_matches('/').split('/').collect();
+        if pattern_parts.len() != self.path_segments.len() {
+            return false;
+        }
+
+        let mut params = HashMap::new();
+        for (seg, pat) in self.path_segments.iter().zip(pattern_parts.iter()) {
+            if pat.starts_with(":") {
+                params.insert(pat[1..].to_string(), seg.clone());
+            } else if pat != seg {
+                return false;
+            }
+        }
+
+        self.path_params = params;
+        true
+    }
+
+    pub fn param<T: std::str::FromStr>(&self, key: &str) -> Option<T> {
+        self.path_params.get(key)?.parse::<T>().ok()
+    }
+
+    pub fn query<T: std::str::FromStr>(&self, key: &str) -> Option<T> {
+        self.query_params.get(key)?.parse::<T>().ok()
     }
 }

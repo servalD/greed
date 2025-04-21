@@ -1,8 +1,9 @@
-use std::fmt::Error;
+use std::collections::HashMap;
 
 use diesel::{PgConnection, QueryResult};
-use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey, TokenData};
+use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey, get_current_timestamp};
 use serde::{Serialize, Deserialize};
+use std::sync::{Arc, RwLock};
 use chrono::{Utc, Duration};
 
 use crate::config::Config;
@@ -13,30 +14,30 @@ use crate::utils::logger;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub sub: i32,
-    pub exp: usize,
+    pub exp: u64,
+    pub start: u64,
     pub refresh: String,
 }
 
 #[derive(Clone)]
 pub struct AuthService {
     pub config: Config,
+    pub refresh_count: Arc<RwLock<HashMap<i32, u16>>>,
 }
 
 impl AuthService {
     pub fn new(config: Config) -> Self {
-        Self { config }
+        Self { config, refresh_count: Arc::new(RwLock::new(HashMap::new())) }
     }
 // JWT
     pub fn generate_token(&self, refresh_token: RefreshToken) -> Result<String, jsonwebtoken::errors::Error> {
         logger::debug(&format!("Génération du token pour l'utilisateur {}", refresh_token.user_id));
-        let expiration = Utc::now()
-            .checked_add_signed(Duration::seconds(self.config.jwt_expiration as i64))
-            .expect("Erreur lors du calcul d'expiration")
-            .timestamp();
+        let expiration = get_current_timestamp() + self.config.jwt_expiration;
         // On utilise le refresh_token pour générer le JWT afin de pouvoir revoquer ce dernier
         let claims = Claims {
             sub: refresh_token.user_id,
-            exp: expiration as usize,
+            exp: expiration,
+            start: Utc::now().timestamp() as u64,
             refresh: refresh_token.token,
             
         };
@@ -54,12 +55,9 @@ impl AuthService {
         result
     }
 
-    pub fn validate_token(&self, conn: &mut PgConnection, request: &str, check_refresh: bool) -> Result<Claims, &str> {
+    pub fn validate_token(&mut self, conn: &mut PgConnection, auth: &str) -> Result<Claims, &str> {
         logger::debug("Extraction du token JWT");
-        let token = match request
-            .lines()
-            .find(|line| line.starts_with("Authorization: "))
-            .and_then(|line| line.strip_prefix("Authorization: Bearer "))
+        let token = match auth.strip_prefix("Bearer ")
             .map(str::trim) {
                 Some(t) if !t.is_empty() => t,
                 _ => {
@@ -68,10 +66,13 @@ impl AuthService {
                 }
         };
         logger::debug("Validation du token JWT");
+        let mut valid = Validation::default();
+        valid.validate_exp = true;
+        valid.leeway = 0;
         let result = decode::<Claims>(
             token,
             &DecodingKey::from_secret(self.config.jwt_secret.as_ref()),
-            &Validation::default(),
+            &valid,
         );
         result
             .map_err(|e| {
@@ -79,9 +80,16 @@ impl AuthService {
                 "Invalid JWT token"
             })
             .and_then(|data| {
-                if check_refresh {
+                let last_refresh = self.refresh_count.read().unwrap().get(&data.claims.sub).copied().unwrap_or(0);
+                let current_refresh = (((Utc::now().timestamp() as u64) - data.claims.start) / self.config.jwt_check) as u16;
+                logger::debug(&format!("Last modulo {}, Current modulo {}", last_refresh, current_refresh));
+                if last_refresh != current_refresh {
                     rt_repo::check_refresh_token(conn, &data.claims.refresh)
-                        .map(|_| data.claims.clone())
+                        .map(|_| {
+                            self.refresh_count.write().unwrap().insert(data.claims.sub, current_refresh);
+                            logger::debug(&format!("Token expiration time: {}", Utc::now().timestamp() as u64 - data.claims.start));
+                            data.claims.clone()
+                        })
                         .map_err(|e| {
                             logger::warning(&format!("Refresh token invalide : {}", e));
                             "Invalid JWT token"
@@ -90,6 +98,7 @@ impl AuthService {
                     Ok(data.claims.clone())
                 }
             })
+        
     }
 
 // Refresh token
@@ -109,12 +118,9 @@ impl AuthService {
     pub fn validate_refresh_token(
     &self,
     conn: &mut PgConnection,
-    request: &str,
+    auth: &str,
 ) -> Result<RefreshToken, &str> {
-    request
-        .lines()
-        .find(|l| l.starts_with("Authorization: "))
-        .and_then(|l| l.strip_prefix("Authorization: Bearer "))
+    auth.strip_prefix("Bearer ")
         .map(str::trim)
         .filter(|t| !t.is_empty())
         .ok_or("Invalid refresh token")
