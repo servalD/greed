@@ -50,7 +50,7 @@ async fn main() -> std::io::Result<()> {
     loop {
         let (mut socket, addr) = listener.accept().await?;
         logger::info(&format!("Connexion entrante depuis {}", addr));
-        let auth_service = auth_service.clone();
+        let mut auth_service = auth_service.clone();
         let db_pool = db_pool.clone();
 
         tokio::spawn(async move {
@@ -71,7 +71,7 @@ async fn main() -> std::io::Result<()> {
             let first_line = request.lines().next().unwrap_or("");
             logger::debug(&format!("Requête brute : {}", first_line));
             let mut conn = db_pool.get().unwrap();
-            let response = handle_routes(&first_line, &request, &auth_service, &mut conn).await;
+            let response = handle_routes(&first_line, &request, &mut auth_service, &mut conn).await;
 
             if let Err(e) = socket.write_all(response.to_string().as_bytes()).await {
                 logger::error(&format!("Erreur d'écriture dans le socket : {}", e));

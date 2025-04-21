@@ -1,52 +1,43 @@
-use crate::{http::HttpResponse, services::auth_service::AuthService, logger};
+use crate::{http::{HttpResponse, RequestContext}, services::auth_service::AuthService, logger};
 mod auth;
 use diesel::pg::PgConnection;
-
-fn parse_first_line(line: &str) -> Option<(&str, &str)> {
-    let mut parts = line.split_whitespace();
-    Some((parts.next()?, parts.next()?))
-}
 
 pub async fn handle_routes(
     first_line: &str,
     request: &str,
-    auth_service: &AuthService,
+    auth_service: &mut AuthService,
     conn: &mut PgConnection,
 ) -> HttpResponse {
-    let (method, path) = match parse_first_line(first_line) {
-        Some(res) => res,
-        None => return HttpResponse::bad_request("Invalid request"),
+    let mut ctx = match RequestContext::new(first_line, request, None) {
+        Some(c) => c,
+        None => return HttpResponse::bad_request("Invalid request format"),
     };
 
-    let segments: Vec<&str> = path.trim_start_matches('/').split('/').collect();
+    let resp = match true {
+        _ if ctx.match_route("POST", "/signup") => auth::handle_signup(conn, &ctx).await,
+        _ if ctx.match_route("POST", "/login") => auth::handle_login(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("POST", "/refresh") => auth::handle_refresh(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("POST", "/logout") => auth::handle_logout(conn, &ctx, auth_service).await,
+        _ => HttpResponse::i_am_a_teapot()
+    };
 
-    // Routes publiques
-    match (method, segments.as_slice()) {
-        ("POST", ["signup"]) => return auth::handle_signup(conn, request).await,
-        ("POST", ["login"]) => return auth::handle_login(conn, request, auth_service).await,
-        ("POST", ["refresh"]) => return auth::handle_refresh(conn, request, auth_service).await,
-        ("POST", ["logout"]) => return auth::handle_logout(conn, request, auth_service).await,
-        _ => {}
+    if resp.status_code != 418 {
+        return resp;
     }
 
-    // Routes protégées : valider le JWT une fois
-    let user_id = match auth_service.validate_token(conn, request, true) {
-        Ok(claims) => claims.sub,
+    ctx.user_id = match auth_service.validate_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
+        Ok(claims) => Some(claims.sub),
         Err(e) => {
             logger::warning(&format!("Erreur d'authentification : {}", e));
             return HttpResponse::unauthorized();
         }
     };
 
-    // Routes avec JWT
-    match (method, segments.as_slice()) {
-        ("GET", ["user"]) => auth::handle_get_user(conn, user_id).await,
-        ("GET", ["user", id_str]) => match id_str.parse::<i32>() {
-            Ok(id) => auth::handle_get_user(conn, id).await,
-            Err(_) => HttpResponse::bad_request("Invalid user ID"),
-        },
-        ("PUT", ["user"]) => auth::handle_update_user(conn, request).await,
-        ("DELETE", ["user"]) => auth::handle_delete_user(conn, request).await,
+    match true {
+        _ if ctx.match_route("GET", "/user") => auth::handle_get_user(conn, &ctx).await,
+        _ if ctx.match_route("GET", "/user/:id") => auth::handle_get_user(conn, &ctx).await,
+        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx).await,
+        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx).await,
         _ => {
             logger::warning("Route non reconnue");
             HttpResponse::not_found()
