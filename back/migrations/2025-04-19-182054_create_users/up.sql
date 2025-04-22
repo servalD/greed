@@ -1,8 +1,11 @@
--- Active: 1745172809718@@localhost@5432@greed
+CREATE TYPE role AS ENUM ('admin', 'agent', 'client', 'guest');
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
-    eth_address TEXT UNIQUE,
-    password_hash TEXT NOT NULL
+    first_name TEXT,
+    last_name TEXT,
+    eth_address TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role role NOT NULL
 );

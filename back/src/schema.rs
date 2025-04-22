@@ -1,5 +1,11 @@
 // @generated automatically by Diesel CLI.
 
+pub mod sql_types {
+    #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "role"))]
+    pub struct Role;
+}
+
 diesel::table! {
     refresh_tokens (id) {
         id -> Int4,
@@ -11,12 +17,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::Role;
+
     users (id) {
         id -> Int4,
-        username -> Text,
         email -> Text,
-        eth_address -> Nullable<Text>,
+        first_name -> Nullable<Text>,
+        last_name -> Nullable<Text>,
+        eth_address -> Text,
         password_hash -> Text,
+        role -> Role,
     }
 }
 
