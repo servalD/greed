@@ -35,7 +35,7 @@ pub fn revoke_all_refresh_tokens_for_user(
     conn: &mut PgConnection,
     uid: i32
 ) -> QueryResult<usize> {
-    diesel::delete(refresh_tokens.filter(user_id.eq(uid))).execute(conn)
+    diesel::delete(refresh_tokens.filter(user_id.eq(&uid))).execute(conn)
 }
 
 pub fn purge_expired_refresh_tokens(
