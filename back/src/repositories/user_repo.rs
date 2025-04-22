@@ -9,15 +9,15 @@ pub fn create_user(conn: &mut PgConnection, new: &NewUser) -> QueryResult<usize>
 pub fn find_user(
     conn: &mut PgConnection,
     id_opt: Option<i32>,
-    username_opt: Option<&str>,
+    eth_address_opt: Option<&str>,
     email_opt: Option<&str>,
 ) -> QueryResult<Option<User>> {
     use back::schema::users::dsl::*;
 
     if let Some(id_val) = id_opt {
         users.filter(id.eq(id_val)).first::<User>(conn).optional()
-    } else if let Some(username_val) = username_opt {
-        users.filter(username.eq(username_val)).first::<User>(conn).optional()
+    } else if let Some(eth_address_val) = eth_address_opt {
+        users.filter(eth_address.eq(eth_address_val)).first::<User>(conn).optional()
     } else if let Some(email_val) = email_opt {
         users.filter(email.eq(email_val)).first::<User>(conn).optional()
     } else {

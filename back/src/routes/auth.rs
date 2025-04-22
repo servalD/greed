@@ -17,16 +17,25 @@ pub async fn handle_signup(conn: &mut PgConnection, ctx: &RequestContext) -> Htt
         Err(_) => return HttpResponse::internal_server_error(),
     };
 
+    logger::debug(&format!("Création de l'utilisateur {:?}", payload));
+
     let new_user = NewUser {
-        username: payload.username,
         email: payload.email,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
         password_hash,
+        eth_address: payload.eth_address,
+        role: payload.role,
     };
+    
     match user_repo::create_user(conn, &new_user) {
         Ok(_) => HttpResponse::ok(Some("User created".to_string())),
         Err(e) => match e.to_string().as_str() {
             e if e.starts_with("duplicate") => HttpResponse::conflict(),
-            _ => HttpResponse::internal_server_error()
+            e => {
+                logger::error(&format!("Erreur création utilisateur: {}", e));
+                HttpResponse::internal_server_error()
+            },
         },
     }
 }
@@ -39,7 +48,7 @@ pub async fn handle_login(conn: &mut PgConnection, ctx: &RequestContext, auth_se
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    let user = match user_repo::find_user(conn, None, payload.username.as_deref(), payload.email.as_deref()) {
+    let user = match user_repo::find_user(conn, None, Some(&payload.eth_address), payload.email.as_deref()) {
         Ok(Some(u)) => u,
         Ok(None) => {
             logger::warning("Utilisateur non trouvé");
@@ -110,7 +119,6 @@ pub async fn handle_refresh(conn: &mut PgConnection, ctx: &RequestContext, auth_
     HttpResponse::ok(Some(json))
 }
 
-
 pub async fn handle_logout(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
     let refresh_token = match auth_service.validate_refresh_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
         Ok(c) => c,
@@ -138,9 +146,12 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
     };
 
     let update = UpdateUserData {
-        username: payload.username,
         email: payload.email,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
         password_hash,
+        eth_address: payload.eth_address,
+        role: payload.role,
     };
     
     match user_repo::update_user(conn, payload.id, update) {
@@ -158,7 +169,7 @@ pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -
         None => return HttpResponse::bad_request("Invalid body format"),
     };
     match user_repo::delete_user(conn, payload.id) {
-        Ok(size) => match size{
+        Ok(size) => match size {
             1 => HttpResponse::ok(Some("User deleted".to_string())),
             _ => HttpResponse::not_found(),
         },
@@ -172,7 +183,7 @@ pub async fn handle_find_user(conn: &mut PgConnection, ctx: &RequestContext) -> 
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    match user_repo::find_user(conn, payload.id, payload.username.as_deref(), payload.email.as_deref()) {
+    match user_repo::find_user(conn, payload.id, payload.eth_address.as_deref(), payload.email.as_deref()) {
         Ok(Some(user)) => match user.safe_json() {
             Ok(json) => HttpResponse::ok(Some(json)),
             Err(_) => HttpResponse::internal_server_error(),
@@ -183,7 +194,6 @@ pub async fn handle_find_user(conn: &mut PgConnection, ctx: &RequestContext) -> 
 }
 
 pub async fn handle_get_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
-
     let user_id = ctx.param::<i32>("id").or(ctx.user_id);
 
     match user_repo::find_user(conn, user_id, None, None) {

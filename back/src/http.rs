@@ -2,6 +2,8 @@
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 
+use crate::utils::logger;
+
 pub struct HttpResponse {
     pub status_code: u16,
     reason_phrase: &'static str,
@@ -133,11 +135,21 @@ impl RequestContext {
         })
     }
 
-    pub fn parse_body<T: DeserializeOwned>(&self) -> Option<T> {
-        self.raw_body
-            .as_ref()
-            .and_then(|b| serde_json::from_str::<T>(b).ok())
-    }
+        pub fn parse_body<T: DeserializeOwned>(&self) -> Option<T> {
+            match &self.raw_body {
+                Some(body) => match serde_json::from_str::<T>(body) {
+                    Ok(parsed) => Some(parsed),
+                    Err(e) => {
+                        logger::warning(&format!("Erreur de parsing du body : {}", e));
+                        None
+                    }
+                },
+                None => {
+                    logger::debug("Aucun body à parser");
+                    None
+                }
+            }
+        }
 
     pub fn match_route(&mut self, method: &str, pattern: &str) -> bool {
         if self.method != method {
