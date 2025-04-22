@@ -32,7 +32,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\": \"bob\", \"email\": \"bob@example.com\", \"password\": \"bob123\"}"
+					"raw": "{\n    \"first_name\": \"Bob2\",\n    \"last_name\": \"Marley\",\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE5\",\n    \"email\": \"bob2@marley.com\", \n    \"password\": \"bob123\",\n    \"role\": \"Admin\"\n}\n"
 				},
 				"url": {
 					"raw": "{{URL}}/signup",
@@ -76,7 +76,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\": \"bob\", \"password\": \"bob123\"}"
+					"raw": "{\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE2\", \n    \"password\": \"bob123\"\n}"
 				},
 				"url": {
 					"raw": "{{URL}}/login",
@@ -213,12 +213,16 @@
 							"    pm.response.to.have.status(200);",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [
 					{
 						"key": "Authorization",
@@ -227,15 +231,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\": 1}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "{{URL}}/user",
+					"raw": "{{URL}}/user/1",
 					"host": [
 						"{{URL}}"
 					],
 					"path": [
-						"user"
+						"user",
+						"1"
 					]
 				}
 			},
@@ -252,7 +257,8 @@
 							"    pm.response.to.have.status(200);",
 							"});"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -270,7 +276,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\": 1, \"username\": \"bob_updated\", \"email\": \"bob.updated@example.com\", \"password\": \"newpassword\"}"
+					"raw": "{\n    \"id\": 1,\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE2\",\n    \"first_name\": \"Bob up\",\n    \"last_name\": \"Marley up\",\n    \"email\": \"bobup@marleyup.com\",\n    \"role\": \"Agent\"\n}"
 				},
 				"url": {
 					"raw": "{{URL}}/user",

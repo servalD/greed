@@ -15,7 +15,7 @@ pub fn find_user(
     use back::schema::users::dsl::*;
 
     if let Some(id_val) = id_opt {
-        users.filter(id.eq(id_val)).first::<User>(conn).optional()
+        users.filter(id.eq(&id_val)).first::<User>(conn).optional()
     } else if let Some(eth_address_val) = eth_address_opt {
         users.filter(eth_address.eq(eth_address_val)).first::<User>(conn).optional()
     } else if let Some(email_val) = email_opt {
@@ -30,11 +30,11 @@ pub fn update_user(
     user_id: i32,
     update: UpdateUserData,
 ) -> QueryResult<User> {
-    diesel::update(users.filter(id.eq(user_id)))
+    diesel::update(users.filter(id.eq(&user_id)))
         .set(update)
         .get_result(conn)
 }
 
 pub fn delete_user(conn: &mut PgConnection, user_id: i32) -> QueryResult<usize> {
-    diesel::delete(users.filter(id.eq(user_id))).execute(conn)
+    diesel::delete(users.filter(id.eq(&user_id))).execute(conn)
 }
