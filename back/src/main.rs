@@ -16,6 +16,7 @@ use utils::logger;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool};
 use std::env;
+use alloy::providers::ProviderBuilder;
 
 type PgPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -46,6 +47,7 @@ async fn main() -> std::io::Result<()> {
     let db_pool =  get_db_connection_pool();
     let listener = TcpListener::bind("127.0.0.1:3000").await?;
     logger::info("Serveur écoutant sur 127.0.0.1:3000");
+    
 
     loop {
         let (mut socket, addr) = listener.accept().await?;
