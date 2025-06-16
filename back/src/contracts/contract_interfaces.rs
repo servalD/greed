@@ -22,3 +22,9 @@ sol!(
     "../foundry/out/FractionalToken.sol/FractionalToken.json"
 );
 
+sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    IManager,
+    "../foundry/out/Manager.sol/Manager.json"
+);
