@@ -3,6 +3,7 @@ pub mod title;
 pub mod status;
 pub mod store;
 pub mod request;
+pub mod db;
 
 use std::sync::Arc;
 use request::handle_client;

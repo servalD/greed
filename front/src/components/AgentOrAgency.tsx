@@ -6,6 +6,7 @@ import { ErrorService } from '@/service/error.service';
 import { Address } from 'viem';
 import { useAgency } from '@/contracts/useAgency';
 import { useReadDataContract } from '@/contracts/useReadDataContract';
+import { motion } from 'framer-motion';
 
 const darkTheme = createTheme({
   palette: {
@@ -57,10 +58,20 @@ const AgentOrAgency = () => {
       options: {
         customBodyRenderLite: (dataIndex: any) => (
           <div className="flex gap-2">
-            <Button variant="contained" color="success" onClick={() => handleAccept(guestData[dataIndex].id)}>
+            <Button 
+              variant="contained" 
+              color="success" 
+              onClick={() => handleAccept(guestData[dataIndex].id)}
+              className="bg-green-600 hover:bg-green-700 transition-colors"
+            >
               Accepter
             </Button>
-            <Button variant="contained" color="error" onClick={() => handleDeny(guestData[dataIndex].id)}>
+            <Button 
+              variant="contained" 
+              color="error" 
+              onClick={() => handleDeny(guestData[dataIndex].id)}
+              className="bg-red-600 hover:bg-red-700 transition-colors"
+            >
               Refuser
             </Button>
           </div>
@@ -77,7 +88,12 @@ const AgentOrAgency = () => {
       label: 'Actions',
       options: {
         customBodyRenderLite: (dataIndex : any) => (
-          <Button variant="contained" color="warning" onClick={() => handleBan(clientData[dataIndex].id)}>
+          <Button 
+            variant="contained" 
+            color="warning" 
+            onClick={() => handleBan(clientData[dataIndex].id)}
+            className="bg-amber-600 hover:bg-amber-700 transition-colors"
+          >
             Bannir
           </Button>
         ),
@@ -117,28 +133,96 @@ const AgentOrAgency = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div className="min-h-screen p-8" style={{ backgroundColor: darkTheme.palette.background.default, color: darkTheme.palette.text.primary }}>
-        <h1 className="text-2xl font-bold mb-4">Agent's dashboard</h1>
-        <Button variant="contained" color="primary" onClick={handleClickOpen} disabled={isPendingCopro}>
-          {isPendingCopro ? "Création..." : "Add a new Copro"}
-        </Button>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-24">
+        <div className="container mx-auto px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+              Dashboard Administrateur
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Gérez vos propriétés et vos utilisateurs depuis ce panneau de contrôle
+            </p>
+          </motion.div>
 
-        <AddCoproDialog
-          open={open}
-          handleClose={handleClose}
-          handleSubmit={handleSubmit}
-          handleChange={handleChange}
-          propertyData={propertyData}
-        />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-8"
+          >
+            <Button 
+              variant="contained" 
+              onClick={handleClickOpen} 
+              disabled={isPendingCopro}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+                text-white font-medium px-6 py-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all duration-200
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPendingCopro ? (
+                <div className="flex items-center">
+                  <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                  Création en cours...
+                </div>
+              ) : (
+                "Ajouter une nouvelle propriété"
+              )}
+            </Button>
+          </motion.div>
 
-        <h2 className="text-xl font-semibold mt-8">Guest waitlist</h2>
-        <div className="mt-4">
-          <MUIDataTable title="Guest list" data={guestData} columns={guestColumns} options={{ selectableRows: 'none' }} />
-        </div>
+          <AddCoproDialog
+            open={open}
+            handleClose={handleClose}
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            propertyData={propertyData}
+          />
 
-        <h2 className="text-xl font-semibold mt-8">Clients</h2>
-        <div className="mt-4">
-          <MUIDataTable title="Client list" data={clientData} columns={clientColumns} options={{ selectableRows: 'none' }} />
+          <div className="space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-white">Liste d'attente des invités</h2>
+              <MUIDataTable 
+                title="" 
+                data={guestData} 
+                columns={guestColumns} 
+                options={{ 
+                  selectableRows: 'none',
+                  elevation: 0,
+                  tableBodyHeight: 'auto',
+                  tableBodyMaxHeight: '400px',
+                }} 
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-white">Liste des clients</h2>
+              <MUIDataTable 
+                title="" 
+                data={clientData} 
+                columns={clientColumns} 
+                options={{ 
+                  selectableRows: 'none',
+                  elevation: 0,
+                  tableBodyHeight: 'auto',
+                  tableBodyMaxHeight: '400px',
+                }} 
+              />
+            </motion.div>
+          </div>
         </div>
       </div>
     </ThemeProvider>

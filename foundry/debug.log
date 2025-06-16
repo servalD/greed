@@ -1,0 +1,889 @@
+No files changed, compilation skipped
+
+Ran 3 tests for test/Manager.t.sol:ManagerTest
+[PASS] testAddAgency() (gas: 15411)
+Traces:
+  [15411] ManagerTest::testAddAgency()
+    ├─ [4340] Manager::hasRole(1, Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1]) [staticcall]
+    │   └─ ← [Return] true, 0
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testAddAgent() (gas: 43751)
+Traces:
+  [43751] ManagerTest::testAddAgent()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [26824] Manager::addAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ emit RoleGranted(roleId: 2, account: SHA-256: [0x0000000000000000000000000000000000000002], delay: 0, since: 1, newMember: true)
+    │   └─ ← [Stop]
+    ├─ [2340] Manager::hasRole(2, SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] true, 0
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testAddCopro() (gas: 5699116)
+Traces:
+  [5798616] ManagerTest::testAddCopro()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(Identity: [0x0000000000000000000000000000000000000004], 10000000000000000000 [1e19])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [43786] Agency::hireAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ [9359] Manager::canCall(ECRecover: [0x0000000000000000000000000000000000000001], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xf2f74689) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [26824] Manager::addAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   │   ├─ emit RoleGranted(roleId: 2, account: SHA-256: [0x0000000000000000000000000000000000000002], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [72496] Agency::GuestEntrance()
+    │   ├─ [4207] Manager::hasRole(3, Identity: [0x0000000000000000000000000000000000000004]) [staticcall]
+    │   │   └─ ← [Return] false, 0
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [45559] Agency::acceptClient(Identity: [0x0000000000000000000000000000000000000004])
+    │   ├─ [5359] Manager::canCall(SHA-256: [0x0000000000000000000000000000000000000002], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xa3eb9444) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [33657] Manager::grantRole(3, Identity: [0x0000000000000000000000000000000000000004], 0)
+    │   │   ├─ emit RoleGranted(roleId: 3, account: Identity: [0x0000000000000000000000000000000000000004], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   ├─ emit ClientAccepted(client: Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: de547b7d00000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [8430] Copro::buy{value: 1000000000000000000}(0)
+    │   ├─ [5359] Manager::canCall(Identity: [0x0000000000000000000000000000000000000004], Copro: [0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc], 0xd96a094a) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   └─ ← [Revert] FlatNotForSale()
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [53688] Copro::sell(0, 1000000000000000000 [1e18])
+    │   ├─ emit Approval(owner: ModExp: [0x0000000000000000000000000000000000000005], approved: Copro: [0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc], tokenId: 0)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [193914] Copro::buy{value: 1000000000000000000}(0)
+    │   ├─ [5359] Manager::canCall(Identity: [0x0000000000000000000000000000000000000004], Copro: [0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc], 0xd96a094a) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ emit Transfer(from: ModExp: [0x0000000000000000000000000000000000000005], to: Identity: [0x0000000000000000000000000000000000000004], tokenId: 0)
+    │   ├─ emit Approval(owner: Identity: [0x0000000000000000000000000000000000000004], approved: 0x0000000000000000000000000000000000000000, tokenId: 0)
+    │   ├─ [150] ECAdd::fallback{value: 20000000000000000}()
+    │   │   └─ ← [Return] 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    │   ├─ [200] ModExp::fallback{value: 980000000000000000}()
+    │   │   └─ ← [Return]
+    │   └─ ← [Stop]
+    ├─ [1191] Copro::ownerOf(0) [staticcall]
+    │   └─ ← [Return] Identity: [0x0000000000000000000000000000000000000004]
+    ├─ [0] VM::assertEq(Identity: [0x0000000000000000000000000000000000000004], Identity: [0x0000000000000000000000000000000000000004]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 5.28ms (581.29µs CPU time)
+
+Ran 13 tests for test/FractionalToken.t.sol:FractionalTokenTest
+[PASS] testCancelSaleOrderRevertNoSaleActive() (gas: 13165)
+Traces:
+  [13165] FractionalTokenTest::testCancelSaleOrderRevertNoSaleActive()
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf4844814)
+    │   └─ ← [Return]
+    ├─ [2446] FractionalToken::cancelSaleOrder()
+    │   └─ ← [Revert] NoSaleActive()
+    └─ ← [Stop]
+
+[PASS] testCancelSaleOrderSuccess() (gas: 77626)
+Traces:
+  [102298] FractionalTokenTest::testCancelSaleOrderSuccess()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [74886] FractionalToken::listAllTokensForSale(1)
+    │   ├─ emit Transfer(from: SHA-256: [0x0000000000000000000000000000000000000002], to: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], value: 1000)
+    │   ├─ emit TokensListed(seller: SHA-256: [0x0000000000000000000000000000000000000002], amount: 1000, pricePerToken: 1000000000000000000 [1e18])
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [5343] FractionalToken::cancelSaleOrder()
+    │   ├─ emit Transfer(from: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], to: SHA-256: [0x0000000000000000000000000000000000000002], value: 1000)
+    │   ├─ emit SaleOrderCanceled(seller: SHA-256: [0x0000000000000000000000000000000000000002], amount: 1000)
+    │   └─ ← [Stop]
+    ├─ [1136] FractionalToken::saleOrders(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 0, 0
+    ├─ [0] VM::assertEq(0, 0, "Sale order must be deleted after cancellation") [staticcall]
+    │   └─ ← [Return]
+    ├─ [940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::assertEq(1000, 1000, "Seller should recover tokens after cancellation") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testInitialDistribution() (gas: 28156)
+Traces:
+  [28156] FractionalTokenTest::testInitialDistribution()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::assertEq(1000, 1000, "coOwner1 n'a pas la bonne part") [staticcall]
+    │   └─ ← [Return]
+    ├─ [2940] FractionalToken::balanceOf(RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::assertEq(1000, 1000, "coOwner2 n'a pas la bonne part") [staticcall]
+    │   └─ ← [Return]
+    ├─ [2940] FractionalToken::balanceOf(Identity: [0x0000000000000000000000000000000000000004]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::assertEq(1000, 1000, "coOwner3 n'a pas la bonne part") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testListAllTokensForSaleRevertNoTokens() (gas: 11748)
+Traces:
+  [11748] FractionalTokenTest::testListAllTokensForSaleRevertNoTokens()
+    ├─ [0] VM::prank(PointEvaluation: [0x000000000000000000000000000000000000000A])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: 19f2de1700000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [2717] FractionalToken::listAllTokensForSale(1)
+    │   └─ ← [Revert] NoTokenToList()
+    └─ ← [Stop]
+
+[PASS] testListAllTokensForSaleSuccess() (gas: 92245)
+Traces:
+  [97045] FractionalTokenTest::testListAllTokensForSaleSuccess()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [74886] FractionalToken::listAllTokensForSale(1)
+    │   ├─ emit Transfer(from: SHA-256: [0x0000000000000000000000000000000000000002], to: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], value: 1000)
+    │   ├─ emit TokensListed(seller: SHA-256: [0x0000000000000000000000000000000000000002], amount: 1000, pricePerToken: 1000000000000000000 [1e18])
+    │   └─ ← [Stop]
+    ├─ [1136] FractionalToken::saleOrders(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000, 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000, 1000, "Listed amount must equal seller's balance") [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18], "Price per token not converted correctly") [staticcall]
+    │   └─ ← [Return]
+    ├─ [940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0, "Seller balance should be zero after listing") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testMintByNonOwnerRevert() (gas: 14547)
+Traces:
+  [14547] FractionalTokenTest::testMintByNonOwnerRevert()
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf4844814)
+    │   └─ ← [Return]
+    ├─ [3225] FractionalToken::mint(SHA-256: [0x0000000000000000000000000000000000000002], 100)
+    │   └─ ← [Revert] OwnableUnauthorizedAccount(0x0000000000000000000000000000000000000002)
+    └─ ← [Stop]
+
+[PASS] testMintByNonOwnerReverts() (gas: 14548)
+Traces:
+  [14548] FractionalTokenTest::testMintByNonOwnerReverts()
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf4844814)
+    │   └─ ← [Return]
+    ├─ [3225] FractionalToken::mint(SHA-256: [0x0000000000000000000000000000000000000002], 100)
+    │   └─ ← [Revert] OwnableUnauthorizedAccount(0x0000000000000000000000000000000000000002)
+    └─ ← [Stop]
+
+[PASS] testMintByOwner() (gas: 31484)
+Traces:
+  [31484] FractionalTokenTest::testMintByOwner()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [15443] FractionalToken::mint(SHA-256: [0x0000000000000000000000000000000000000002], 100)
+    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: SHA-256: [0x0000000000000000000000000000000000000002], value: 100)
+    │   └─ ← [Stop]
+    ├─ [940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1100
+    ├─ [0] VM::assertEq(1100, 1100, "Mint par owner incorrect") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testMintByOwnerSuccess() (gas: 33383)
+Traces:
+  [33383] FractionalTokenTest::testMintByOwnerSuccess()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [13443] FractionalToken::mint(SHA-256: [0x0000000000000000000000000000000000000002], 100)
+    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: SHA-256: [0x0000000000000000000000000000000000000002], value: 100)
+    │   └─ ← [Stop]
+    ├─ [940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1100
+    ├─ [0] VM::assertEq(1100, 1100, "Mint did not increase balance correctly") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testOnERC721Received() (gas: 18198)
+Traces:
+  [18198] FractionalTokenTest::testOnERC721Received()
+    ├─ [0] VM::expectEmit(true, true, true, true)
+    │   └─ ← [Return]
+    ├─ emit ReceivedNFT(operator: 0x0000000000000000000000000000000000000064, from: 0x0000000000000000000000000000000000000065, tokenId: 1, data: 0x74657374)
+    ├─ [4421] FractionalToken::onERC721Received(0x0000000000000000000000000000000000000064, 0x0000000000000000000000000000000000000065, 1, 0x74657374)
+    │   ├─ emit ReceivedNFT(operator: 0x0000000000000000000000000000000000000064, from: 0x0000000000000000000000000000000000000065, tokenId: 1, data: 0x74657374)
+    │   └─ ← [Return] 0x150b7a02
+    ├─ [0] VM::assertEq(0x150b7a0200000000000000000000000000000000000000000000000000000000, 0x150b7a0200000000000000000000000000000000000000000000000000000000, "Selecteur retourne incorrect") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testPurchaseAllTokensFromSellerRevertInsufficientFunds() (gas: 95376)
+Traces:
+  [100176] FractionalTokenTest::testPurchaseAllTokensFromSellerRevertInsufficientFunds()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [74886] FractionalToken::listAllTokensForSale(1)
+    │   ├─ emit Transfer(from: SHA-256: [0x0000000000000000000000000000000000000002], to: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], value: 1000)
+    │   ├─ emit TokensListed(seller: SHA-256: [0x0000000000000000000000000000000000000002], amount: 1000, pricePerToken: 1000000000000000000 [1e18])
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(0x000000000000000000000000000000000000000b, 2000000000000000000000 [2e21])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: 356680b700000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [1168] FractionalToken::purchaseAllTokensFromSeller{value: 1000000000000000000000}(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Revert] InsufficientFunds()
+    └─ ← [Stop]
+
+[PASS] testPurchaseAllTokensFromSellerRevertNoSaleActive() (gas: 14709)
+Traces:
+  [14709] FractionalTokenTest::testPurchaseAllTokensFromSellerRevertNoSaleActive()
+    ├─ [0] VM::deal(0x000000000000000000000000000000000000000b, 2000000000000000000000 [2e21])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: 23e790c900000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [2782] FractionalToken::purchaseAllTokensFromSeller(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Revert] NoSaleActive()
+    └─ ← [Stop]
+
+[PASS] testPurchaseAllTokensFromSellerSuccess() (gas: 133847)
+Traces:
+  [172574] FractionalTokenTest::testPurchaseAllTokensFromSellerSuccess()
+    ├─ [2940] FractionalToken::balanceOf(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [74886] FractionalToken::listAllTokensForSale(1)
+    │   ├─ emit Transfer(from: SHA-256: [0x0000000000000000000000000000000000000002], to: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], value: 1000)
+    │   ├─ emit TokensListed(seller: SHA-256: [0x0000000000000000000000000000000000000002], amount: 1000, pricePerToken: 1000000000000000000 [1e18])
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(0x000000000000000000000000000000000000000b, 2000000000000000000000 [2e21])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return]
+    ├─ [67671] FractionalToken::purchaseAllTokensFromSeller{value: 1000100000000000000000}(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ emit Transfer(from: FractionalToken: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459], to: 0x000000000000000000000000000000000000000b, value: 1000)
+    │   ├─ [60] PRECOMPILES::sha256{value: 1000000000000000000000}(0x)
+    │   │   └─ ← [Return] 0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    │   ├─ [0] 0x000000000000000000000000000000000000000b::fallback{value: 100000000000000000}()
+    │   │   └─ ← [Stop]
+    │   ├─ emit TokensPurchasedFromSeller(seller: SHA-256: [0x0000000000000000000000000000000000000002], buyer: 0x000000000000000000000000000000000000000b, amount: 1000, totalPrice: 1000000000000000000000 [1e21])
+    │   └─ ← [Stop]
+    ├─ [940] FractionalToken::balanceOf(0x000000000000000000000000000000000000000b) [staticcall]
+    │   └─ ← [Return] 1000
+    ├─ [0] VM::assertEq(1000, 1000, "Buyer must receive all tokens") [staticcall]
+    │   └─ ← [Return]
+    ├─ [1136] FractionalToken::saleOrders(SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] 0, 0
+    ├─ [0] VM::assertEq(0, 0, "Sale order must be deleted after purchase") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 5.43ms (2.00ms CPU time)
+
+Ran 5 tests for test/Agency.t.sol:AgencyTest
+[PASS] testAcceptClient() (gas: 148104)
+Traces:
+  [190396] AgencyTest::testAcceptClient()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [46286] Agency::hireAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ [9359] Manager::canCall(ECRecover: [0x0000000000000000000000000000000000000001], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xf2f74689) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [26824] Manager::addAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   │   ├─ emit RoleGranted(roleId: 2, account: SHA-256: [0x0000000000000000000000000000000000000002], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return]
+    ├─ [72496] Agency::GuestEntrance()
+    │   ├─ [4207] Manager::hasRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   │   └─ ← [Return] false, 0
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [45559] Agency::acceptClient(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   ├─ [5359] Manager::canCall(SHA-256: [0x0000000000000000000000000000000000000002], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xa3eb9444) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [33657] Manager::grantRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003], 0)
+    │   │   ├─ emit RoleGranted(roleId: 3, account: RIPEMD-160: [0x0000000000000000000000000000000000000003], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   ├─ emit ClientAccepted(client: RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Stop]
+    ├─ [967] Agency::guests() [staticcall]
+    │   └─ ← [Return] []
+    ├─ [0] VM::assertFalse(false) [staticcall]
+    │   └─ ← [Return]
+    ├─ [2340] Manager::hasRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   └─ ← [Return] true, 0
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testCreateAndGetCopro() (gas: 5450751)
+Traces:
+  [5450751] AgencyTest::testCreateAndGetCopro()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5405452] Agency::createCopro("TestCopro", "TC", 5, ModExp: [0x0000000000000000000000000000000000000005])
+    │   ├─ [5263505] → new Copro@0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B
+    │   │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   │   └─ ← [Return] 25074 bytes of code
+    │   ├─ [24897] Manager::addCopro(Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B])
+    │   │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], selector: 0xd96a094a, roleId: 3)
+    │   │   └─ ← [Stop]
+    │   └─ ← [Return] Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [536] Agency::nbListedCopro() [staticcall]
+    │   └─ ← [Return] 1
+    ├─ [0] VM::assertEq(1, 1) [staticcall]
+    │   └─ ← [Return]
+    ├─ [1172] Agency::getCoproById(0) [staticcall]
+    │   └─ ← [Return] Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [1397] Copro::name() [staticcall]
+    │   └─ ← [Return] "TestCopro"
+    ├─ [0] VM::assertEq("TestCopro", "TestCopro") [staticcall]
+    │   └─ ← [Return]
+    ├─ [1375] Copro::symbol() [staticcall]
+    │   └─ ← [Return] "TC"
+    ├─ [0] VM::assertEq("TC", "TC") [staticcall]
+    │   └─ ← [Return]
+    ├─ [5447] Agency::getCoproByName("TestCopro") [staticcall]
+    │   ├─ [1397] Copro::name() [staticcall]
+    │   │   └─ ← [Return] "TestCopro"
+    │   └─ ← [Return] Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [0] VM::assertEq(Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3: 00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000064ed40eab60000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b4e6f6e4578697374696e6700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [5300] Agency::getCoproByName("NonExisting") [staticcall]
+    │   ├─ [1397] Copro::name() [staticcall]
+    │   │   └─ ← [Return] "TestCopro"
+    │   └─ ← [Revert] COLLECTION_NOT_FOUND("NonExisting")
+    ├─ [2020] Agency::getCopros() [staticcall]
+    │   └─ ← [Return] [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [0] VM::assertEq(1, 1) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], Copro: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testGuestEntrance() (gas: 91089)
+Traces:
+  [91089] AgencyTest::testGuestEntrance()
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return]
+    ├─ [76996] Agency::GuestEntrance()
+    │   ├─ [4207] Manager::hasRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   │   └─ ← [Return] false, 0
+    │   └─ ← [Stop]
+    ├─ [1501] Agency::guests() [staticcall]
+    │   └─ ← [Return] [0x0000000000000000000000000000000000000003]
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testGuestEntranceAndAlreadyClient() (gas: 145358)
+Traces:
+  [186963] AgencyTest::testGuestEntranceAndAlreadyClient()
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return]
+    ├─ [76996] Agency::GuestEntrance()
+    │   ├─ [4207] Manager::hasRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   │   └─ ← [Return] false, 0
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [41786] Agency::hireAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ [9359] Manager::canCall(ECRecover: [0x0000000000000000000000000000000000000001], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xf2f74689) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [26824] Manager::addAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   │   ├─ emit RoleGranted(roleId: 2, account: SHA-256: [0x0000000000000000000000000000000000000002], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   └─ ← [Return]
+    ├─ [45559] Agency::acceptClient(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   ├─ [5359] Manager::canCall(SHA-256: [0x0000000000000000000000000000000000000002], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xa3eb9444) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [33657] Manager::grantRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003], 0)
+    │   │   ├─ emit RoleGranted(roleId: 3, account: RIPEMD-160: [0x0000000000000000000000000000000000000003], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   ├─ emit ClientAccepted(client: RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(RIPEMD-160: [0x0000000000000000000000000000000000000003])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: e3cc0e1e00000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [3727] Agency::GuestEntrance()
+    │   ├─ [2340] Manager::hasRole(3, RIPEMD-160: [0x0000000000000000000000000000000000000003]) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   └─ ← [Revert] AlreadyClient()
+    └─ ← [Stop]
+
+[PASS] testHireAgent() (gas: 65139)
+Traces:
+  [65139] AgencyTest::testHireAgent()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [46286] Agency::hireAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   ├─ [9359] Manager::canCall(ECRecover: [0x0000000000000000000000000000000000000001], Agency: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xf2f74689) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ [26824] Manager::addAgent(SHA-256: [0x0000000000000000000000000000000000000002])
+    │   │   ├─ emit RoleGranted(roleId: 2, account: SHA-256: [0x0000000000000000000000000000000000000002], delay: 0, since: 1, newMember: true)
+    │   │   └─ ← [Stop]
+    │   └─ ← [Stop]
+    ├─ [2340] Manager::hasRole(2, SHA-256: [0x0000000000000000000000000000000000000002]) [staticcall]
+    │   └─ ← [Return] true, 0
+    ├─ [0] VM::assertTrue(true) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 5.46ms (997.67µs CPU time)
+
+Ran 12 tests for test/Copro.t.sol:CoproTest
+[PASS] testAddApartmentsNotAuthorized() (gas: 5350947)
+Traces:
+  [5350947] CoproTest::testAddApartmentsNotAuthorized()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: ea8e4eb500000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [676] Copro::addApartments(2)
+    │   └─ ← [Revert] NotAuthorized()
+    └─ ← [Stop]
+
+[PASS] testAddApartmentsSuccess() (gas: 5484514)
+Traces:
+  [5484514] CoproTest::testAddApartmentsSuccess()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectEmit(true, false, false, true)
+    │   └─ ← [Return]
+    ├─ emit ApartmentsAdded(startTokenId: 5, additionalCount: 3)
+    ├─ [117029] Copro::addApartments(3)
+    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: ModExp: [0x0000000000000000000000000000000000000005], tokenId: 5)
+    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: ModExp: [0x0000000000000000000000000000000000000005], tokenId: 6)
+    │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: ModExp: [0x0000000000000000000000000000000000000005], tokenId: 7)
+    │   ├─ emit ApartmentsAdded(startTokenId: 5, additionalCount: 3)
+    │   └─ ← [Stop]
+    ├─ [493] Copro::additionalFlats() [staticcall]
+    │   └─ ← [Return] 3
+    ├─ [0] VM::assertEq(3, 3) [staticcall]
+    │   └─ ← [Return]
+    ├─ [1191] Copro::ownerOf(5) [staticcall]
+    │   └─ ← [Return] ModExp: [0x0000000000000000000000000000000000000005]
+    ├─ [0] VM::assertEq(ModExp: [0x0000000000000000000000000000000000000005], ModExp: [0x0000000000000000000000000000000000000005]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [866] Copro::market(5) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [1191] Copro::ownerOf(6) [staticcall]
+    │   └─ ← [Return] ModExp: [0x0000000000000000000000000000000000000005]
+    ├─ [0] VM::assertEq(ModExp: [0x0000000000000000000000000000000000000005], ModExp: [0x0000000000000000000000000000000000000005]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [866] Copro::market(6) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [1191] Copro::ownerOf(7) [staticcall]
+    │   └─ ← [Return] ModExp: [0x0000000000000000000000000000000000000005]
+    ├─ [0] VM::assertEq(ModExp: [0x0000000000000000000000000000000000000005], ModExp: [0x0000000000000000000000000000000000000005]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [866] Copro::market(7) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testAddApartmentsZeroRevert() (gas: 5349044)
+Traces:
+  [5349044] CoproTest::testAddApartmentsZeroRevert()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: dec1f15a00000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [708] Copro::addApartments(0)
+    │   └─ ← [Revert] MustBeGreaterThan0()
+    └─ ← [Stop]
+
+[PASS] testBuyRevertInvalidAmount() (gas: 5459161)
+Traces:
+  [5459161] CoproTest::testBuyRevertInvalidAmount()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [53688] Copro::sell(0, 1000000000000000000 [1e18])
+    │   ├─ emit Approval(owner: ModExp: [0x0000000000000000000000000000000000000005], approved: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], tokenId: 0)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [35657] Manager::grantRole(3, Identity: [0x0000000000000000000000000000000000000004], 0)
+    │   ├─ emit RoleGranted(roleId: 3, account: Identity: [0x0000000000000000000000000000000000000004], delay: 0, since: 1, newMember: true)
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(Identity: [0x0000000000000000000000000000000000000004], 10000000000000000000 [1e19])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: 2c5211c600000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [8628] Copro::buy{value: 500000000000000000}(0)
+    │   ├─ [5359] Manager::canCall(Identity: [0x0000000000000000000000000000000000000004], Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xd96a094a) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   └─ ← [Revert] InvalidAmount()
+    └─ ← [Stop]
+
+[PASS] testBuyRevertNotForSale() (gas: 5403912)
+Traces:
+  [5403912] CoproTest::testBuyRevertNotForSale()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [35657] Manager::grantRole(3, Identity: [0x0000000000000000000000000000000000000004], 0)
+    │   ├─ emit RoleGranted(roleId: 3, account: Identity: [0x0000000000000000000000000000000000000004], delay: 0, since: 1, newMember: true)
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(Identity: [0x0000000000000000000000000000000000000004], 10000000000000000000 [1e19])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: de547b7d00000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [8430] Copro::buy{value: 1000000000000000000}(0)
+    │   ├─ [5359] Manager::canCall(Identity: [0x0000000000000000000000000000000000000004], Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xd96a094a) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   └─ ← [Revert] FlatNotForSale()
+    └─ ← [Stop]
+
+[PASS] testBuyStandard() (gas: 5592914)
+Traces:
+  [5632714] CoproTest::testBuyStandard()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [53688] Copro::sell(0, 1000000000000000000 [1e18])
+    │   ├─ emit Approval(owner: ModExp: [0x0000000000000000000000000000000000000005], approved: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], tokenId: 0)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [35657] Manager::grantRole(3, Identity: [0x0000000000000000000000000000000000000004], 0)
+    │   ├─ emit RoleGranted(roleId: 3, account: Identity: [0x0000000000000000000000000000000000000004], delay: 0, since: 1, newMember: true)
+    │   └─ ← [Stop]
+    ├─ [0] VM::deal(Identity: [0x0000000000000000000000000000000000000004], 10000000000000000000 [1e19])
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(Identity: [0x0000000000000000000000000000000000000004])
+    │   └─ ← [Return]
+    ├─ [168914] Copro::buy{value: 1000000000000000000}(0)
+    │   ├─ [5359] Manager::canCall(Identity: [0x0000000000000000000000000000000000000004], Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], 0xd96a094a) [staticcall]
+    │   │   └─ ← [Return] true, 0
+    │   ├─ emit Transfer(from: ModExp: [0x0000000000000000000000000000000000000005], to: Identity: [0x0000000000000000000000000000000000000004], tokenId: 0)
+    │   ├─ emit Approval(owner: Identity: [0x0000000000000000000000000000000000000004], approved: 0x0000000000000000000000000000000000000000, tokenId: 0)
+    │   ├─ [150] ECAdd::fallback{value: 20000000000000000}()
+    │   │   └─ ← [Return] 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    │   ├─ [200] ModExp::fallback{value: 980000000000000000}()
+    │   │   └─ ← [Return]
+    │   └─ ← [Stop]
+    ├─ [1191] Copro::ownerOf(0) [staticcall]
+    │   └─ ← [Return] Identity: [0x0000000000000000000000000000000000000004]
+    ├─ [0] VM::assertEq(Identity: [0x0000000000000000000000000000000000000004], Identity: [0x0000000000000000000000000000000000000004]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [866] Copro::market(0) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    ├─ [1488] Copro::history(0, 0) [staticcall]
+    │   └─ ← [Return] Identity: [0x0000000000000000000000000000000000000004], 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(Identity: [0x0000000000000000000000000000000000000004], Identity: [0x0000000000000000000000000000000000000004]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(20000000000000000 [2e16], 20000000000000000 [2e16]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(9000000000000000000 [9e18], 9000000000000000000 [9e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::assertEq(100980000000000000000 [1.009e20], 100980000000000000000 [1.009e20]) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testCoproConstructorInvalidFlatCount() (gas: 148329)
+Traces:
+  [148329] CoproTest::testCoproConstructorInvalidFlatCount()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: f9603c6e00000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [93525] → new <unknown>@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   └─ ← [Revert] InvalidFlatCount()
+    └─ ← [Stop]
+
+[PASS] testDisabledFunctions() (gas: 5362692)
+Traces:
+  [5362692] CoproTest::testDisabledFunctions()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  disabled)
+    │   └─ ← [Return]
+    ├─ [1895] Copro::safeTransferFrom(ModExp: [0x0000000000000000000000000000000000000005], Identity: [0x0000000000000000000000000000000000000004], 0, 0x) [staticcall]
+    │   └─ ← [Revert] revert: disabled
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  disabled)
+    │   └─ ← [Return]
+    ├─ [1204] Copro::transferFrom(ModExp: [0x0000000000000000000000000000000000000005], Identity: [0x0000000000000000000000000000000000000004], 0) [staticcall]
+    │   └─ ← [Revert] revert: disabled
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  disabled)
+    │   └─ ← [Return]
+    ├─ [947] Copro::approve(Identity: [0x0000000000000000000000000000000000000004], 0) [staticcall]
+    │   └─ ← [Revert] revert: disabled
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  disabled)
+    │   └─ ← [Return]
+    ├─ [952] Copro::setApprovalForAll(Identity: [0x0000000000000000000000000000000000000004], true) [staticcall]
+    │   └─ ← [Revert] revert: disabled
+    └─ ← [Stop]
+
+[PASS] testFractionalizeAlreadyFractionalized() (gas: 6984015)
+Traces:
+  [6984015] CoproTest::testFractionalizeAlreadyFractionalized()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [1627811] Copro::fractionalize(0, "FracToken", "FTK", [0x000000000000000000000000000000000000000A], 1000000000000000000000 [1e21])
+    │   ├─ [1507827] → new FractionalToken@0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B
+    │   │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: PointEvaluation: [0x000000000000000000000000000000000000000A], value: 1000000000000000000000 [1e21])
+    │   │   └─ ← [Return] 6825 bytes of code
+    │   ├─ emit Transfer(from: ModExp: [0x0000000000000000000000000000000000000005], to: FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], tokenId: 0)
+    │   ├─ emit Fractionalized(tokenId: 0, fractionalTokenAddress: FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B])
+    │   └─ ← [Return] FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [0] VM::prank(FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: 63d0097600000000000000000000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [3811] Copro::fractionalize(0, "FracToken", "FTK", [0x000000000000000000000000000000000000000A], 1000000000000000000000 [1e21])
+    │   └─ ← [Revert] AlreadyFractionalized()
+    └─ ← [Stop]
+
+[PASS] testFractionalizeNotOwnerRevert() (gas: 5359187)
+Traces:
+  [5359187] CoproTest::testFractionalizeNotOwnerRevert()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [0] VM::expectRevert(custom error 0xc31eb0e0: w*!/)
+    │   └─ ← [Return]
+    ├─ [9324] Copro::fractionalize(0, "FracToken", "FTK", [0x000000000000000000000000000000000000000A], 1000000000000000000000 [1e21])
+    │   └─ ← [Revert] NotFlatOwner()
+    └─ ← [Stop]
+
+[PASS] testFractionalizeSuccess() (gas: 7031521)
+Traces:
+  [7031521] CoproTest::testFractionalizeSuccess()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [1675968] Copro::fractionalize(0, "FracToken", "FTK", [0x000000000000000000000000000000000000000A, 0x000000000000000000000000000000000000000b], 1000000000000000000000 [1e21])
+    │   ├─ [1555393] → new FractionalToken@0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B
+    │   │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: PointEvaluation: [0x000000000000000000000000000000000000000A], value: 500000000000000000000 [5e20])
+    │   │   ├─ emit Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x000000000000000000000000000000000000000b, value: 500000000000000000000 [5e20])
+    │   │   └─ ← [Return] 6825 bytes of code
+    │   ├─ emit Transfer(from: ModExp: [0x0000000000000000000000000000000000000005], to: FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], tokenId: 0)
+    │   ├─ emit Fractionalized(tokenId: 0, fractionalTokenAddress: FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B])
+    │   └─ ← [Return] FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [895] Copro::fractionalTokenForNFT(0) [staticcall]
+    │   └─ ← [Return] FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [0] VM::assertTrue(true, "L adresse du FractionalToken doit etre non nulle") [staticcall]
+    │   └─ ← [Return]
+    ├─ [1191] Copro::ownerOf(0) [staticcall]
+    │   └─ ← [Return] FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B]
+    ├─ [0] VM::assertEq(FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], FractionalToken: [0xfeE3f359c00b1Ef7e9123D21ff056B7BF95e508B], "Le NFT doit etre detenu par le contrat FractionalToken") [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+[PASS] testSellAndCancelSale() (gas: 5375307)
+Traces:
+  [5415107] CoproTest::testSellAndCancelSale()
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [5263505] → new Copro@0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1
+    │   ├─ emit AuthorityUpdated(authority: Manager: [0x522B3294E6d06aA25Ad0f1B8891242E335D3B459])
+    │   ├─ emit ConsecutiveTransfer(fromTokenId: 0, toTokenId: 4, fromAddress: 0x0000000000000000000000000000000000000000, toAddress: ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return] 25074 bytes of code
+    ├─ [0] VM::prank(ECRecover: [0x0000000000000000000000000000000000000001])
+    │   └─ ← [Return]
+    ├─ [24897] Manager::addCopro(Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1])
+    │   ├─ emit TargetFunctionRoleUpdated(target: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], selector: 0xd96a094a, roleId: 3)
+    │   └─ ← [Stop]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [53688] Copro::sell(0, 1000000000000000000 [1e18])
+    │   ├─ emit Approval(owner: ModExp: [0x0000000000000000000000000000000000000005], approved: Copro: [0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1], tokenId: 0)
+    │   └─ ← [Stop]
+    ├─ [866] Copro::market(0) [staticcall]
+    │   └─ ← [Return] 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18]) [staticcall]
+    │   └─ ← [Return]
+    ├─ [0] VM::prank(ModExp: [0x0000000000000000000000000000000000000005])
+    │   └─ ← [Return]
+    ├─ [7783] Copro::cancelSale(0)
+    │   ├─ emit Approval(owner: ModExp: [0x0000000000000000000000000000000000000005], approved: 0x0000000000000000000000000000000000000000, tokenId: 0)
+    │   └─ ← [Stop]
+    ├─ [866] Copro::market(0) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0) [staticcall]
+    │   └─ ← [Return]
+    └─ ← [Stop]
+
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 5.48ms (4.91ms CPU time)
+
+Ran 4 test suites in 1.78s (21.65ms CPU time): 33 tests passed, 0 failed, 0 skipped (33 total tests)
