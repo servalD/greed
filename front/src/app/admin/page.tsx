@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <main>
-      <Navbar connectionStatus={status} />
+      <Navbar />
       {status === "connected" && (role === "agent" || role === 'agency') ? (
         <AgentOrAgency />
       ) : (
