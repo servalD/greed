@@ -17,6 +17,7 @@ pub struct Apartment {
     pub region: String,
     pub country: String,
     pub address: String,
+    pub image_url: String,
 }
 
 #[derive(Insertable, Deserialize)]
@@ -32,4 +33,5 @@ pub struct NewApartment {
     pub region: String,
     pub country: String,
     pub address: String,
+    pub image_url: String,
 }

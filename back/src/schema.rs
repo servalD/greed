@@ -19,6 +19,7 @@ diesel::table! {
         region -> Text,
         country -> Text,
         address -> Text,
+        image_url -> Text,
     }
 }
 
