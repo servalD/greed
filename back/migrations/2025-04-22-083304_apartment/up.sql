@@ -9,5 +9,6 @@ CREATE TABLE apartments (
     zip_code TEXT NOT NULL,
     region TEXT NOT NULL,
     country TEXT NOT NULL,
-    address TEXT NOT NULL
+    address TEXT NOT NULL,
+    image_url TEXT NOT NULL
 );

@@ -56,3 +56,8 @@ back-add-migration:## Crée, valide et exécute une nouvelle migration Diesel
 	read -p "Validez quand les scripts sont complété." &&\
 	diesel migration run && \
 	diesel print-schema > src/schema.rs
+
+front-up:## Démarre le frontend
+	cd ./front && \
+	source .env && \
+	pnpm run dev
