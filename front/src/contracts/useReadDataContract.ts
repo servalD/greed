@@ -17,10 +17,10 @@ export const useReadDataContract = () => {
   const { data: isCoOwner, refetch: refetchCoOwner } = useReadManagerHasRole({ args: [BigInt(CO_OWNER_ROLE), address as `0x${string}`] });
 
   const userRole = useMemo(() => {
-    if (isAgency) return "agency";
-    if (isAgent) return "agent";
-    if (isClient) return "client";
-    if (isCoOwner) return "coOwner";
+    if (isAgency && isAgency[0]) return "agency";
+    if (isAgent && isAgent[0]) return "agent";
+    if (isClient && isClient[0]) return "client";
+    if (isCoOwner && isCoOwner[0]) return "coOwner";
     return "guest";
   }, [isAgency, isAgent, isClient, isCoOwner]);
 

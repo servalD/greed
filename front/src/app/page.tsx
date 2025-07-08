@@ -2,14 +2,13 @@
 
 import Navbar from "@/components/ui/navbar";
 import NotConnected from "@/components/notConnected";
-import List from "@/components/ui/list";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
 import GuestOrClient from "@/components/guestOrClient";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const status = useActiveWalletConnectionStatus();
-  const [role, setRole] = useState<string | null>(null);
+  const [_, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -19,7 +18,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-      <Navbar connectionStatus={status} />
+      <Navbar />
       
       {status === "connected" ? (
         <GuestOrClient />

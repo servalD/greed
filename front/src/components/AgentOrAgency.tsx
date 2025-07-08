@@ -56,7 +56,7 @@ const AgentOrAgency = () => {
       name: 'actions',
       label: 'Actions',
       options: {
-        customBodyRenderLite: (dataIndex: any) => (
+        customBodyRenderLite: (dataIndex: number) => (
           <div className="flex gap-2">
             <Button 
               variant="contained" 
@@ -104,7 +104,7 @@ const AgentOrAgency = () => {
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e : any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPropertyData((prevData) => ({ ...prevData, [name]: value }));
   };
@@ -126,9 +126,9 @@ const AgentOrAgency = () => {
     }
   };
 
-  const handleAccept = (id : number) => ErrorService.mixinMessage("L'invité a été accepté", "success");
-  const handleDeny = (id : number) => ErrorService.mixinMessage("L'invité a été refusé", "error");
-  const handleBan = (id : number) => ErrorService.mixinMessage("Le client a été banni", "info");
+  const handleAccept = (_ : number) => ErrorService.mixinMessage("L'invité a été accepté", "success");
+  const handleDeny = (_ : number) => ErrorService.mixinMessage("L'invité a été refusé", "error");
+  const handleBan = (_ : number) => ErrorService.mixinMessage("Le client a été banni", "info");
 
   return (
     <ThemeProvider theme={darkTheme}>

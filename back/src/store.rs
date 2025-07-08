@@ -3,9 +3,7 @@ use std::ops::{Index, IndexMut};
 
 use serde::{Deserialize, Serialize};
 
-use crate::status::Status;
-use crate::title::Title;
-use crate::description::Description;
+use crate::types::{status::Status, title::Title, description::Description};
 
 #[derive(Clone)]
 pub struct ImageStore {
