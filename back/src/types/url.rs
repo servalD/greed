@@ -95,8 +95,13 @@ fn validate_url(url: &str) -> Result<(), UrlError> {
     }
 
     // Accepter localhost ou domaines avec au moins un point
-    if domain != "localhost" && !domain.contains('.') {
+    if domain != "localhost" && !domain.contains('.') && !domain.contains(':') {
         return Err(UrlError::InvalidFormat);
+    }
+
+    // Pour localhost avec port, extraire juste localhost
+    if domain.starts_with("localhost:") {
+        return Ok(());
     }
 
     Ok(())
