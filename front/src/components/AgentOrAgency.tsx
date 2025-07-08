@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import MUIDataTable from 'mui-datatables';
 import AddCoproDialog from './dialog/AddCopro';
 import { ErrorService } from '@/service/error.service';
 import { Address } from 'viem';
 import { useAgency } from '@/contracts/useAgency';
 import { useReadDataContract } from '@/contracts/useReadDataContract';
 import { motion } from 'framer-motion';
+import { CustomDataTable } from './ui/Datatable';
 
 const darkTheme = createTheme({
   palette: {
@@ -52,59 +52,19 @@ const AgentOrAgency = () => {
   const guestColumns = [
     { name: 'name', label: 'Nom' },
     { name: 'email', label: 'Email' },
-    {
-      name: 'actions',
-      label: 'Actions',
-      options: {
-        customBodyRenderLite: (dataIndex: number) => (
-          <div className="flex gap-2">
-            <Button 
-              variant="contained" 
-              color="success" 
-              onClick={() => handleAccept(guestData[dataIndex].id)}
-              className="bg-green-600 hover:bg-green-700 transition-colors"
-            >
-              Accepter
-            </Button>
-            <Button 
-              variant="contained" 
-              color="error" 
-              onClick={() => handleDeny(guestData[dataIndex].id)}
-              className="bg-red-600 hover:bg-red-700 transition-colors"
-            >
-              Refuser
-            </Button>
-          </div>
-        ),
-      },
-    },
+    { name: 'actions', label: 'Actions', actions: true },
   ];
 
   const clientColumns = [
     { name: 'name', label: 'Nom' },
     { name: 'email', label: 'Email' },
-    {
-      name: 'actions',
-      label: 'Actions',
-      options: {
-        customBodyRenderLite: (dataIndex : any) => (
-          <Button 
-            variant="contained" 
-            color="warning" 
-            onClick={() => handleBan(clientData[dataIndex].id)}
-            className="bg-amber-600 hover:bg-amber-700 transition-colors"
-          >
-            Bannir
-          </Button>
-        ),
-      },
-    },
+    { name: 'actions', label: 'Actions', actions: true },
   ];
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e : any) => {
     const { name, value } = e.target;
     setPropertyData((prevData) => ({ ...prevData, [name]: value }));
   };
@@ -126,9 +86,19 @@ const AgentOrAgency = () => {
     }
   };
 
-  const handleAccept = (_ : number) => ErrorService.mixinMessage("L'invité a été accepté", "success");
-  const handleDeny = (_ : number) => ErrorService.mixinMessage("L'invité a été refusé", "error");
-  const handleBan = (_ : number) => ErrorService.mixinMessage("Le client a été banni", "info");
+  const handleAction = (id: number, action: string) => {
+    switch (action) {
+      case 'accept':
+        ErrorService.mixinMessage("L'invité a été accepté", "success");
+        break;
+      case 'deny':
+        ErrorService.mixinMessage("L'invité a été refusé", "error");
+        break;
+      case 'ban':
+        ErrorService.mixinMessage("Le client a été banni", "info");
+        break;
+    }
+  };
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -187,19 +157,12 @@ const AgentOrAgency = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50"
             >
-              <h2 className="text-2xl font-semibold mb-4 text-white">Liste d'attente des invités</h2>
-              <MUIDataTable 
-                title="" 
-                data={guestData} 
-                columns={guestColumns} 
-                options={{ 
-                  selectableRows: 'none',
-                  elevation: 0,
-                  tableBodyHeight: 'auto',
-                  tableBodyMaxHeight: '400px',
-                }} 
+              <CustomDataTable
+                title="Liste d'attente des invités"
+                data={guestData}
+                columns={guestColumns}
+                onAction={handleAction}
               />
             </motion.div>
 
@@ -207,19 +170,12 @@ const AgentOrAgency = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50"
             >
-              <h2 className="text-2xl font-semibold mb-4 text-white">Liste des clients</h2>
-              <MUIDataTable 
-                title="" 
-                data={clientData} 
-                columns={clientColumns} 
-                options={{ 
-                  selectableRows: 'none',
-                  elevation: 0,
-                  tableBodyHeight: 'auto',
-                  tableBodyMaxHeight: '400px',
-                }} 
+              <CustomDataTable
+                title="Liste des clients"
+                data={clientData}
+                columns={clientColumns}
+                onAction={handleAction}
               />
             </motion.div>
           </div>
