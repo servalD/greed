@@ -2,9 +2,7 @@
 
 import Navbar from "@/components/ui/navbar";
 import NotConnected from "@/components/notConnected";
-import List from "@/components/ui/list";
 import { useActiveWalletConnectionStatus } from "thirdweb/react";
-import GuestOrClient from "@/components/guestOrClient";
 import { useEffect, useState } from "react";
 import AgentOrAgency from "@/components/AgentOrAgency";
 import { useRouter } from "next/navigation";
@@ -31,7 +29,7 @@ export default function Home() {
 
   return (
     <main>
-      <Navbar connectionStatus={status} />
+      <Navbar />
       {status === "connected" && (role === "agent" || role === 'agency') ? (
         <AgentOrAgency />
       ) : (
