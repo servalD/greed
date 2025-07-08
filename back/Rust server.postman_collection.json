@@ -1,582 +1,882 @@
 {
 	"info": {
-		"_postman_id": "a52c8d4c-7c14-4662-8b3e-3296c35457a3",
+		"_postman_id": "11a80dae-3b29-41e3-98e3-bf95cecab169",
 		"name": "Greed API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "34310812",
-		"_collection_link": "https://universal-astronaut-668728.postman.co/workspace/My-Workspace~f4a50da5-9cfc-415f-86da-b47699e2d1d9/collection/34310812-a52c8d4c-7c14-4662-8b3e-3296c35457a3?action=share&source=collection_link&creator=34310812"
+		"_collection_link": "https://universal-astronaut-668728.postman.co/workspace/Personal~d3b259ff-3a5b-46a4-90b3-0bf542fe29c7/collection/34310812-11a80dae-3b29-41e3-98e3-bf95cecab169?action=share&source=collection_link&creator=34310812"
 	},
 	"item": [
 		{
-			"name": "Signup",
-			"event": [
+			"name": "Auth",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"User créé\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"first_name\": \"Bob2\",\n    \"last_name\": \"Marley\",\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE5\",\n    \"email\": \"bob2@marley.com\", \n    \"password\": \"bob123\",\n    \"role\": \"Admin\"\n}\n"
-				},
-				"url": {
-					"raw": "{{URL}}/signup",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"JWT reçu\", function () {",
-							"    var json = pm.response.json();",
-							"    pm.expect(json.token).to.be.a(\"string\");",
-							"    pm.expect(json.refresh_token).to.be.a(\"string\");",
-							"    pm.environment.set(\"jwt\", json.token);",
-							"    pm.environment.set(\"refresh_token\", json.refresh_token);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE2\", \n    \"password\": \"bob123\"\n}"
-				},
-				"url": {
-					"raw": "{{URL}}/login",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Me",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Infos utilisateur reçues\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/user",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Refresh",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Token refresh OK\", function () {",
-							"    var json = pm.response.json();",
-							"    pm.expect(json.token).to.be.a(\"string\");",
-							"    pm.expect(json.refresh_token).to.be.a(\"string\");",
-							"    pm.environment.set(\"jwt\", json.token);",
-							"    pm.environment.set(\"refresh_token\", json.refresh_token);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{refresh_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/refresh",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"refresh"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Logout",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Déconnexion OK\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{refresh_token}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/logout",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get User by ID/Username/Email",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"User trouvé\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "{{URL}}/user/1",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"user",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update User",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"User mis à jour\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": 1,\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE2\",\n    \"first_name\": \"Bob up\",\n    \"last_name\": \"Marley up\",\n    \"email\": \"bobup@marleyup.com\",\n    \"role\": \"Agent\"\n}"
-				},
-				"url": {
-					"raw": "{{URL}}/user",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete User",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"User supprimé\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"id\": 1}"
-				},
-				"url": {
-					"raw": "{{URL}}/user",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Apartment",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Appartement créé\", function () {",
-							"    pm.response.to.have.status(201);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T3\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment.jpg\"\n}"
-				},
-				"url": {
-					"raw": "{{URL}}/apartments",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"apartments"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Apartment by ID",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Appartement récupéré\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/apartments/1",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"apartments",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Apartments by Realty",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Appartements récupérés\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/realty/1/apartments",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"realty",
-						"1",
-						"apartments"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update Apartment",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Appartement mis à jour\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T4 rénové\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment-updated.jpg\"\n}"
-				},
-				"url": {
-					"raw": "{{URL}}/apartments/1",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"apartments",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Apartment",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Appartement supprimé\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/apartments/1",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"apartments",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Search Apartments",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Recherche réussie\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{jwt}}"
-					}
-				],
-				"url": {
-					"raw": "{{URL}}/apartments/search?q=Paris",
-					"host": [
-						"{{URL}}"
-					],
-					"path": [
-						"apartments",
-						"search"
-					],
-					"query": [
+					"name": "Signup",
+					"event": [
 						{
-							"key": "q",
-							"value": "Paris"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User créé\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Bob2\",\n    \"last_name\": \"Marley\",\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE5\",\n    \"email\": \"bob2@marley.com\", \n    \"password\": \"bob123\",\n    \"role\": \"Admin\"\n}\n"
+						},
+						"url": {
+							"raw": "{{URL}}/signup",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"JWT reçu\", function () {",
+									"    var json = pm.response.json();",
+									"    pm.expect(json.token).to.be.a(\"string\");",
+									"    pm.expect(json.refresh_token).to.be.a(\"string\");",
+									"    pm.environment.set(\"jwt\", json.token);",
+									"    pm.environment.set(\"refresh_token\", json.refresh_token);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE5\", \n    \"password\": \"bob123\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token refresh OK\", function () {",
+									"    var json = pm.response.json();",
+									"    pm.expect(json.token).to.be.a(\"string\");",
+									"    pm.expect(json.refresh_token).to.be.a(\"string\");",
+									"    pm.environment.set(\"jwt\", json.token);",
+									"    pm.environment.set(\"refresh_token\", json.refresh_token);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{refresh_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/refresh",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Déconnexion OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{refresh_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/logout",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get User by ID/Username/Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User trouvé\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{URL}}/user/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User mis à jour\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"eth_address\": \"0x763C7a14dd20A9Da9765CfeCF3a6246AB9814DE2\",\n    \"first_name\": \"Bob up\",\n    \"last_name\": \"Marley up\",\n    \"email\": \"bobup@marleyup.com\",\n    \"role\": \"Agent\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User supprimé\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\": 1}"
+						},
+						"url": {
+							"raw": "{{URL}}/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Infos utilisateur reçues\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Realty",
+			"item": [
+				{
+					"name": "Create Realty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Bien immobilier créé\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    var json = pm.response.json();",
+									"    pm.environment.set(\"realty_id\", json.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Résidence des Jardins\",\n    \"user_id\": 1,\n    \"address\": \"123 Avenue des Champs, 75008 Paris, France\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/realty",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Realty by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Bien immobilier récupéré\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/realty/{{realty_id}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty",
+								"{{realty_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Realties",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Biens immobiliers récupérés\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/realty",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Realty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Bien immobilier mis à jour\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Résidence des Jardins Rénovée\",\n    \"user_id\": 1,\n    \"address\": \"123 Avenue des Champs, 75008 Paris, France\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/realty/{{realty_id}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty",
+								"{{realty_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Realty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Bien immobilier supprimé\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/realty/{{realty_id}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty",
+								"{{realty_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Realties",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Recherche réussie\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/realty/search?q=Jardins",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Jardins"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Apartment",
+			"item": [
+				{
+					"name": "Create Apartment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Appartement créé\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T3\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/apartments",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Apartment by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Appartement récupéré\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/apartments/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Apartments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Tous les appartements récupérés\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/apartments",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Apartments by Realty",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Appartements récupérés\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/realty/1/apartments",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"realty",
+								"1",
+								"apartments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Apartment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Appartement mis à jour\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T4 rénové\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment-updated.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/apartments/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Apartment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Appartement supprimé\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/apartments/1",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Apartments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Recherche réussie\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/apartments/search?q=Paris",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"apartments",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "Paris"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [

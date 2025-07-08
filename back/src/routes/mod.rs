@@ -1,6 +1,7 @@
-use crate::{http::{HttpResponse, RequestContext}, services::{auth_service::AuthService, apartment_service::ApartmentService}, logger};
+use crate::{http::{HttpResponse, RequestContext}, services::{auth_service::AuthService, apartment_service::ApartmentService, realty_service::RealtyService}, logger};
 mod auth;
 mod apartment;
+mod realty;
 use diesel::pg::PgConnection;
 
 pub async fn handle_routes(
@@ -10,6 +11,7 @@ pub async fn handle_routes(
     conn: &mut PgConnection,
 ) -> HttpResponse {
     let apartment_service = ApartmentService::new();
+    let realty_service = RealtyService::new();
     
     let mut ctx = match RequestContext::new(first_line, request, None) {
         Some(c) => c,
@@ -42,9 +44,18 @@ pub async fn handle_routes(
         _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx).await,
         _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx).await,
         
+        // Routes realty
+        _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("GET", "/realty/:id") => realty::handle_get_realty(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("GET", "/realty") => realty::handle_get_all_realties(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("PUT", "/realty/:id") => realty::handle_update_realty(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("DELETE", "/realty/:id") => realty::handle_delete_realty(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("GET", "/realty/search") => realty::handle_search_realties(conn, &ctx, &realty_service).await,
+        
         // Routes appartements
         _ if ctx.match_route("POST", "/apartments") => apartment::handle_create_apartment(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("GET", "/apartments/:id") => apartment::handle_get_apartment(conn, &ctx, &apartment_service).await,
+        _ if ctx.match_route("GET", "/apartments") => apartment::handle_get_all_apartments(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("GET", "/realty/:realty_id/apartments") => apartment::handle_get_apartments_by_realty(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("PUT", "/apartments/:id") => apartment::handle_update_apartment(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("DELETE", "/apartments/:id") => apartment::handle_delete_apartment(conn, &ctx, &apartment_service).await,
