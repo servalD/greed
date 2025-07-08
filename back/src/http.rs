@@ -43,6 +43,11 @@ impl HttpResponse {
         HttpResponse::new(200, "OK", body).header("Content-Type", content_type)
     }
 
+    pub fn created(body: Option<String>) -> Self {
+        HttpResponse::new(201, "Created", body)
+            .header("Content-Type", "application/json")
+    }
+
     pub fn bad_request(msg: &str) -> Self {
         HttpResponse::new(400, "Bad Request", Some(msg.to_string()))
         .header("Content-Type", "text/plain")

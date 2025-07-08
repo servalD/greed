@@ -3,7 +3,8 @@
 		"_postman_id": "a52c8d4c-7c14-4662-8b3e-3296c35457a3",
 		"name": "Greed API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "34310812"
+		"_exporter_id": "34310812",
+		"_collection_link": "https://universal-astronaut-668728.postman.co/workspace/My-Workspace~f4a50da5-9cfc-415f-86da-b47699e2d1d9/collection/34310812-a52c8d4c-7c14-4662-8b3e-3296c35457a3?action=share&source=collection_link&creator=34310812"
 	},
 	"item": [
 		{
@@ -328,6 +329,250 @@
 					],
 					"path": [
 						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Apartment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Appartement créé\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T3\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment.jpg\"\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/apartments",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"apartments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Apartment by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Appartement récupéré\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/apartments/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"apartments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Apartments by Realty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Appartements récupérés\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/realty/1/apartments",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"realty",
+						"1",
+						"apartments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Apartment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Appartement mis à jour\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"realty_id\": 1,\n    \"name\": \"Appartement T4 rénové\",\n    \"street_number\": \"42\",\n    \"street_name\": \"Rue de la Paix\",\n    \"complement_address\": \"2ème étage\",\n    \"city\": \"Paris\",\n    \"zip_code\": \"75001\",\n    \"region\": \"Île-de-France\",\n    \"country\": \"France\",\n    \"address\": \"42 Rue de la Paix, 75001 Paris, France\",\n    \"image_url\": \"https://example.com/apartment-updated.jpg\"\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/apartments/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"apartments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Apartment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Appartement supprimé\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/apartments/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"apartments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Apartments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Recherche réussie\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{jwt}}"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/apartments/search?q=Paris",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"apartments",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Paris"
+						}
 					]
 				}
 			},
