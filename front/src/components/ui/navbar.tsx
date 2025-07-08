@@ -8,6 +8,7 @@ import { useSwitchActiveWalletChain } from "thirdweb/react";
 import { motion } from "framer-motion";
 import { sepolia } from "thirdweb/chains";
 import { useReadDataContract } from "@/contracts/useReadDataContract";
+import { useAgency } from "@/contracts/useAgency";
 
 export default function Navbar() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function Navbar() {
   const connectionStatus = useActiveWalletConnectionStatus();
   const account = useActiveAccount();
   const { userRole, refetchUserRole } = useReadDataContract();
+  const { guestEntrance: becomeClient } = useAgency();
 
   useEffect(() => {
     const updateRole = async () => {
@@ -62,6 +64,7 @@ export default function Navbar() {
     try {
       setIsSwitchingChain(true);
       await switchChain(sepolia);
+      becomeClient();
     } catch (error) {
       console.error("Error switching chain:", error);
     } finally {
