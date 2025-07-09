@@ -36,7 +36,8 @@ contract CoproTest is Test {
             "CoproTest",
             "CT",
             _flatCount,
-            payable(safeAddress)
+            payable(safeAddress),
+            "fakeurl"
         );
         vm.prank(admin);
         manager.addCopro(address(localCopro));
@@ -52,7 +53,8 @@ contract CoproTest is Test {
             "CoproTest",
             "CT",
             0,
-            payable(safeAddress)
+            payable(safeAddress),
+            "fakeurl"
         );
     }
 
