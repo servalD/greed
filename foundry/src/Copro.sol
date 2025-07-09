@@ -37,6 +37,8 @@ contract Copro is ERC721Consecutive, AccessManaged {
     mapping(uint256 => uint256) public market; // tokenId => Owner Proposal
     mapping(uint256 => Proposal[]) public history; // tokenId => Successful transaction history
     mapping(uint256 => address) public fractionalTokenForNFT; // Associate each NFT to his ERC20 address
+    mapping(uint256 => string) public tokenImages; // tokenId => image URL
+    string public baseImageUrl; // Base URL for images
 
     // =============================================================
     //                          STRUCTS
@@ -62,6 +64,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
         address fractionalTokenAddress
     );
     event ApartmentsAdded(uint256 startTokenId, uint256 additionalCount);
+    event ImageSet(uint256 indexed tokenId, string imageUrl);
 
     // =============================================================
     //                          CONSTRUCTOR
@@ -75,6 +78,7 @@ contract Copro is ERC721Consecutive, AccessManaged {
      * @param symbol Symbol of the ERC721 token.
      * @param _flatCount Number of flats to mint.
      * @param _SAFE Address of the safe wallet to receive fees.
+     * @param _baseImageUrl Base URL for the images.
      */
     constructor(
         AccessManager _manager,
@@ -82,13 +86,15 @@ contract Copro is ERC721Consecutive, AccessManaged {
         string memory name,
         string memory symbol,
         uint96 _flatCount,
-        address payable _SAFE
+        address payable _SAFE,
+        string memory _baseImageUrl
     ) ERC721(name, symbol) AccessManaged(address(_manager)) {
         if (_flatCount <= 0) revert InvalidFlatCount();
         if (_flatCount >= _maxBatchSize()) revert ExceedsMaxBatchSize();
         initialFlats = _flatCount;
         safe = _SAFE;
         promoter = _promoter;
+        baseImageUrl = _baseImageUrl;
         // Batch transfer to the promoter (the owner of all flat at Agency deployment)
         _mintConsecutive(_promoter, _flatCount); // Constrained type (uint96) propagated to _flatCount
         for (uint256 i = 0; i < _flatCount; i++) market[i] = 0; // Ensure nothing is for sale
