@@ -28,6 +28,7 @@ const AgentOrAgency = () => {
     symbol: '',
     flatCount: 0,
     promoter: '',
+    imageUrl: '',
   });
 
   const { createCopro, isPendingCopro } = useAgency();
@@ -75,10 +76,11 @@ const AgentOrAgency = () => {
         propertyData.name,
         propertyData.symbol,
         Number(propertyData.flatCount),
-        propertyData.promoter as Address
+        propertyData.promoter as Address,
+        propertyData.imageUrl
       );
 
-      setPropertyData({ name: '', symbol: '', flatCount: 0, promoter: '' });
+      setPropertyData({ name: '', symbol: '', flatCount: 0, promoter: '', imageUrl: '' });
       handleClose();
     } catch (error) {
       ErrorService.mixinMessage('Erreur lors de la création du bien', 'error');

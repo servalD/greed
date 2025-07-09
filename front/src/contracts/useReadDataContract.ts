@@ -1,4 +1,4 @@
-import { useReadManagerHasRole, useReadAgencyGuests, useReadAgencyClientRole } from "./generatedContracts";
+import { useReadManagerHasRole, useReadAgencyGuests, useReadAgencyClients } from "./generatedContracts";
 import { useAccount } from "wagmi";
 import { useMemo } from "react";
 
@@ -27,7 +27,7 @@ export const useReadDataContract = () => {
   /*  */
 
   const { data: guests, refetch: refetchGuests } = useReadAgencyGuests();
-  const { data: clients, refetch: refetchClients } = useReadAgencyClientRole();
+  const { data: clients, refetch: refetchClients } = useReadAgencyClients();
 
   const refetchUserRole = async () => {
     await Promise.all([

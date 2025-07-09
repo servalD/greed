@@ -10,10 +10,11 @@ setup-all:## Install Foundry, compile le backend et build le frontend
 	make setup-back
 	make setup-front
 
-setup-front:## Install et build le frontend (pnpm)
+setup-front:## Install, genere les wagmi hooks et build le frontend (pnpm)
 	cd ./front && \
 	source .env && \
 	pnpm install && \
+	pnpm wagmi generate --config wagmi.config.ts && \
 	pnpm run build
 
 setup-back:## Compile le backend Rust
@@ -25,20 +26,19 @@ setup-foundry:## Install les dépendances et compile les smart contracts
 	forge i &&\
 	forge compile
 
-foundry-deploy:## Compile Foundry et prépare au déploiement (TBD)
-	echo "start anvil before entering it as network" && \
-	forge compile &&\
-	echo "TBD"
+foundry-deploy:## Compile, deploie sur Sepolia
+	cd ./foundry && \
+	source .env && \
+	forge script script/deploy.s.sol:DemoScript --optimize --rpc-url $$SEPOLIA_RPC_URL --private-key $$ADMIN_PRIVATE_KEY --broadcast
+
+foundry-verify:## Vérifie le contrat Manager, Agency et Copro sur Etherscan Sepolia
+	cd ./foundry && \
+	source .env && \
+	forge verify-contract --watch --chain sepolia $$NEXT_PUBLIC_MANAGER src/Manager.sol:Manager --verifier etherscan --etherscan-api-key $$ETHERSCAN_API_KEY --num-of-optimizations 200 --compiler-version 0.8.25+commit.b61c2a91 --evm-version cancun --guess-constructor-args --rpc-url $$SEPOLIA_RPC_URL &&\
+	forge verify-contract --watch --chain sepolia $$NEXT_PUBLIC_AGENCY src/Agency.sol:Agency --verifier etherscan --etherscan-api-key $$ETHERSCAN_API_KEY --num-of-optimizations 200 --compiler-version 0.8.25+commit.b61c2a91 --evm-version cancun --guess-constructor-args --rpc-url $$SEPOLIA_RPC_URL
 
 back-up:## Clean, démarre les services backend et lance l'application
 	make back-clean
-	cd ./back && \
-	source .env && \
-	docker compose up -d && sleep 4 &&\
-	diesel migration run && \
-	cargo run
-
-back-alloy:## Comme back-up mais pour Alloy (identique ici)
 	cd ./back && \
 	source .env && \
 	docker compose up -d && sleep 4 &&\
