@@ -40,5 +40,5 @@ export default function GuestOrClient() {
                 )}
             </div>
         </main>
-    );
+      );
 }
