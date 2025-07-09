@@ -115,7 +115,8 @@ contract Agency is AccessManaged {
         string memory name,
         string memory symbol,
         uint96 flatCount,
-        address promoter
+        address promoter,
+        string memory imageURL
     ) external returns (Copro) {
         Copro copro = new Copro(
             manager,
@@ -123,7 +124,8 @@ contract Agency is AccessManaged {
             name,
             symbol,
             flatCount,
-            payable(SAFE)
+            payable(SAFE),
+            imageURL
         ); // index
         copros.push(copro);
         nbListedCopro++;

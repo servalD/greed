@@ -98,9 +98,10 @@ contract AgencyTest is Test {
     function testCreateAndGetCopro() public {
         string memory name = "TestCopro";
         string memory symbol = "TC";
+        string memory imageURL = "";
         uint96 flatCount = 5;
         vm.prank(admin);
-        agency.createCopro(name, symbol, flatCount, promoter);
+        agency.createCopro(name, symbol, flatCount, promoter, imageURL);
         assertEq(agency.nbListedCopro(), 1); // Il doit y avoir 1 copro créé
 
         // Vérifier les getters
