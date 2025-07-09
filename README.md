@@ -50,16 +50,44 @@ Le backend utilise un système JWT + refresh token sécurisé.
 👉 Voir la documentation détaillée ici : [`auth_service.md`](/back/src/services/auth_service.md)
 
 
-## 📜 Contrats (Foundry) *TODO*
+## 📜 Contrats (Foundry)
+
+### Deployer sur sepolia
 ```bash
 make foundry-deploy
 ```
-⚠️ Assurez-vous que `anvil` est lancé avant de déployer.
 
+### Verifier les contracts Manager et Agency
+```bash
+make foundry-verify
+```
+
+## Frontend (Next.js)
+
+### Démarage du frontend
+```bash
+make front-up
+```
 
 ## 🎯 À venir
 - Tests automatisés
 - Déploiement CI
+
+## Liste complette des commandes makefile
+
+```bash
+  make help
+  setup-all            Install Foundry, compile le backend et build le frontend
+  setup-front          Install, genere les wagmi hooks et build le frontend (pnpm)
+  setup-back           Compile le backend Rust
+  setup-foundry        Install les dépendances et compile les smart contracts
+  foundry-deploy       Compile, deploie sur Sepolia
+  foundry-verify       Vérifie le contrat Manager, Agency et Copro sur Etherscan Sepolia
+  back-up              Clean, démarre les services backend et lance l application
+  back-clean           Stoppe les conteneurs et supprime les volumes
+  back-add-migration   Crée, valide et exécute une nouvelle migration Diesel
+  front-up             Démarre le frontend
+```
 
 ---
 
