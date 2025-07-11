@@ -1,11 +1,16 @@
 "use client";
 
 import Navbar from "@/components/ui/navbar";
-import NotConnected from "@/components/notConnected";
 import { useActiveWalletConnectionStatus, ConnectButton } from "thirdweb/react";
 import { client } from "@/app/client";
 import GuestOrClient from "@/components/guestOrClient";
 import { useEffect, useState } from "react";
+import {
+  generatePayload,
+  getUser,
+  login,
+  logout,
+} from "@/service/auth";
 
 export default function Home() {
   const status = useActiveWalletConnectionStatus();
@@ -40,13 +45,37 @@ export default function Home() {
                 Accédez à notre plateforme sécurisée et explorez nos propriétés uniques
               </p>
               <div className="flex justify-center">
-                <ConnectButton
-                  client={client}
-                  appMetadata={{
-                    name: "GREED Agency",
-                    url: "",
-                  }}
-                />
+                  <ConnectButton
+                    client={client}
+                    appMetadata={{
+                      name: "GREED Agency",
+                      url: "",
+                    }}
+                    auth={{
+                      getLoginPayload: async (params) => {
+                        // Génère le payload SIWE depuis le backend
+                        const payload = generatePayload(params);
+                        console.log('Generated Payload:', await payload);
+                        return payload
+                      },
+                      doLogin: async (params) => {
+                        // Envoie la signature au backend pour validation
+                        const data = await login({ nonce: params.payload.nonce, signature: params.signature });
+                        localStorage.setItem("user", data.user);
+                        localStorage.setItem("access_token", data.token);
+                        localStorage.setItem("refresh_token", data.refresh_token);
+                      },
+                      isLoggedIn: async () => {
+                        // Vérifie si l'utilisateur est connecté
+                        const user = await getUser();
+                        return !!user;
+                      },
+                      doLogout: async () => {
+                        // Déconnecte l'utilisateur
+                        return logout();
+                      },
+                    }}
+                  />
               </div>
             </div>
           </div>

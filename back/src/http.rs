@@ -26,17 +26,21 @@ impl HttpResponse {
         self
     }
 
-    pub fn to_string(self) -> String {
-        let body_content = self.body.unwrap_or_default();
-        let mut response = format!("HTTP/1.1 {} {}\r\n", self.status_code, self.reason_phrase);
-        for (key, value) in self.headers {
-            response.push_str(&format!("{}: {}\r\n", key, value));
-        }
-        response.push_str(&format!("Content-Length: {}\r\n", body_content.len()));
-        response.push_str("\r\n");
-        response.push_str(&body_content);
-        response
+    pub fn to_string(mut self) -> String {
+    // Ajout automatique des headers CORS
+    self.headers.push(("Access-Control-Allow-Origin".to_string(), "*".to_string()));
+    self.headers.push(("Access-Control-Allow-Headers".to_string(), "Content-Type, Authorization".to_string()));
+
+    let body_content = self.body.unwrap_or_default();
+    let mut response = format!("HTTP/1.1 {} {}\r\n", self.status_code, self.reason_phrase);
+    for (key, value) in self.headers {
+        response.push_str(&format!("{}: {}\r\n", key, value));
     }
+    response.push_str(&format!("Content-Length: {}\r\n", body_content.len()));
+    response.push_str("\r\n");
+    response.push_str(&body_content);
+    response
+}
 
     pub fn ok(body: Option<String>) -> Self {
         let content_type = if body.is_some() { "application/json" } else { "text/plain" };
