@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { sepolia } from "thirdweb/chains";
 import { useReadDataContract } from "@/contracts/useReadDataContract";
 import { useAgency } from "@/contracts/useAgency";
+import { generatePayload, getUser, login, logout } from "@/service/auth";
 
 export default function Navbar() {
   const router = useRouter();
@@ -141,6 +142,30 @@ export default function Navbar() {
                   appMetadata={{
                     name: "GREED Agency",
                     url: "",
+                  }}
+                  auth={{
+                    getLoginPayload: async (params) => {
+                      // Génère le payload SIWE depuis le backend
+                      const payload = generatePayload(params);
+                      console.log('Generated Payload:', await payload);
+                      return payload
+                    },
+                    doLogin: async (params) => {
+                      // Envoie la signature au backend pour validation
+                      const data = await login({ nonce: params.payload.nonce, signature: params.signature });
+                      localStorage.setItem("user", data.user);
+                      localStorage.setItem("access_token", data.token);
+                      localStorage.setItem("refresh_token", data.refresh_token);
+                    },
+                    isLoggedIn: async () => {
+                      // Vérifie si l'utilisateur est connecté
+                      const user = await getUser();
+                      return !!user;
+                    },
+                    doLogout: async () => {
+                      // Déconnecte l'utilisateur
+                      return logout();
+                    },
                   }}
                 />
               </motion.div>
