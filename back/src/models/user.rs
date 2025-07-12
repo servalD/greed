@@ -17,11 +17,11 @@ pub enum Role {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
     pub id: i32,
-    pub email: String,
+    pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub eth_address: String,
-    pub password_hash: String,
+    pub password_hash: Option<String>,
     pub role: Role,
 }
 
@@ -31,7 +31,7 @@ pub struct UserSafe {
     pub eth_address: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub email: String,
+    pub email: Option<String>,
     pub role: Role,
 }
 impl User {
@@ -51,10 +51,10 @@ impl User {
 #[derive(Insertable, Deserialize)]
 #[diesel(table_name = users)]
 pub struct NewUser {
-    pub email: String,
+    pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password_hash: String,
+    pub password_hash: Option<String>,
     pub eth_address: String,
     pub role: Role,
 }
@@ -67,15 +67,15 @@ pub struct UpdateUserData {
     pub last_name: Option<String>,
     pub password_hash: Option<String>,
     pub eth_address: String,
-    pub role: Role,
+    pub role: Option<Role>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct NewUserPayload {
-    pub email: String,
+    pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password: String,
+    pub password: Option<String>,
     pub eth_address: String,
     pub role: Role,
 }
@@ -86,16 +86,17 @@ pub struct UpdateUserPayload {
     pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password: Option<String>,
+    pub password: String,
+    pub new_password: Option<String>,
     pub eth_address: String,
-    pub role: Role,
+    pub role: Option<Role>,
 }
 
 #[derive(Deserialize)]
 pub struct LoginPayload {
     pub eth_address: String,
     pub email: Option<String>,
-    pub password: String,
+    pub password: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -108,4 +109,5 @@ pub struct FindUserPayload {
 #[derive(Deserialize)]
 pub struct DeleteUserPayload {
     pub id: i32,
+    pub password: String
 }

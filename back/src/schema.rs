@@ -73,11 +73,11 @@ diesel::table! {
 
     users (id) {
         id -> Int4,
-        email -> Text,
+        email -> Nullable<Text>,
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
         eth_address -> Text,
-        password_hash -> Text,
+        password_hash -> Nullable<Text>,
         role -> Role,
     }
 }

@@ -22,98 +22,6 @@ pub struct SiweSigPayload {
     pub signature: String,
 }
 
-pub async fn handle_signup(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
-    let payload = match ctx.parse_body::<NewUserPayload>() {
-        Some(p) => p,
-        None => return HttpResponse::bad_request("Invalid body format"),
-    };
-
-    let password_hash = match hash(&payload.password, DEFAULT_COST) {
-        Ok(h) => h,
-        Err(_) => return HttpResponse::internal_server_error(),
-    };
-
-    logger::debug(&format!("Création de l'utilisateur {:?}", payload));
-
-    let new_user = NewUser {
-        email: payload.email,
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        password_hash,
-        eth_address: payload.eth_address,
-        role: payload.role,
-    };
-    
-    match user_repo::create_user(conn, &new_user) {
-        Ok(_) => HttpResponse::ok(Some("User created".to_string())),
-        Err(e) => match e.to_string().as_str() {
-            e if e.starts_with("duplicate") => HttpResponse::conflict(),
-            e => {
-                logger::error(&format!("Erreur création utilisateur: {}", e));
-                HttpResponse::internal_server_error()
-            },
-        },
-    }
-}
-
-pub async fn handle_login(
-    conn: &mut PgConnection,
-    ctx: &RequestContext,
-    auth_service: &AuthService,
-) -> HttpResponse {
-    logger::debug("Requête de login reçue");
-
-    let payload = match ctx.parse_body::<LoginPayload>() {
-        Some(p) => p,
-        None => return HttpResponse::bad_request("Invalid body format"),
-    };
-
-    let user = match user_repo::find_user(
-        conn,
-        None,
-        Some(&payload.eth_address),
-        payload.email.as_deref(),
-    ) {
-        Ok(Some(u)) => u,
-        Ok(None) => {
-            logger::warning("Utilisateur non trouvé");
-            return HttpResponse::unauthorized();
-        }
-        Err(e) => {
-            logger::error(&format!("Erreur recherche utilisateur: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    if !verify(&payload.password, &user.password_hash).unwrap_or(false) {
-        logger::warning("Mot de passe invalide");
-        return HttpResponse::unauthorized();
-    }
-
-    let refresh_token = match auth_service.generate_refresh_token(conn, user.id) {
-        Ok(rt) => rt,
-        Err(e) => {
-            logger::error(&format!("Erreur refresh token: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    let access_token = match auth_service.generate_token(refresh_token.clone()) {
-        Ok(token) => token,
-        Err(e) => {
-            logger::error(&format!("Erreur token: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    let json = serde_json::json!({
-        "token": access_token,
-        "refresh_token": refresh_token.token
-    })
-    .to_string();
-    HttpResponse::ok(Some(json))
-}
-
 pub async fn handle_refresh(
     conn: &mut PgConnection,
     ctx: &RequestContext,
@@ -177,11 +85,29 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    let password_hash = match payload.password {
-        Some(pw) => match hash(&pw, DEFAULT_COST) {
-            Ok(h) => Some(h),
-            Err(_) => return HttpResponse::internal_server_error(),
+    if payload.password.is_empty() {
+        return HttpResponse::bad_request("Password is required");
+    }
+
+    if !match user_repo::find_user(conn, Some(payload.id), None, None) {
+        Ok(Some(user)) => {
+            match user.password_hash {
+                Some(h) => verify(payload.password.clone(), &h).unwrap_or(false),
+                None => true,
+            }
         },
+        Ok(None) => true,
+        Err(_) => return HttpResponse::internal_server_error(),
+    } {
+        return HttpResponse::bad_request("Invalid password");
+    }
+
+
+    let password_hash = match payload.new_password {
+        Some(p) => match hash(p, DEFAULT_COST) {
+                Ok(h) => Some(h),
+                Err(_) => return HttpResponse::internal_server_error(),
+            },
         None => None,
     };
 
@@ -208,6 +134,24 @@ pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
+
+    if payload.password.is_empty() {
+        return HttpResponse::bad_request("Password is required");
+    }
+
+    if !match user_repo::find_user(conn, Some(payload.id), None, None) {
+        Ok(Some(user)) => {
+            match user.password_hash {
+                Some(h) => verify(payload.password, &h).unwrap_or(false),
+                None => true,
+            }
+        },
+        Ok(None) => true,
+        Err(_) => return HttpResponse::internal_server_error(),
+    } {
+        return HttpResponse::bad_request("Invalid password");
+    }
+
     match user_repo::delete_user(conn, payload.id) {
         Ok(size) => match size {
             1 => HttpResponse::ok(Some("User deleted".to_string())),
@@ -313,10 +257,10 @@ pub async fn handle_siwe_login(
             logger::debug("Création d'un nouvel utilisateur SIWE");
             // Auto-création d'utilisateur avec wallet
             let new_user = NewUser {
-                email: format!("{}@wallet.local", eth_address),
+                email: None,
                 first_name: None,
                 last_name: None,
-                password_hash: "".to_string(), // Pas de mot de passe pour auth SIWE
+                password_hash: None,
                 eth_address: eth_address.clone(),
                 role: crate::models::user::Role::Guest,
             };
