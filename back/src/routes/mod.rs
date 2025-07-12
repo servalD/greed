@@ -27,8 +27,6 @@ pub async fn handle_routes(
     
     logger::debug(&format!("Handling request: {}", first_line.to_string()));
     let resp = match true {
-        _ if ctx.match_route("POST", "/signup") => auth::handle_signup(conn, &ctx).await,
-        _ if ctx.match_route("POST", "/login") => auth::handle_login(conn, &ctx, auth_service).await,
         _ if ctx.match_route("POST", "/siwe/generate") => auth::handle_siwe_generate(&ctx, siwe_service).await,
         _ if ctx.match_route("POST", "/siwe/login") => auth::handle_siwe_login(conn, &ctx, auth_service, siwe_service).await,
         _ if ctx.match_route("POST", "/refresh") => auth::handle_refresh(conn, &ctx, auth_service).await,
