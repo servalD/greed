@@ -11,16 +11,11 @@ import {
   login,
   logout,
 } from "@/service/auth";
+import { useReadDataContract } from "@/contracts/useReadDataContract";
 
 export default function Home() {
   const status = useActiveWalletConnectionStatus();
-  const [_, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setRole(localStorage.getItem("role"));
-    }
-  }, []);
+  const { userRole } = useReadDataContract();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">

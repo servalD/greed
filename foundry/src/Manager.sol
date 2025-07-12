@@ -72,4 +72,23 @@ contract Manager is AccessManager {
             IRoleDefinition.CLIENT_ROLE
         );
     }
+
+    function getRole(address account) public view returns (uint256) {
+        (bool isAgency, ) = hasRole(IRoleDefinition.AGENCY_ROLE, account);
+        (bool isAgent, ) = hasRole(IRoleDefinition.AGENT_ROLE, account);
+        (bool isClient, ) = hasRole(IRoleDefinition.CLIENT_ROLE, account);
+        (bool isCoOwner, ) = hasRole(IRoleDefinition.CO_OWNER_ROLE, account);
+        if (isAgency) {
+            return IRoleDefinition.AGENCY_ROLE;
+        } else if (isAgent) {
+            return IRoleDefinition.AGENT_ROLE;
+        } else if (isClient) {
+            return IRoleDefinition.CLIENT_ROLE;
+        } else if (isCoOwner) {
+            return IRoleDefinition.CO_OWNER_ROLE;
+        } else {
+            return 0; // No role assigned
+        }
+
+    }
 }

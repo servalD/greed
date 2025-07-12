@@ -10,45 +10,17 @@ import { sepolia } from "thirdweb/chains";
 import { useReadDataContract } from "@/contracts/useReadDataContract";
 import { useAgency } from "@/contracts/useAgency";
 import { generatePayload, getUser, login, logout } from "@/service/auth";
+import { UserRoleIds } from "@/types/users";
 
 export default function Navbar() {
   const router = useRouter();
-  const [role, setRole] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
   const switchChain = useSwitchActiveWalletChain();
   const connectionStatus = useActiveWalletConnectionStatus();
   const account = useActiveAccount();
-  const { userRole, refetchUserRole } = useReadDataContract();
+  const { userRole } = useReadDataContract();
   const { guestEntrance: becomeClient } = useAgency();
-
-  useEffect(() => {
-    const updateRole = async () => {
-      console.log('Connection Status:', connectionStatus);
-      console.log('Account:', account?.address);
-
-      if (connectionStatus === "connected" && account?.address) {
-        try {
-          await refetchUserRole();
-          console.log('User Role after refetch:', userRole);
-          
-          if (userRole) {
-            console.log('Setting role to:', userRole);
-            setRole(userRole);
-            localStorage.setItem("role", userRole);
-          }
-        } catch (error) {
-          console.error('Error refetching user role:', error);
-        }
-      } else if (connectionStatus === "disconnected" || !account?.address) {
-        console.log('Clearing role');
-        setRole(null);
-        localStorage.removeItem("role");
-      }
-    };
-
-    updateRole();
-  }, [connectionStatus, account?.address, refetchUserRole, userRole]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -98,7 +70,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              {connectionStatus === "connected" && account?.address && role === "guest" && (
+              {connectionStatus === "connected" && account?.address && userRole === UserRoleIds.GUEST && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -119,7 +91,7 @@ export default function Navbar() {
                 </motion.button>
               )}
               
-              {connectionStatus === "connected" && account?.address && (role === "agent" || role === "agency") && (
+              {connectionStatus === "connected" && account?.address && (userRole === UserRoleIds.AGENT) && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -146,9 +118,7 @@ export default function Navbar() {
                   auth={{
                     getLoginPayload: async (params) => {
                       // Génère le payload SIWE depuis le backend
-                      const payload = generatePayload(params);
-                      console.log('Generated Payload:', await payload);
-                      return payload
+                      return generatePayload(params);
                     },
                     doLogin: async (params) => {
                       // Envoie la signature au backend pour validation
