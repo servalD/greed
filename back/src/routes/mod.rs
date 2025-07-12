@@ -22,7 +22,7 @@ pub async fn handle_routes(
     if ctx.method == "OPTIONS" {
         return HttpResponse::new(204, "No Content", None)
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-            .header("Access-Control-Max-Age", "86400"); // 24h cache
+            .header("Access-Control-Max-Age", "86400"); 
     }
     
     logger::debug(&format!("Handling request: {}", first_line.to_string()));
@@ -49,8 +49,8 @@ pub async fn handle_routes(
     match true {
         _ if ctx.match_route("GET", "/user") => auth::handle_get_user(conn, &ctx).await,
         _ if ctx.match_route("GET", "/user/:id") => auth::handle_get_user(conn, &ctx).await,
-        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx).await,
-        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx).await,
+        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx, auth_service).await,
         
         // Routes realty
         _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service).await,

@@ -70,16 +70,6 @@ pub struct UpdateUserData {
     pub role: Option<Role>,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct NewUserPayload {
-    pub email: Option<String>,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub password: Option<String>,
-    pub eth_address: String,
-    pub role: Role,
-}
-
 #[derive(Deserialize)]
 pub struct UpdateUserPayload {
     pub id: i32,
@@ -90,13 +80,6 @@ pub struct UpdateUserPayload {
     pub new_password: Option<String>,
     pub eth_address: String,
     pub role: Option<Role>,
-}
-
-#[derive(Deserialize)]
-pub struct LoginPayload {
-    pub eth_address: String,
-    pub email: Option<String>,
-    pub password: Option<String>,
 }
 
 #[derive(Deserialize)]

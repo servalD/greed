@@ -1,12 +1,12 @@
 use crate::http::{HttpResponse, RequestContext};
 use crate::models::user::{
-    DeleteUserPayload, FindUserPayload, LoginPayload, NewUser, NewUserPayload, UpdateUserData,
+    DeleteUserPayload, FindUserPayload, NewUser, UpdateUserData,
     UpdateUserPayload,
 };
 use crate::repositories::{refresh_token_repo as rt_repo, user_repo};
 use crate::services::{auth_service::AuthService, siwe_service::SiweService};
 use crate::utils::logger;
-use bcrypt::{DEFAULT_COST, hash, verify};
+use bcrypt::{DEFAULT_COST, hash};
 use diesel::pg::PgConnection;
 use serde::Deserialize;
 
@@ -79,28 +79,17 @@ pub async fn handle_logout(
     }
 }
 
-pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext, 
+    auth_service: &AuthService) -> HttpResponse {
     let payload = match ctx.parse_body::<UpdateUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    if payload.password.is_empty() {
-        return HttpResponse::bad_request("Password is required");
-    }
-
-    if !match user_repo::find_user(conn, Some(payload.id), None, None) {
-        Ok(Some(user)) => {
-            match user.password_hash {
-                Some(h) => verify(payload.password.clone(), &h).unwrap_or(false),
-                None => true,
-            }
-        },
-        Ok(None) => true,
-        Err(_) => return HttpResponse::internal_server_error(),
-    } {
-        return HttpResponse::bad_request("Invalid password");
-    }
+    match auth_service.validate_password(conn, payload.id, &payload.password) {
+        Ok(user) => user,
+        Err(err) => return HttpResponse::bad_request(err),
+    };
 
 
     let password_hash = match payload.new_password {
@@ -129,28 +118,17 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
     }
 }
 
-pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext, 
+    auth_service: &AuthService) -> HttpResponse {
     let payload = match ctx.parse_body::<DeleteUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    if payload.password.is_empty() {
-        return HttpResponse::bad_request("Password is required");
-    }
-
-    if !match user_repo::find_user(conn, Some(payload.id), None, None) {
-        Ok(Some(user)) => {
-            match user.password_hash {
-                Some(h) => verify(payload.password, &h).unwrap_or(false),
-                None => true,
-            }
-        },
-        Ok(None) => true,
-        Err(_) => return HttpResponse::internal_server_error(),
-    } {
-        return HttpResponse::bad_request("Invalid password");
-    }
+    match auth_service.validate_password(conn, payload.id, &payload.password) {
+        Ok(user) => user,
+        Err(err) => return HttpResponse::bad_request(err),
+    };
 
     match user_repo::delete_user(conn, payload.id) {
         Ok(size) => match size {
