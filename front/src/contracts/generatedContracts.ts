@@ -196,7 +196,7 @@ export const agencyAbi = [
 ] as const
 
 export const agencyAddress =
-  '0xeD9189FA774857C83027c7a3ad3f71C26cc8caf9' as const
+  '0xb93bc5dca936373D689B43E69531dc146B85e465' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -775,7 +775,7 @@ export const coproAbi = [
 ] as const
 
 export const coproAddress =
-  '0x344bC8c0A5f21358dcc4A7188026c5e52D443A3d' as const
+  '0xbb8714eEA41A93b5690a40083b0F69449Eb5C503' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
@@ -1293,6 +1293,13 @@ export const managerAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'getRole',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'roleId', internalType: 'uint64', type: 'uint64' }],
     name: 'getRoleAdmin',
     outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
@@ -1780,7 +1787,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0x4cAD319ed2b9F7D98cbCbbe428D8036A0C91732A' as const
+  '0x204bc79b54180af9355ef09AC4851F814Dd4eE3e' as const
 
 export const managerConfig = {
   address: managerAddress,
@@ -2906,6 +2913,15 @@ export const useReadManagerGetNonce = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
   address: managerAddress,
   functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"getRole"`
+ */
+export const useReadManagerGetRole = /*#__PURE__*/ createUseReadContract({
+  abi: managerAbi,
+  address: managerAddress,
+  functionName: 'getRole',
 })
 
 /**
