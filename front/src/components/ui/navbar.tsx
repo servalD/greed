@@ -11,15 +11,15 @@ import { useReadDataContract } from "@/contracts/useReadDataContract";
 import { useAgency } from "@/contracts/useAgency";
 import { generatePayload, getUser, login, logout } from "@/service/auth";
 import { UserRoleIds } from "@/types/users";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
   const switchChain = useSwitchActiveWalletChain();
-  const connectionStatus = useActiveWalletConnectionStatus();
   const account = useActiveAccount();
-  const { userRole } = useReadDataContract();
+  const { user, isAuthenticated } = useAuth();
   const { guestEntrance: becomeClient } = useAgency();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Navbar() {
     try {
       setIsSwitchingChain(true);
       await switchChain(sepolia);
-      becomeClient();
+      await becomeClient();
     } catch (error) {
       console.error("Error switching chain:", error);
     } finally {
@@ -70,7 +70,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              {connectionStatus === "connected" && account?.address && userRole === UserRoleIds.GUEST && (
+              {isAuthenticated && user?.role === UserRoleIds.GUEST && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -91,7 +91,7 @@ export default function Navbar() {
                 </motion.button>
               )}
               
-              {connectionStatus === "connected" && account?.address && (userRole === UserRoleIds.AGENT) && (
+              {isAuthenticated && (user?.role === UserRoleIds.AGENT) && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

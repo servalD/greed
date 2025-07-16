@@ -98,6 +98,10 @@ export async function patch<T>(url: string, body: Record<string, unknown> = {}) 
   return write<T>("PATCH", url, body);
 }
 
+export async function put<T>(url: string, body: Record<string, unknown> = {}) {
+  return write<T>("PUT", url, body);
+}
+
 export async function delete_<T>(url: string, body: Record<string, unknown> = {}) {
   return write<T>("DELETE", url, body);
 }

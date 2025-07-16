@@ -1,6 +1,7 @@
 "use client";
 
-import { get, post } from "@/utils/api";
+import { User, UserUpdate } from "@/types/users";
+import { delete_, get, post, put } from "@/utils/api";
 import { LoginPayload } from "thirdweb/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3000";
@@ -56,18 +57,39 @@ export async function login(params: LoginParams) {
 // Vérifie si l'utilisateur est connecté
 export async function getUser() {
   try {
-    const accessToken = cookieStore.get("jwt");
+    const accessToken = localStorage.getItem('access_token');
 
     if (!accessToken) {
       return null;
     }
 
-    const response = await get(`/user`);
+    const response = await get<User>(`/user`);
 
     return response
   } catch (error) {
     console.error("Erreur lors de la récupération de l'utilisateur:", error);
     return null;
+  }
+}
+
+// Met à jour les informations de l'utilisateur (il faut le password pour la mise à jour. Si pas de password, il faut le mettre dans newPassword)
+export function updateUser(user: UserUpdate) {
+  try {
+    console.log("Updating user:", user);
+    return put<User>(`/user`, user as unknown as Record<string, unknown>);
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'utilisateur:", error);
+    throw error;
+  }
+}
+
+// Supprime l'utilisateur (id et pw)
+export async function deleteUser(id: number, password: string) {
+  try {
+    return delete_<string>(`/user`, { id, password } as unknown as Record<string, unknown>);
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'utilisateur:", error);
+    throw error;
   }
 }
 
@@ -87,7 +109,7 @@ export async function logout() {
     }
 
     localStorage.removeItem("user");
-    localStorage.removeItem("jwt");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
 
     // ThirdWeb attend void en retour

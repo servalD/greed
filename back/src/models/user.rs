@@ -6,10 +6,12 @@ use diesel_derive_enum::DbEnum;
 #[derive(Debug, DbEnum, Serialize, Clone, PartialEq, Eq, Deserialize)]
 #[db_enum(existing_type_path = "back::schema::sql_types::Role")]
 pub enum Role {
-    Admin,
-    Agent,
-    Client,
-    Guest
+    Guest = 0,
+    Agency = 1,
+    Agent = 2,
+    Client = 3,
+    Co_owner = 4,
+    Admin = 5,
 }
 
 #[derive(Queryable, Selectable, Serialize)]
@@ -70,7 +72,7 @@ pub struct UpdateUserData {
     pub role: Option<Role>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct UpdateUserPayload {
     pub id: i32,
     pub email: Option<String>,
