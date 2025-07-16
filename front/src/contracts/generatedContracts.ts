@@ -21,34 +21,6 @@ export const agencyAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'AGENCY_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'AGENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CLIENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CO_OWNER_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
     name: 'GuestEntrance',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -69,6 +41,13 @@ export const agencyAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'clients',
+    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'copros',
     outputs: [{ name: '', internalType: 'contract Copro', type: 'address' }],
@@ -81,6 +60,7 @@ export const agencyAbi = [
       { name: 'symbol', internalType: 'string', type: 'string' },
       { name: 'flatCount', internalType: 'uint96', type: 'uint96' },
       { name: 'promoter', internalType: 'address', type: 'address' },
+      { name: 'imageURL', internalType: 'string', type: 'string' },
     ],
     name: 'createCopro',
     outputs: [{ name: '', internalType: 'contract Copro', type: 'address' }],
@@ -136,6 +116,13 @@ export const agencyAbi = [
     name: 'nbListedCopro',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_client', internalType: 'address', type: 'address' }],
+    name: 'revokeClient',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -209,7 +196,7 @@ export const agencyAbi = [
 ] as const
 
 export const agencyAddress =
-  '0xA662Ed93e6960a3cfd878cF58206fa71f93efe75' as const
+  '0xeD9189FA774857C83027c7a3ad3f71C26cc8caf9' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -222,44 +209,33 @@ export const coproAbi = [
     type: 'constructor',
     inputs: [
       {
-        name: 'manager',
+        name: '_manager',
         internalType: 'contract AccessManager',
         type: 'address',
       },
-      { name: 'promoter', internalType: 'address', type: 'address' },
+      { name: '_promoter', internalType: 'address', type: 'address' },
       { name: 'name', internalType: 'string', type: 'string' },
       { name: 'symbol', internalType: 'string', type: 'string' },
       { name: '_flatCount', internalType: 'uint96', type: 'uint96' },
       { name: '_SAFE', internalType: 'address payable', type: 'address' },
+      { name: '_baseImageUrl', internalType: 'string', type: 'string' },
     ],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'AGENCY_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
+    inputs: [
+      { name: 'additionalCount', internalType: 'uint96', type: 'uint96' },
+    ],
+    name: 'addApartments',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
     inputs: [],
-    name: 'AGENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CLIENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CO_OWNER_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
+    name: 'additionalFlats',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -288,6 +264,13 @@ export const coproAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'baseImageUrl',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'buy',
     outputs: [],
@@ -302,10 +285,25 @@ export const coproAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'flatCount',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'fractionalTokenForNFT',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      { name: 'ftName', internalType: 'string', type: 'string' },
+      { name: 'ftSymbol', internalType: 'string', type: 'string' },
+      { name: 'coOwners', internalType: 'address[]', type: 'address[]' },
+      { name: 'totalSupply', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'fractionalize',
+    outputs: [
+      { name: '', internalType: 'contract FractionalToken', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -325,6 +323,13 @@ export const coproAbi = [
       { name: 'part', internalType: 'address', type: 'address' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'initialFlats',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -362,6 +367,13 @@ export const coproAbi = [
     type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'ownerOf',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'promoter',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
   },
@@ -446,6 +458,13 @@ export const coproAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'tokenImages',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'tokenURI',
     outputs: [{ name: '', internalType: 'string', type: 'string' }],
@@ -461,6 +480,25 @@ export const coproAbi = [
     name: 'transferFrom',
     outputs: [],
     stateMutability: 'pure',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'startTokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'additionalCount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ApartmentsAdded',
   },
   {
     type: 'event',
@@ -599,6 +637,44 @@ export const coproAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
+      {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'fractionalTokenAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'Fractionalized',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'imageUrl',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+    ],
+    name: 'ImageSet',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
       { name: 'from', internalType: 'address', type: 'address', indexed: true },
       { name: 'to', internalType: 'address', type: 'address', indexed: true },
       {
@@ -628,6 +704,7 @@ export const coproAbi = [
     inputs: [{ name: 'caller', internalType: 'address', type: 'address' }],
     name: 'AccessManagedUnauthorized',
   },
+  { type: 'error', inputs: [], name: 'AlreadyFractionalized' },
   { type: 'error', inputs: [], name: 'CheckpointUnorderedInsertion' },
   {
     type: 'error',
@@ -691,14 +768,407 @@ export const coproAbi = [
   { type: 'error', inputs: [], name: 'FlatNotForSale' },
   { type: 'error', inputs: [], name: 'InvalidAmount' },
   { type: 'error', inputs: [], name: 'InvalidFlatCount' },
+  { type: 'error', inputs: [], name: 'MustBeGreaterThan0' },
+  { type: 'error', inputs: [], name: 'NotAuthorized' },
   { type: 'error', inputs: [], name: 'NotFlatOwner' },
   { type: 'error', inputs: [], name: 'SoldOutError' },
 ] as const
 
 export const coproAddress =
-  '0x574EAB16A1B1A94605bb7214b0518aCEf817f6a9' as const
+  '0x344bC8c0A5f21358dcc4A7188026c5e52D443A3d' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fractional
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const fractionalAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'symbol', internalType: 'string', type: 'string' },
+      { name: 'coOwners', internalType: 'address[]', type: 'address[]' },
+      { name: 'totalSupply', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'cancelSaleOrder',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'pricePerTokenInEther',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+    ],
+    name: 'listAllTokensForSale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'operator', internalType: 'address', type: 'address' },
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'onERC721Received',
+    outputs: [{ name: '', internalType: 'bytes4', type: 'bytes4' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'seller', internalType: 'address', type: 'address' }],
+    name: 'purchaseAllTokensFromSeller',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'saleOrders',
+    outputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'pricePerToken', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'supply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'operator',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'from',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'data', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'ReceivedNFT',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'seller',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'SaleOrderCanceled',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'seller',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'pricePerToken',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'TokensListed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'seller',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'buyer',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'totalPrice',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'TokensPurchasedFromSeller',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+  { type: 'error', inputs: [], name: 'InsufficientFunds' },
+  { type: 'error', inputs: [], name: 'NoSaleActive' },
+  { type: 'error', inputs: [], name: 'NoTokenToList' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Manager
@@ -716,34 +1186,6 @@ export const managerAbi = [
     type: 'function',
     inputs: [],
     name: 'ADMIN_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'AGENCY_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'AGENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CLIENT_ROLE',
-    outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'CO_OWNER_ROLE',
     outputs: [{ name: '', internalType: 'uint64', type: 'uint64' }],
     stateMutability: 'view',
   },
@@ -1338,7 +1780,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0x0Ec41ED26c8184e25E59bdFF0E65483205C4Eb4C' as const
+  '0x4cAD319ed2b9F7D98cbCbbe428D8036A0C91732A' as const
 
 export const managerConfig = {
   address: managerAddress,
@@ -1358,48 +1800,21 @@ export const useReadAgency = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"AGENCY_ROLE"`
- */
-export const useReadAgencyAgencyRole = /*#__PURE__*/ createUseReadContract({
-  abi: agencyAbi,
-  address: agencyAddress,
-  functionName: 'AGENCY_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"AGENT_ROLE"`
- */
-export const useReadAgencyAgentRole = /*#__PURE__*/ createUseReadContract({
-  abi: agencyAbi,
-  address: agencyAddress,
-  functionName: 'AGENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"CLIENT_ROLE"`
- */
-export const useReadAgencyClientRole = /*#__PURE__*/ createUseReadContract({
-  abi: agencyAbi,
-  address: agencyAddress,
-  functionName: 'CLIENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"CO_OWNER_ROLE"`
- */
-export const useReadAgencyCoOwnerRole = /*#__PURE__*/ createUseReadContract({
-  abi: agencyAbi,
-  address: agencyAddress,
-  functionName: 'CO_OWNER_ROLE',
-})
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"authority"`
  */
 export const useReadAgencyAuthority = /*#__PURE__*/ createUseReadContract({
   abi: agencyAbi,
   address: agencyAddress,
   functionName: 'authority',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"clients"`
+ */
+export const useReadAgencyClients = /*#__PURE__*/ createUseReadContract({
+  abi: agencyAbi,
+  address: agencyAddress,
+  functionName: 'clients',
 })
 
 /**
@@ -1509,6 +1924,15 @@ export const useWriteAgencyHireAgent = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"revokeClient"`
+ */
+export const useWriteAgencyRevokeClient = /*#__PURE__*/ createUseWriteContract({
+  abi: agencyAbi,
+  address: agencyAddress,
+  functionName: 'revokeClient',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"setAuthority"`
  */
 export const useWriteAgencySetAuthority = /*#__PURE__*/ createUseWriteContract({
@@ -1566,6 +1990,16 @@ export const useSimulateAgencyHireAgent =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"revokeClient"`
+ */
+export const useSimulateAgencyRevokeClient =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: agencyAbi,
+    address: agencyAddress,
+    functionName: 'revokeClient',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"setAuthority"`
  */
 export const useSimulateAgencySetAuthority =
@@ -1612,39 +2046,12 @@ export const useReadCopro = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"AGENCY_ROLE"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"additionalFlats"`
  */
-export const useReadCoproAgencyRole = /*#__PURE__*/ createUseReadContract({
+export const useReadCoproAdditionalFlats = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
   address: coproAddress,
-  functionName: 'AGENCY_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"AGENT_ROLE"`
- */
-export const useReadCoproAgentRole = /*#__PURE__*/ createUseReadContract({
-  abi: coproAbi,
-  address: coproAddress,
-  functionName: 'AGENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"CLIENT_ROLE"`
- */
-export const useReadCoproClientRole = /*#__PURE__*/ createUseReadContract({
-  abi: coproAbi,
-  address: coproAddress,
-  functionName: 'CLIENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"CO_OWNER_ROLE"`
- */
-export const useReadCoproCoOwnerRole = /*#__PURE__*/ createUseReadContract({
-  abi: coproAbi,
-  address: coproAddress,
-  functionName: 'CO_OWNER_ROLE',
+  functionName: 'additionalFlats',
 })
 
 /**
@@ -1675,13 +2082,23 @@ export const useReadCoproBalanceOf = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"flatCount"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"baseImageUrl"`
  */
-export const useReadCoproFlatCount = /*#__PURE__*/ createUseReadContract({
+export const useReadCoproBaseImageUrl = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
   address: coproAddress,
-  functionName: 'flatCount',
+  functionName: 'baseImageUrl',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"fractionalTokenForNFT"`
+ */
+export const useReadCoproFractionalTokenForNft =
+  /*#__PURE__*/ createUseReadContract({
+    abi: coproAbi,
+    address: coproAddress,
+    functionName: 'fractionalTokenForNFT',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"getApproved"`
@@ -1699,6 +2116,15 @@ export const useReadCoproHistory = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
   address: coproAddress,
   functionName: 'history',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"initialFlats"`
+ */
+export const useReadCoproInitialFlats = /*#__PURE__*/ createUseReadContract({
+  abi: coproAbi,
+  address: coproAddress,
+  functionName: 'initialFlats',
 })
 
 /**
@@ -1743,6 +2169,15 @@ export const useReadCoproOwnerOf = /*#__PURE__*/ createUseReadContract({
   abi: coproAbi,
   address: coproAddress,
   functionName: 'ownerOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"promoter"`
+ */
+export const useReadCoproPromoter = /*#__PURE__*/ createUseReadContract({
+  abi: coproAbi,
+  address: coproAddress,
+  functionName: 'promoter',
 })
 
 /**
@@ -1791,6 +2226,15 @@ export const useReadCoproSymbol = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"tokenImages"`
+ */
+export const useReadCoproTokenImages = /*#__PURE__*/ createUseReadContract({
+  abi: coproAbi,
+  address: coproAddress,
+  functionName: 'tokenImages',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"tokenURI"`
  */
 export const useReadCoproTokenUri = /*#__PURE__*/ createUseReadContract({
@@ -1817,6 +2261,15 @@ export const useWriteCopro = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"addApartments"`
+ */
+export const useWriteCoproAddApartments = /*#__PURE__*/ createUseWriteContract({
+  abi: coproAbi,
+  address: coproAddress,
+  functionName: 'addApartments',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"buy"`
  */
 export const useWriteCoproBuy = /*#__PURE__*/ createUseWriteContract({
@@ -1832,6 +2285,15 @@ export const useWriteCoproCancelSale = /*#__PURE__*/ createUseWriteContract({
   abi: coproAbi,
   address: coproAddress,
   functionName: 'cancelSale',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"fractionalize"`
+ */
+export const useWriteCoproFractionalize = /*#__PURE__*/ createUseWriteContract({
+  abi: coproAbi,
+  address: coproAddress,
+  functionName: 'fractionalize',
 })
 
 /**
@@ -1871,6 +2333,16 @@ export const useSimulateCopro = /*#__PURE__*/ createUseSimulateContract({
 })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"addApartments"`
+ */
+export const useSimulateCoproAddApartments =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: coproAbi,
+    address: coproAddress,
+    functionName: 'addApartments',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"buy"`
  */
 export const useSimulateCoproBuy = /*#__PURE__*/ createUseSimulateContract({
@@ -1887,6 +2359,16 @@ export const useSimulateCoproCancelSale =
     abi: coproAbi,
     address: coproAddress,
     functionName: 'cancelSale',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"fractionalize"`
+ */
+export const useSimulateCoproFractionalize =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: coproAbi,
+    address: coproAddress,
+    functionName: 'fractionalize',
   })
 
 /**
@@ -1925,6 +2407,16 @@ export const useWatchCoproEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: coproAbi,
   address: coproAddress,
 })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coproAbi}__ and `eventName` set to `"ApartmentsAdded"`
+ */
+export const useWatchCoproApartmentsAddedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: coproAbi,
+    address: coproAddress,
+    eventName: 'ApartmentsAdded',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coproAbi}__ and `eventName` set to `"Approval"`
@@ -1987,12 +2479,370 @@ export const useWatchCoproFlatRecoveredEvent =
   })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coproAbi}__ and `eventName` set to `"Fractionalized"`
+ */
+export const useWatchCoproFractionalizedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: coproAbi,
+    address: coproAddress,
+    eventName: 'Fractionalized',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coproAbi}__ and `eventName` set to `"ImageSet"`
+ */
+export const useWatchCoproImageSetEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: coproAbi,
+    address: coproAddress,
+    eventName: 'ImageSet',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link coproAbi}__ and `eventName` set to `"Transfer"`
  */
 export const useWatchCoproTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: coproAbi,
     address: coproAddress,
+    eventName: 'Transfer',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__
+ */
+export const useReadFractional = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadFractionalAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadFractionalBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadFractionalDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadFractionalName = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"owner"`
+ */
+export const useReadFractionalOwner = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"saleOrders"`
+ */
+export const useReadFractionalSaleOrders = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'saleOrders',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"supply"`
+ */
+export const useReadFractionalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'supply',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadFractionalSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: fractionalAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadFractionalTotalSupply = /*#__PURE__*/ createUseReadContract(
+  { abi: fractionalAbi, functionName: 'totalSupply' },
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__
+ */
+export const useWriteFractional = /*#__PURE__*/ createUseWriteContract({
+  abi: fractionalAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteFractionalApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: fractionalAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"cancelSaleOrder"`
+ */
+export const useWriteFractionalCancelSaleOrder =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'cancelSaleOrder',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"listAllTokensForSale"`
+ */
+export const useWriteFractionalListAllTokensForSale =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'listAllTokensForSale',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"mint"`
+ */
+export const useWriteFractionalMint = /*#__PURE__*/ createUseWriteContract({
+  abi: fractionalAbi,
+  functionName: 'mint',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"onERC721Received"`
+ */
+export const useWriteFractionalOnErc721Received =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'onERC721Received',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"purchaseAllTokensFromSeller"`
+ */
+export const useWriteFractionalPurchaseAllTokensFromSeller =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'purchaseAllTokensFromSeller',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useWriteFractionalRenounceOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteFractionalTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: fractionalAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteFractionalTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useWriteFractionalTransferOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: fractionalAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__
+ */
+export const useSimulateFractional = /*#__PURE__*/ createUseSimulateContract({
+  abi: fractionalAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateFractionalApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"cancelSaleOrder"`
+ */
+export const useSimulateFractionalCancelSaleOrder =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'cancelSaleOrder',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"listAllTokensForSale"`
+ */
+export const useSimulateFractionalListAllTokensForSale =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'listAllTokensForSale',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"mint"`
+ */
+export const useSimulateFractionalMint =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'mint',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"onERC721Received"`
+ */
+export const useSimulateFractionalOnErc721Received =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'onERC721Received',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"purchaseAllTokensFromSeller"`
+ */
+export const useSimulateFractionalPurchaseAllTokensFromSeller =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'purchaseAllTokensFromSeller',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useSimulateFractionalRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateFractionalTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateFractionalTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link fractionalAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useSimulateFractionalTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: fractionalAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__
+ */
+export const useWatchFractionalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: fractionalAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchFractionalApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const useWatchFractionalOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"ReceivedNFT"`
+ */
+export const useWatchFractionalReceivedNftEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'ReceivedNFT',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"SaleOrderCanceled"`
+ */
+export const useWatchFractionalSaleOrderCanceledEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'SaleOrderCanceled',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"TokensListed"`
+ */
+export const useWatchFractionalTokensListedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'TokensListed',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"TokensPurchasedFromSeller"`
+ */
+export const useWatchFractionalTokensPurchasedFromSellerEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
+    eventName: 'TokensPurchasedFromSeller',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link fractionalAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchFractionalTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: fractionalAbi,
     eventName: 'Transfer',
   })
 
@@ -2011,42 +2861,6 @@ export const useReadManagerAdminRole = /*#__PURE__*/ createUseReadContract({
   abi: managerAbi,
   address: managerAddress,
   functionName: 'ADMIN_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"AGENCY_ROLE"`
- */
-export const useReadManagerAgencyRole = /*#__PURE__*/ createUseReadContract({
-  abi: managerAbi,
-  address: managerAddress,
-  functionName: 'AGENCY_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"AGENT_ROLE"`
- */
-export const useReadManagerAgentRole = /*#__PURE__*/ createUseReadContract({
-  abi: managerAbi,
-  address: managerAddress,
-  functionName: 'AGENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"CLIENT_ROLE"`
- */
-export const useReadManagerClientRole = /*#__PURE__*/ createUseReadContract({
-  abi: managerAbi,
-  address: managerAddress,
-  functionName: 'CLIENT_ROLE',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link managerAbi}__ and `functionName` set to `"CO_OWNER_ROLE"`
- */
-export const useReadManagerCoOwnerRole = /*#__PURE__*/ createUseReadContract({
-  abi: managerAbi,
-  address: managerAddress,
-  functionName: 'CO_OWNER_ROLE',
 })
 
 /**

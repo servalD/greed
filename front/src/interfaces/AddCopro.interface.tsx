@@ -8,5 +8,6 @@ export interface AddCoproDialogProps {
       symbol: string;
       flatCount: number;
       promoter: string;
+      imageUrl: string;
     };
 }

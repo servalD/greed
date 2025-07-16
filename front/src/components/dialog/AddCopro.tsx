@@ -86,6 +86,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
       const imageUrl = await PinataService.uploadImage(selectedFile);
       setUploadedImageUrl(imageUrl);
       
+      propertyData.imageUrl = imageUrl; // Update propertyData with the uploaded image URL
       // Call the original handleSubmit after successful upload
       await handleSubmit();
       
@@ -155,7 +156,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
                 placeholder={placeholder}
                 fullWidth
                 variant="outlined"
-                value={propertyData[field as keyof typeof propertyData]}
+                value={propertyData[field as keyof (Exclude<typeof propertyData, 'imageUrl'>)]}
                 onChange={handleChange}
                 sx={{
                   '& .MuiOutlinedInput-root': {

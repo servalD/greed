@@ -57,7 +57,8 @@ contract ManagerTest is Test {
             "CoproTest",
             "CT",
             flatCount,
-            payable(safeAddress)
+            payable(safeAddress),
+            "fakeurl"
         );
         vm.prank(admin);
         manager.addCopro(address(localCopro));
