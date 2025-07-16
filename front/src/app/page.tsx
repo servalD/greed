@@ -4,24 +4,22 @@ import Navbar from "@/components/ui/navbar";
 import { useActiveWalletConnectionStatus, ConnectButton } from "thirdweb/react";
 import { client } from "@/app/client";
 import GuestOrClient from "@/components/guestOrClient";
-import { useEffect, useState } from "react";
 import {
   generatePayload,
   getUser,
   login,
   logout,
 } from "@/service/auth";
-import { useReadDataContract } from "@/contracts/useReadDataContract";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  const status = useActiveWalletConnectionStatus();
-  const { userRole } = useReadDataContract();
+  const { user, isAuthenticated, refetch } = useAuth();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
       <Navbar />
       
-      {status === "connected" ? (
+      {isAuthenticated ? (
         <GuestOrClient />
       ) : (
         <div className="container mx-auto px-4 py-16">
@@ -59,6 +57,7 @@ export default function Home() {
                         localStorage.setItem("user", data.user);
                         localStorage.setItem("access_token", data.token);
                         localStorage.setItem("refresh_token", data.refresh_token);
+                        refetch();
                       },
                       isLoggedIn: async () => {
                         // Vérifie si l'utilisateur est connecté
