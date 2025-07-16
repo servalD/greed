@@ -30,7 +30,7 @@ contract Agency is AccessManaged {
     address private immutable SAFE;
 
     EnumerableSet.AddressSet private guestList; // Incoming guest (to be validated by the agent and then able to buy flat)
-    // No need to keep track of clients (handled by the access manager)
+    EnumerableSet.AddressSet private clientList; // List of clients (validated guests)
 
     // =============================================================
     //                            STRUCTS
@@ -101,7 +101,26 @@ contract Agency is AccessManaged {
     function acceptClient(address _client) external restricted {
         manager.grantRole(IRoleDefinition.CLIENT_ROLE, _client, 0);
         guestList.remove(_client);
+        clientList.add(_client);
         emit ClientAccepted(_client);
+    }
+
+    /**
+     * @notice Revokes the client role from an address.
+     * @dev Restricted to agents. Removes the client from the client list.
+     * @param _client Address of the client to be revoked.
+     */
+    function revokeClient(address _client) external restricted {
+        manager.revokeRole(IRoleDefinition.CLIENT_ROLE, _client);
+        clientList.remove(_client);
+    }
+
+    /**
+     * @notice Returns the list of clients.
+     * @return List of client addresses.
+     */
+    function clients() public view returns (address[] memory) {
+        return clientList.values();
     }
 
     /**
@@ -115,7 +134,8 @@ contract Agency is AccessManaged {
         string memory name,
         string memory symbol,
         uint96 flatCount,
-        address promoter
+        address promoter,
+        string memory imageURL
     ) external returns (Copro) {
         Copro copro = new Copro(
             manager,
@@ -123,7 +143,8 @@ contract Agency is AccessManaged {
             name,
             symbol,
             flatCount,
-            payable(SAFE)
+            payable(SAFE),
+            imageURL
         ); // index
         copros.push(copro);
         nbListedCopro++;

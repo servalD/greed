@@ -46,7 +46,7 @@ contract DemoScript is Script {
       vm.stopBroadcast();
       vm.startBroadcast(agentPk);
 
-      Copro sepoliaCopro = agency.createCopro("Long Court", "LC", 10, promoter);
+      Copro sepoliaCopro = agency.createCopro("Long Court", "LC", 10, promoter, "");
 
       console.log("NEXT_PUBLIC_COPRO=", address(sepoliaCopro));
 

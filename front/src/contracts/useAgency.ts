@@ -35,13 +35,13 @@ export const useAgency = () => {
     }
   };
 
-  const createCopro = async (name: string, symbol: string, flatCount: number, promoter: Address) => {
+  const createCopro = async (name: string, symbol: string, flatCount: number, promoter: Address, imageUrl: string) => {
     if (!isConnected) {
         await connector?.connect();
     }
 
     try {
-        const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter] })
+      const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter, imageUrl] })
         console.log("Transaction envoyée:", tx);
         setTxHash(tx);
     } catch (err: unknown) {

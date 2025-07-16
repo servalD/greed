@@ -2,7 +2,8 @@
 
 import Navbar from "@/components/ui/navbar";
 import NotConnected from "@/components/notConnected";
-import { useActiveWalletConnectionStatus } from "thirdweb/react";
+import { useActiveWalletConnectionStatus, ConnectButton } from "thirdweb/react";
+import { client } from "@/app/client";
 import GuestOrClient from "@/components/guestOrClient";
 import { useEffect, useState } from "react";
 
@@ -38,8 +39,14 @@ export default function Home() {
               <p className="text-gray-400 mb-6">
                 Accédez à notre plateforme sécurisée et explorez nos propriétés uniques
               </p>
-              <div className="animate-pulse">
-                <div className="h-12 w-48 mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg opacity-75"></div>
+              <div className="flex justify-center">
+                <ConnectButton
+                  client={client}
+                  appMetadata={{
+                    name: "GREED Agency",
+                    url: "",
+                  }}
+                />
               </div>
             </div>
           </div>
