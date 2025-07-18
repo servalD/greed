@@ -8,8 +8,10 @@ use chrono::{Utc, Duration};
 
 use crate::config::Config;
 use crate::models::refresh_token::{NewRefreshToken, RefreshToken};
-use crate::repositories::refresh_token_repo as rt_repo;
+use crate::models::user::User;
+use crate::repositories::{refresh_token_repo as rt_repo, user_repo};
 use crate::utils::logger;
+use bcrypt::{verify};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -116,19 +118,42 @@ impl AuthService {
     // Les validate/revoke refresh token sont dans le refresh_token_repo car ils sont trop lié à la DB
 
     pub fn validate_refresh_token(
-    &self,
-    conn: &mut PgConnection,
-    auth: &str,
-) -> Result<RefreshToken, &str> {
-    auth.strip_prefix("Bearer ")
-        .map(str::trim)
-        .filter(|t| !t.is_empty())
-        .ok_or("Invalid refresh token")
-        .and_then(|token| {
-            rt_repo::check_refresh_token(conn, token).map_err(|e| {
-                logger::warning(&format!("Refresh token invalide : {}", e));
-                "Invalid refresh token"
+        &self,
+        conn: &mut PgConnection,
+        auth: &str,
+    ) -> Result<RefreshToken, &str> {
+        auth.strip_prefix("Bearer ")
+            .map(str::trim)
+            .filter(|t| !t.is_empty())
+            .ok_or("Invalid refresh token")
+            .and_then(|token| {
+                rt_repo::check_refresh_token(conn, token).map_err(|e| {
+                    logger::warning(&format!("Refresh token invalide : {}", e));
+                    "Invalid refresh token"
+                })
             })
-        })
-}
+    }
+
+    pub fn validate_password(
+        &self,
+        conn: &mut PgConnection,
+        user_id: i32,
+        password: &str,
+    ) -> Result<User, &str> {
+        if password.is_empty() {
+            return Err("Password is required");
+        }
+    
+        let user = user_repo::find_user(conn, Some(user_id), None, None)
+            .map_err(|_| "db error")?
+            .ok_or("User not found")?;
+
+        let hash = user.password_hash.as_ref().ok_or("No password set")?;
+
+        if verify(password, hash).map_err(|_| "Verify failed")? {
+            Ok(user)
+        } else {
+            Err("Invalid password")
+        }
+    }
 }

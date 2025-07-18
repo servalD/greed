@@ -1,97 +1,37 @@
-use crate::repositories::{user_repo, refresh_token_repo as rt_repo};
-use crate::models::user::{NewUser, NewUserPayload, UpdateUserPayload, UpdateUserData, FindUserPayload, DeleteUserPayload, LoginPayload};
 use crate::http::{HttpResponse, RequestContext};
+use crate::models::user::{
+    DeleteUserPayload, FindUserPayload, NewUser, UpdateUserData,
+    UpdateUserPayload,
+};
+use crate::repositories::{refresh_token_repo as rt_repo, user_repo};
+use crate::services::{auth_service::AuthService, siwe_service::SiweService};
 use crate::utils::logger;
-use crate::services::auth_service::AuthService;
-use bcrypt::{hash, verify, DEFAULT_COST};
+use bcrypt::{DEFAULT_COST, hash};
 use diesel::pg::PgConnection;
+use serde::Deserialize;
 
-pub async fn handle_signup(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
-    let payload = match ctx.parse_body::<NewUserPayload>() {
-        Some(p) => p,
-        None => return HttpResponse::bad_request("Invalid body format"),
-    };
-
-    let password_hash = match hash(&payload.password, DEFAULT_COST) {
-        Ok(h) => h,
-        Err(_) => return HttpResponse::internal_server_error(),
-    };
-
-    logger::debug(&format!("Création de l'utilisateur {:?}", payload));
-
-    let new_user = NewUser {
-        email: payload.email,
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        password_hash,
-        eth_address: payload.eth_address,
-        role: payload.role,
-    };
-    
-    match user_repo::create_user(conn, &new_user) {
-        Ok(_) => HttpResponse::ok(Some("User created".to_string())),
-        Err(e) => match e.to_string().as_str() {
-            e if e.starts_with("duplicate") => HttpResponse::conflict(),
-            e => {
-                logger::error(&format!("Erreur création utilisateur: {}", e));
-                HttpResponse::internal_server_error()
-            },
-        },
-    }
+#[derive(Deserialize)]
+pub struct SiweGeneratePayload {
+    pub eth_address: String,
+    pub chain_id: u64,
 }
 
-pub async fn handle_login(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
-    logger::debug("Requête de login reçue");
-
-    let payload = match ctx.parse_body::<LoginPayload>() {
-        Some(p) => p,
-        None => return HttpResponse::bad_request("Invalid body format"),
-    };
-
-    let user = match user_repo::find_user(conn, None, Some(&payload.eth_address), payload.email.as_deref()) {
-        Ok(Some(u)) => u,
-        Ok(None) => {
-            logger::warning("Utilisateur non trouvé");
-            return HttpResponse::unauthorized();
-        }
-        Err(e) => {
-            logger::error(&format!("Erreur recherche utilisateur: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    if !verify(&payload.password, &user.password_hash).unwrap_or(false) {
-        logger::warning("Mot de passe invalide");
-        return HttpResponse::unauthorized();
-    }
-
-    let refresh_token = match auth_service.generate_refresh_token(conn, user.id) {
-        Ok(rt) => rt,
-        Err(e) => {
-            logger::error(&format!("Erreur refresh token: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    let access_token = match auth_service.generate_token(refresh_token.clone()) {
-        Ok(token) => token,
-        Err(e) => {
-            logger::error(&format!("Erreur token: {}", e));
-            return HttpResponse::internal_server_error();
-        }
-    };
-
-    let json = serde_json::json!({
-        "token": access_token,
-        "refresh_token": refresh_token.token
-    }).to_string();
-    HttpResponse::ok(Some(json))
+#[derive(Deserialize)]
+pub struct SiweSigPayload {
+    pub nonce: String,
+    pub signature: String,
 }
 
-pub async fn handle_refresh(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
-
+pub async fn handle_refresh(
+    conn: &mut PgConnection,
+    ctx: &RequestContext,
+    auth_service: &AuthService,
+) -> HttpResponse {
     // Vérifie le refresh token transmis dans l'Authorization header
-    let refresh_token = match auth_service.validate_refresh_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
+    let refresh_token = match auth_service.validate_refresh_token(
+        conn,
+        ctx.headers.get("Authorization").unwrap_or(&"".to_string()),
+    ) {
         Ok(rt) => rt,
         Err(_) => return HttpResponse::unauthorized(),
     };
@@ -114,13 +54,21 @@ pub async fn handle_refresh(conn: &mut PgConnection, ctx: &RequestContext, auth_
     let json = serde_json::json!({
         "token": new_jwt,
         "refresh_token": new_refresh.token
-    }).to_string();
+    })
+    .to_string();
 
     HttpResponse::ok(Some(json))
 }
 
-pub async fn handle_logout(conn: &mut PgConnection, ctx: &RequestContext, auth_service: &AuthService) -> HttpResponse {
-    let refresh_token = match auth_service.validate_refresh_token(conn, ctx.headers.get("Authorization").unwrap_or(&"".to_string())) {
+pub async fn handle_logout(
+    conn: &mut PgConnection,
+    ctx: &RequestContext,
+    auth_service: &AuthService,
+) -> HttpResponse {
+    let refresh_token = match auth_service.validate_refresh_token(
+        conn,
+        ctx.headers.get("Authorization").unwrap_or(&"".to_string()),
+    ) {
         Ok(c) => c,
         Err(_) => return HttpResponse::unauthorized(),
     };
@@ -131,17 +79,24 @@ pub async fn handle_logout(conn: &mut PgConnection, ctx: &RequestContext, auth_s
     }
 }
 
-pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext, 
+    auth_service: &AuthService) -> HttpResponse {
     let payload = match ctx.parse_body::<UpdateUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    let password_hash = match payload.password {
-        Some(pw) => match hash(&pw, DEFAULT_COST) {
-            Ok(h) => Some(h),
-            Err(_) => return HttpResponse::internal_server_error(),
-        },
+    match auth_service.validate_password(conn, payload.id, &payload.password) {
+        Ok(user) => user,
+        Err(err) => return HttpResponse::bad_request(err),
+    };
+
+
+    let password_hash = match payload.new_password {
+        Some(p) => match hash(p, DEFAULT_COST) {
+                Ok(h) => Some(h),
+                Err(_) => return HttpResponse::internal_server_error(),
+            },
         None => None,
     };
 
@@ -153,7 +108,7 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
         eth_address: payload.eth_address,
         role: payload.role,
     };
-    
+
     match user_repo::update_user(conn, payload.id, update) {
         Ok(user) => match user.safe_json() {
             Ok(json) => HttpResponse::ok(Some(json)),
@@ -163,11 +118,18 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
     }
 }
 
-pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext, 
+    auth_service: &AuthService) -> HttpResponse {
     let payload = match ctx.parse_body::<DeleteUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
+
+    match auth_service.validate_password(conn, payload.id, &payload.password) {
+        Ok(user) => user,
+        Err(err) => return HttpResponse::bad_request(err),
+    };
+
     match user_repo::delete_user(conn, payload.id) {
         Ok(size) => match size {
             1 => HttpResponse::ok(Some("User deleted".to_string())),
@@ -183,7 +145,12 @@ pub async fn handle_find_user(conn: &mut PgConnection, ctx: &RequestContext) -> 
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    match user_repo::find_user(conn, payload.id, payload.eth_address.as_deref(), payload.email.as_deref()) {
+    match user_repo::find_user(
+        conn,
+        payload.id,
+        payload.eth_address.as_deref(),
+        payload.email.as_deref(),
+    ) {
         Ok(Some(user)) => match user.safe_json() {
             Ok(json) => HttpResponse::ok(Some(json)),
             Err(_) => HttpResponse::internal_server_error(),
@@ -204,4 +171,141 @@ pub async fn handle_get_user(conn: &mut PgConnection, ctx: &RequestContext) -> H
         Ok(None) => HttpResponse::not_found(),
         Err(_) => HttpResponse::internal_server_error(),
     }
+}
+
+/// Génère un message SIWE pour l'authentification
+pub async fn handle_siwe_generate(
+    ctx: &RequestContext,
+    siwe_service: &SiweService,
+) -> HttpResponse {
+    logger::debug("Requête de génération SIWE reçue");
+
+    let payload = match ctx.parse_body::<SiweGeneratePayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
+    };
+
+    // Configurer les paramètres SIWE
+    
+
+    match siwe_service.generate_siwe_nonce(&payload.eth_address, &payload.chain_id.to_string()) {
+        Ok(response) => {
+            
+            let json = serde_json::to_string(&response).unwrap_or_default();
+            HttpResponse::ok(Some(json))
+        }
+        Err(e) => {
+            logger::error(&format!("Erreur génération SIWE: {}", e));
+            HttpResponse::internal_server_error()
+        }
+    }
+}
+
+/// Authentifie l'utilisateur avec SIWE
+pub async fn handle_siwe_login(
+    conn: &mut PgConnection,
+    ctx: &RequestContext,
+    auth_service: &AuthService,
+    siwe_service: &SiweService,
+) -> HttpResponse {
+    logger::debug("Requête de login SIWE reçue");
+
+    let payload = match ctx.parse_body::<SiweSigPayload>() {
+        Some(p) => p,
+        None => return HttpResponse::bad_request("Invalid body format"),
+    };
+
+    // Valider la signature SIWE
+    let eth_address =
+        match siwe_service.validate_siwe_signature(&payload.nonce, &payload.signature) {
+            Ok(addr) => addr,
+            Err(e) => {
+                logger::warning(&format!("Signature SIWE invalide: {}", e));
+                return HttpResponse::unauthorized();
+            }
+        };
+
+    // Chercher ou créer l'utilisateur
+    let user = match user_repo::find_user(conn, None, Some(&eth_address), None) {
+        Ok(Some(u)) => {
+            logger::debug(&format!("Utilisateur trouvé: {}", u.id));
+            u
+        }
+        Ok(None) => {
+            logger::debug("Création d'un nouvel utilisateur SIWE");
+            // Auto-création d'utilisateur avec wallet
+            let new_user = NewUser {
+                email: None,
+                first_name: None,
+                last_name: None,
+                password_hash: None,
+                eth_address: eth_address.clone(),
+                role: crate::models::user::Role::Guest,
+            };
+            match user_repo::create_user(conn, &new_user) {
+                Ok(_) => {
+                    logger::debug("Nouvel utilisateur créé");
+                    // Récupérer l'utilisateur créé
+                    match user_repo::find_user(conn, None, Some(&eth_address), None) {
+                        Ok(Some(u)) => u,
+                        Ok(None) => return HttpResponse::internal_server_error(),
+                        Err(e) => {
+                            logger::error(&format!(
+                                "Erreur lors de la récupération de l'utilisateur créé: {}",
+                                e
+                            ));
+                            return HttpResponse::internal_server_error();
+                        }
+                    }
+                }
+                Err(e) => {
+                    logger::error(&format!(
+                        "Erreur lors de la création de l'utilisateur: {}",
+                        e
+                    ));
+                    return HttpResponse::internal_server_error();
+                }
+            }
+        }
+        Err(e) => {
+            logger::error(&format!(
+                "Erreur lors de la recherche de l'utilisateur: {}",
+                e
+            ));
+            return HttpResponse::internal_server_error();
+        }
+    };
+
+    let refresh_token = match auth_service.generate_refresh_token(conn, user.id) {
+        Ok(rt) => rt,
+        Err(e) => {
+            logger::error(&format!(
+                "Erreur lors de la génération du refresh token: {}",
+                e
+            ));
+            return HttpResponse::internal_server_error();
+        }
+    };
+
+    let access_token = match auth_service.generate_token(refresh_token.clone()) {
+        Ok(token) => token,
+        Err(e) => {
+            logger::error(&format!("Erreur lors de la génération du token: {}", e));
+            return HttpResponse::internal_server_error();
+        }
+    };
+
+    let user_json = match user.safe_json() {
+        Ok(json) => json,
+        Err(_) => "{}".to_string(),
+    };
+
+    let json = serde_json::json!({
+        "token": access_token,
+        "refresh_token": refresh_token.token,
+        "user": serde_json::from_str::<serde_json::Value>(&user_json).unwrap_or(serde_json::json!({}))
+    }).to_string();
+
+    logger::debug(&format!("Login SIWE réussi pour l'utilisateur {}", user.id));
+    HttpResponse::ok(Some(json))
 }

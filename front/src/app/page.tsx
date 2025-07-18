@@ -1,27 +1,25 @@
 "use client";
 
 import Navbar from "@/components/ui/navbar";
-import NotConnected from "@/components/notConnected";
 import { useActiveWalletConnectionStatus, ConnectButton } from "thirdweb/react";
 import { client } from "@/app/client";
 import GuestOrClient from "@/components/guestOrClient";
-import { useEffect, useState } from "react";
+import {
+  generatePayload,
+  getUser,
+  login,
+  logout,
+} from "@/service/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  const status = useActiveWalletConnectionStatus();
-  const [_, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setRole(localStorage.getItem("role"));
-    }
-  }, []);
+  const { user, isAuthenticated, refetch } = useAuth();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
       <Navbar />
       
-      {status === "connected" ? (
+      {isAuthenticated ? (
         <GuestOrClient />
       ) : (
         <div className="container mx-auto px-4 py-16">
@@ -40,13 +38,38 @@ export default function Home() {
                 Accédez à notre plateforme sécurisée et explorez nos propriétés uniques
               </p>
               <div className="flex justify-center">
-                <ConnectButton
-                  client={client}
-                  appMetadata={{
-                    name: "GREED Agency",
-                    url: "",
-                  }}
-                />
+                  <ConnectButton
+                    client={client}
+                    appMetadata={{
+                      name: "GREED Agency",
+                      url: "",
+                    }}
+                    auth={{
+                      getLoginPayload: async (params) => {
+                        // Génère le payload SIWE depuis le backend
+                        const payload = generatePayload(params);
+                        console.log('Generated Payload:', await payload);
+                        return payload
+                      },
+                      doLogin: async (params) => {
+                        // Envoie la signature au backend pour validation
+                        const data = await login({ nonce: params.payload.nonce, signature: params.signature });
+                        localStorage.setItem("user", data.user);
+                        localStorage.setItem("access_token", data.token);
+                        localStorage.setItem("refresh_token", data.refresh_token);
+                        refetch();
+                      },
+                      isLoggedIn: async () => {
+                        // Vérifie si l'utilisateur est connecté
+                        const user = await getUser();
+                        return !!user;
+                      },
+                      doLogout: async () => {
+                        // Déconnecte l'utilisateur
+                        return logout();
+                      },
+                    }}
+                  />
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-use crate::{http::{HttpResponse, RequestContext}, services::{auth_service::AuthService, apartment_service::ApartmentService, realty_service::RealtyService}, logger};
+use crate::{http::{HttpResponse, RequestContext}, services::{auth_service::AuthService, apartment_service::ApartmentService, realty_service::RealtyService, siwe_service::SiweService}, logger};
 mod auth;
 mod apartment;
 mod realty;
@@ -8,6 +8,7 @@ pub async fn handle_routes(
     first_line: &str,
     request: &str,
     auth_service: &mut AuthService,
+    siwe_service: &SiweService,
     conn: &mut PgConnection,
 ) -> HttpResponse {
     let apartment_service = ApartmentService::new();
@@ -18,9 +19,16 @@ pub async fn handle_routes(
         None => return HttpResponse::bad_request("Invalid request format"),
     };
 
+    if ctx.method == "OPTIONS" {
+        return HttpResponse::new(204, "No Content", None)
+            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+            .header("Access-Control-Max-Age", "86400"); 
+    }
+    
+    logger::debug(&format!("Handling request: {}", first_line.to_string()));
     let resp = match true {
-        _ if ctx.match_route("POST", "/signup") => auth::handle_signup(conn, &ctx).await,
-        _ if ctx.match_route("POST", "/login") => auth::handle_login(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("POST", "/siwe/generate") => auth::handle_siwe_generate(&ctx, siwe_service).await,
+        _ if ctx.match_route("POST", "/siwe/login") => auth::handle_siwe_login(conn, &ctx, auth_service, siwe_service).await,
         _ if ctx.match_route("POST", "/refresh") => auth::handle_refresh(conn, &ctx, auth_service).await,
         _ if ctx.match_route("POST", "/logout") => auth::handle_logout(conn, &ctx, auth_service).await,
         _ => HttpResponse::i_am_a_teapot()
@@ -41,8 +49,8 @@ pub async fn handle_routes(
     match true {
         _ if ctx.match_route("GET", "/user") => auth::handle_get_user(conn, &ctx).await,
         _ if ctx.match_route("GET", "/user/:id") => auth::handle_get_user(conn, &ctx).await,
-        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx).await,
-        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx).await,
+        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx, auth_service).await,
         
         // Routes realty
         _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service).await,
