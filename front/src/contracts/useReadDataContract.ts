@@ -1,44 +1,15 @@
-import { useReadManagerHasRole, useReadAgencyGuests, useReadAgencyClients } from "./generatedContracts";
-import { useAccount } from "wagmi";
-import { useMemo } from "react";
-
-const AGENCY_ROLE = 1;
-const AGENT_ROLE = 2;
-const CLIENT_ROLE = 3;
-const CO_OWNER_ROLE = 4;
+import { useReadAgencyGuests, useReadAgencyClients } from "./generatedContracts";
+import { Address } from "thirdweb";
 
 export const useReadDataContract = () => {
-  const { address } = useAccount();
-
-  // Role verification
-  const { data: isAgency, refetch: refetchAgency } = useReadManagerHasRole({ args: [BigInt(AGENCY_ROLE), address as `0x${string}`] });
-  const { data: isAgent, refetch: refetchAgent } = useReadManagerHasRole({ args: [BigInt(AGENT_ROLE), address as `0x${string}`] });
-  const { data: isClient, refetch: refetchClient } = useReadManagerHasRole({ args: [BigInt(CLIENT_ROLE), address as `0x${string}`] });
-  const { data: isCoOwner, refetch: refetchCoOwner } = useReadManagerHasRole({ args: [BigInt(CO_OWNER_ROLE), address as `0x${string}`] });
-
-  const userRole = useMemo(() => {
-    if (isAgency && isAgency[0]) return "agency";
-    if (isAgent && isAgent[0]) return "agent";
-    if (isClient && isClient[0]) return "client";
-    if (isCoOwner && isCoOwner[0]) return "coOwner";
-    return "guest";
-  }, [isAgency, isAgent, isClient, isCoOwner]);
-
-  /*  */
 
   const { data: guests, refetch: refetchGuests } = useReadAgencyGuests();
   const { data: clients, refetch: refetchClients } = useReadAgencyClients();
 
-  const refetchUserRole = async () => {
-    await Promise.all([
-      refetchAgency(),
-      refetchAgent(),
-      refetchClient(),
-      refetchCoOwner(),
-      refetchGuests(),
-      refetchClients()
-    ]);
+  return {
+    guests: guests as Address[] || [],
+    clients: clients as Address[] || [],
+    refetchGuests,
+    refetchClients,
   };
-
-  return { userRole, guests, clients, refetchUserRole };
 };

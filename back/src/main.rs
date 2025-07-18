@@ -10,7 +10,7 @@ use tokio::net::TcpListener;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 use config::Config;
-use services::auth_service::AuthService;
+use services::{auth_service::AuthService, siwe_service::SiweService};
 use routes::handle_routes;
 use utils::logger;
 use diesel::pg::PgConnection;
@@ -43,6 +43,7 @@ async fn main() -> std::io::Result<()> {
     logger::debug("Configuration chargée depuis l'environnement");
 
     let auth_service = AuthService::new(config);
+    let siwe_service = SiweService::new();
     let db_pool =  get_db_connection_pool();
     let listener = TcpListener::bind("127.0.0.1:3000").await?;
     logger::info("Serveur écoutant sur 127.0.0.1:3000");
@@ -52,6 +53,7 @@ async fn main() -> std::io::Result<()> {
         let (mut socket, addr) = listener.accept().await?;
         logger::info(&format!("Connexion entrante depuis {}", addr));
         let mut auth_service = auth_service.clone();
+        let siwe_service = siwe_service.clone();
         let db_pool = db_pool.clone();
 
         tokio::spawn(async move {
@@ -72,7 +74,7 @@ async fn main() -> std::io::Result<()> {
             let first_line = request.lines().next().unwrap_or("");
             logger::debug(&format!("Requête brute : {}", first_line));
             let mut conn = db_pool.get().unwrap();
-            let response = handle_routes(&first_line, &request, &mut auth_service, &mut conn).await;
+            let response = handle_routes(&first_line, &request, &mut auth_service, &siwe_service, &mut conn).await;
 
             if let Err(e) = socket.write_all(response.to_string().as_bytes()).await {
                 logger::error(&format!("Erreur d'écriture dans le socket : {}", e));
