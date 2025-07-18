@@ -24,8 +24,17 @@ export const UserRoleIdLabels: Record<UserRoleIds, string> = {
   [UserRoleIds.AGENCY]: "Agency",
   [UserRoleIds.AGENT]: "Agent",
   [UserRoleIds.CLIENT]: "Client",
-  [UserRoleIds.CO_OWNER]: "Co-Owner",
+  [UserRoleIds.CO_OWNER]: "Co_owner",
   [UserRoleIds.ADMIN]: "Admin",
+};
+
+export const UserLabelRoleIds: Record<string, UserRoleIds> = {
+  "Guest": UserRoleIds.GUEST,
+  "Agency": UserRoleIds.AGENCY,
+  "Agent": UserRoleIds.AGENT,
+  "Client": UserRoleIds.CLIENT,
+  "Co-Owner": UserRoleIds.CO_OWNER,
+  "Admin": UserRoleIds.ADMIN,
 };
 
 export interface User {
@@ -35,6 +44,7 @@ export interface User {
   last_name: string,
   email: string,
   role: UserRoleIds,
+  is_setup: boolean,
 }
 
 export interface UserUpdate {
@@ -43,7 +53,7 @@ export interface UserUpdate {
   first_name?: string,
   last_name?: string,
   email?: string,
-  role?: UserRoleIds,
+  role?: string,
   password: string,
   new_password?: string,
 }

@@ -8,7 +8,8 @@ use crate::services::{auth_service::AuthService, siwe_service::SiweService};
 use crate::utils::logger;
 use bcrypt::{DEFAULT_COST, hash};
 use diesel::pg::PgConnection;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 #[derive(Deserialize)]
 pub struct SiweGeneratePayload {
@@ -86,27 +87,39 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    match auth_service.validate_password(conn, payload.id, &payload.password) {
-        Ok(user) => user,
+    let (user, valid) = match auth_service.validate_password(conn, payload.id, &payload.password) {
+        Ok(rep) => rep,
         Err(err) => return HttpResponse::bad_request(err),
     };
 
-
-    let password_hash = match payload.new_password {
-        Some(p) => match hash(p, DEFAULT_COST) {
-                Ok(h) => Some(h),
-                Err(_) => return HttpResponse::internal_server_error(),
-            },
-        None => None,
-    };
+    let mut password_hash= None;
+    // Si le mdp n'est pas valid
+    if !valid {
+        // l'utilisateur en a un, on refuse
+        if user.password_hash.is_some() {
+            return HttpResponse::unauthorized();
+            // le new mdp est vide, on ne le met pas à jour
+        } else if payload.new_password.is_none() || payload.new_password.as_ref().unwrap().is_empty() {
+            return HttpResponse::bad_request("New password is required");
+        } else {
+            password_hash = match payload.new_password {
+                Some(p) => match hash(p, DEFAULT_COST) {
+                        Ok(h) => Some(h),
+                        Err(_) => return HttpResponse::internal_server_error(),
+                    },
+                None => None,
+            };
+        }
+    }
 
     let update = UpdateUserData {
         email: payload.email,
         first_name: payload.first_name,
         last_name: payload.last_name,
-        password_hash,
+        password_hash: password_hash.clone(),
         eth_address: payload.eth_address,
         role: payload.role,
+        is_setup: valid || password_hash.is_some(), // Si le mot de passe est valide ou mis à jour, on marque l'utilisateur comme setup
     };
 
     match user_repo::update_user(conn, payload.id, update) {
@@ -158,6 +171,11 @@ pub async fn handle_find_user(conn: &mut PgConnection, ctx: &RequestContext) -> 
         Ok(None) => HttpResponse::not_found(),
         Err(_) => HttpResponse::internal_server_error(),
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct IsSetupResponse {
+    pub is_setup: bool,
 }
 
 pub async fn handle_get_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {

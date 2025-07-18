@@ -150,6 +150,7 @@ impl RequestContext {
                     Ok(parsed) => Some(parsed),
                     Err(e) => {
                         logger::warning(&format!("Erreur de parsing du body : {}", e));
+                        logger::debug(&format!("Body reçu : {}", body));
                         None
                     }
                 },
@@ -159,7 +160,6 @@ impl RequestContext {
                 }
             }
         }
-
     pub fn match_route(&mut self, method: &str, pattern: &str) -> bool {
         if self.method != method {
             return false;
