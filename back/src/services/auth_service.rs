@@ -139,21 +139,25 @@ impl AuthService {
         conn: &mut PgConnection,
         user_id: i32,
         password: &str,
-    ) -> Result<User, &str> {
-        if password.is_empty() {
-            return Err("Password is required");
-        }
+    ) -> Result<(User, bool), &str> {
     
         let user = user_repo::find_user(conn, Some(user_id), None, None)
             .map_err(|_| "db error")?
             .ok_or("User not found")?;
 
-        let hash = user.password_hash.as_ref().ok_or("No password set")?;
+        if password.is_empty() {
+            return Ok((user, false));
+        }
 
-        if verify(password, hash).map_err(|_| "Verify failed")? {
-            Ok(user)
+        let hash = match user.password_hash.clone() {
+            Some(h) => h,
+            None => return Ok((user, false)),
+        };
+
+        if verify(password, &hash).map_err(|_| "Verify failed")? {
+            Ok((user, true))
         } else {
-            Err("Invalid password")
+            Ok((user, false))
         }
     }
 }
