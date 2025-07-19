@@ -1,4 +1,3 @@
-"use client";
 
 import { User, UserUpdate } from "@/types/users";
 import { delete_, get, post, put } from "@/utils/api";
@@ -56,6 +55,7 @@ export async function login(params: LoginParams) {
 
 // Vérifie si l'utilisateur est connecté
 export async function getUser() {
+  if (typeof window === 'undefined') return null
   try {
     const accessToken = localStorage.getItem('access_token');
 
@@ -95,6 +95,7 @@ export async function deleteUser(id: number, password: string) {
 
 // Effectue la déconnexion
 export async function logout() {
+  if (typeof window === 'undefined') throw new Error("logout can only be called on the client side");
   try {
     const refreshToken = localStorage.getItem("refresh_token")
     // Informer le backend de la déconnexion

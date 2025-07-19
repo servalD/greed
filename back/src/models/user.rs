@@ -25,6 +25,7 @@ pub struct User {
     pub eth_address: String,
     pub password_hash: Option<String>,
     pub role: Role,
+    pub is_setup: bool,
 }
 
 #[derive(Serialize)]
@@ -35,6 +36,7 @@ pub struct UserSafe {
     pub last_name: Option<String>,
     pub email: Option<String>,
     pub role: Role,
+    pub is_setup: bool,
 }
 impl User {
     pub fn safe_json(&self) -> Result<String, serde_json::Error> {
@@ -45,6 +47,7 @@ impl User {
             last_name: self.last_name.clone(),
             email: self.email.clone(),
             role: self.role.clone(),
+            is_setup: self.is_setup.clone(),
         };
         serde_json::to_string(&user_safe)
     }
@@ -70,6 +73,7 @@ pub struct UpdateUserData {
     pub password_hash: Option<String>,
     pub eth_address: String,
     pub role: Option<Role>,
+    pub is_setup: bool,
 }
 
 #[derive(Deserialize, Debug)]
