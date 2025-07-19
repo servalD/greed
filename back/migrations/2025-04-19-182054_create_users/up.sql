@@ -7,5 +7,6 @@ CREATE TABLE users (
     last_name TEXT,
     eth_address TEXT NOT NULL UNIQUE,
     password_hash TEXT,
-    role role NOT NULL
+    role role NOT NULL,
+    is_setup BOOLEAN DEFAULT FALSE NOT NULL
 );

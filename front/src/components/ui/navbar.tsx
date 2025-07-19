@@ -70,6 +70,18 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
+              {isAuthenticated && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-gray-800/50 text-white hover:bg-gray-700/50 
+                    border border-gray-700/50 hover:border-purple-500/50 transition-all duration-200"
+                  onClick={() => router.push("/profile")}
+                >
+                  Mon Profil
+                </motion.button>
+              )}
+
               {isAuthenticated && user?.role === UserRoleIds.GUEST && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
