@@ -53,5 +53,4 @@ export interface UserUpdate {
   last_name?: string,
   email?: string,
   role?: string,
-  is_setup?: boolean,
 }
