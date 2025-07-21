@@ -1,12 +1,29 @@
 'use client'
-import { images } from "@/constants/moke/list";
 import List from "./ui/list";
-import { useReadAgencyGetCopros } from "../contracts/generatedContracts";
+import { useReadAgencyGetCopros, useReadCopro, useReadCoproBaseImageUrl } from "../contracts/generatedContracts";
 import { Address } from "viem";
 import { motion } from "framer-motion";
+import { RealtyService } from "@/service/realty.service";
+import { useEffect, useState } from "react";
+import { IRealty } from "@/app/models/realty.model";
+import { ServiceErrorCode } from "@/service/service.result";
 
 export default function GuestOrClient() {
-    const { data: coproAddress, isFetched, error, isLoadingError } = useReadAgencyGetCopros();
+    // const { data: coproAddress, isFetched, error, isLoadingError } = useReadAgencyGetCopros();
+    const [realties, setRealties] = useState([] as IRealty[]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await RealtyService.getAllRealties()
+            if (result.errorCode === ServiceErrorCode.success && result.result) {
+                setRealties(result.result);
+                console.log("Realties fetched successfully:", result.result);
+            } else {
+                console.error("Failed to fetch realties");
+            }
+        }
+        fetchData()
+    }, []);
 
     return (
         <main className="min-h-screen py-12">
@@ -25,13 +42,13 @@ export default function GuestOrClient() {
                     </p>
                 </motion.div>
 
-                {isFetched && coproAddress ? (
+                {realties.length > 0 ? (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <List images={coproAddress.map((_: Address, index: number) => images[index])} />
+                        <List images={realties.map((realty, index: number) => ({id: index, src: realty.image_url}))} />
                     </motion.div>
                 ) : (
                     <div className="flex justify-center items-center min-h-[400px]">

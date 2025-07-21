@@ -1,139 +1,66 @@
-import { get, post, put, delete_ } from "@/utils/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { get, post, put, delete_ } from "../utils/api";
+import { IRealty } from "@/app/models/realty.model";
+import { ServiceResult } from "./service.result";
 
-export interface Realty {
-  id: number;
-  name: string;
-  user_id: number; // promoter
-  street_number: string;
-  street_name: string;
-  complement_address?: string;
-  city: string;
-  zip_code: string;
-  region: string;
-  country: string;
-  address: string;
-  image_url: string;
+export class RealtyService {
+    static async createRealty(data: IRealty): Promise<ServiceResult<IRealty | undefined>> {
+        try {
+            const res = await post<IRealty>("/realty", data as unknown as Record<string, unknown>);
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async getRealtyById(id: number): Promise<ServiceResult<IRealty | undefined>> {
+        try {
+            const res = await get<IRealty>(`/realty/${id}`);
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async getAllRealties(): Promise<ServiceResult<IRealty[] | undefined>> {
+        try {
+            const res = await get<IRealty[]>("/realty");
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async updateRealty(id: number, data: Partial<IRealty>): Promise<ServiceResult<IRealty | undefined>> {
+        try {
+            const res = await put<IRealty>(`/realty/${id}`, data as unknown as Record<string, unknown>);
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async deleteRealty(id: number): Promise<ServiceResult<void>> {
+        try {
+            await delete_<void>(`/realty/${id}`);
+            return ServiceResult.success(undefined);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async searchRealties(params: Record<string, any>): Promise<ServiceResult<IRealty[] | undefined>> {
+        try {
+            const query = new URLSearchParams(params).toString();
+            const res = await get<IRealty[]>(`/realty/search?${query}`);
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
 }
-
-export interface NewRealty {
-  name: string;
-  user_id: number;
-  street_number: string;
-  street_name: string;
-  complement_address?: string;
-  city: string;
-  zip_code: string;
-  region: string;
-  country: string;
-  address: string;
-  image_url: string;
-}
-
-// API Functions
-export class RealtyAPI {
-  // Créer un nouveau bien immobilier
-  static async create(realty: NewRealty): Promise<Realty> {
-    return post<Realty>("/realty", realty as unknown as Record<string, unknown>);
-  }
-
-  // Récupérer un bien immobilier par ID
-  static async getById(id: number): Promise<Realty> {
-    return get<Realty>(`/realty/${id}`);
-  }
-
-  // Récupérer tous les biens immobiliers
-  static async getAll(): Promise<Realty[]> {
-    return get<Realty[]>("/realty");
-  }
-
-  // Récupérer les biens immobiliers par utilisateur
-  static async getByUser(userId: number): Promise<Realty[]> {
-    return get<Realty[]>(`/user/${userId}/realty`);
-  }
-
-  // Mettre à jour un bien immobilier
-  static async update(id: number, realty: NewRealty): Promise<Realty> {
-    return put<Realty>(`/realty/${id}`, realty as unknown as Record<string, unknown>);
-  }
-
-  // Supprimer un bien immobilier
-  static async delete(id: number): Promise<string> {
-    return delete_<string>(`/realty/${id}`);
-  }
-
-  // Rechercher des biens immobiliers
-  static async search(query: string): Promise<Realty[]> {
-    return get<Realty[]>(`/realty/search?q=${encodeURIComponent(query)}`);
-  }
-}
-
-// React Query Hooks
-export const useRealties = () => {
-  return useQuery({
-    queryKey: ['realties'],
-    queryFn: RealtyAPI.getAll,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-};
-
-export const useRealty = (id: number) => {
-  return useQuery({
-    queryKey: ['realty', id],
-    queryFn: () => RealtyAPI.getById(id),
-    enabled: !!id,
-  });
-};
-
-export const useRealitiesByUser = (userId: number) => {
-  return useQuery({
-    queryKey: ['realties', 'user', userId],
-    queryFn: () => RealtyAPI.getByUser(userId),
-    enabled: !!userId,
-  });
-};
-
-export const useSearchRealties = (query: string) => {
-  return useQuery({
-    queryKey: ['realties', 'search', query],
-    queryFn: () => RealtyAPI.search(query),
-    enabled: !!query.trim(),
-  });
-};
-
-export const useCreateRealty = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: RealtyAPI.create,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['realties'] });
-      queryClient.invalidateQueries({ queryKey: ['realties', 'user', data.user_id] });
-    },
-  });
-};
-
-export const useUpdateRealty = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, realty }: { id: number; realty: NewRealty }) =>
-      RealtyAPI.update(id, realty),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['realties'] });
-      queryClient.invalidateQueries({ queryKey: ['realty', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['realties', 'user', data.user_id] });
-    },
-  });
-};
-
-export const useDeleteRealty = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: RealtyAPI.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['realties'] });
-    },
-  });
-};

@@ -1,30 +1,34 @@
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { config as dotenvConf } from "dotenv";
 dotenvConf();
 
+// Create axios instance
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3000",
+  timeout: 10000,
+});
+
 function authorizationHeader(): Record<string, string> {
   const token = typeof window !== 'undefined' ? localStorage.getItem("access_token") : null;
-  console.log("Authorization Header Token:", token);
   return token ? {
     Authorization: `Bearer ${token}`,
   } : {};
 }
 
-async function refreshTokenIfNeeded() {
+async function refreshTokenIfNeeded(): Promise<boolean> {
   const refreshToken = typeof window !== 'undefined' ? localStorage.getItem("refresh_token") : null;
 
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch(buildUrl(process.env.NEXT_PUBLIC_API_URL, "/refresh"), {
-      method: "POST",
+    const response = await apiClient.post("/refresh", {}, {
       headers: {
         Authorization: `Bearer ${refreshToken}`,
-        "Content-Type": "application/json",
       },
     });
 
-    if (response.ok) {
-      const data = await response.json();
+    if (response.status === 200) {
+      const data = response.data;
       localStorage.setItem("access_token", data.token);
       localStorage.setItem("refresh_token", data.refresh_token);
       return true;
@@ -36,58 +40,59 @@ async function refreshTokenIfNeeded() {
   return false;
 }
 
-function buildUrl(base?: string, ...parts: string[]) {
-  base = base || "http://127.0.0.1:3000";
-  return [base.replace(/\/$/, ""), ...parts.map((part) => part.replace(/^\//, ""))].join("/");
-}
-
 export async function get<T>(url: string, retry = true): Promise<T> {
-  const fullUrl = buildUrl(process.env.NEXT_PUBLIC_API_URL, url);
+  try {
+    const response: AxiosResponse<T> = await apiClient.get(url, {
+      headers: {
+        ...authorizationHeader(),
+      },
+    });
 
-  const response = await fetch(fullUrl, {
-    headers: {
-      ...authorizationHeader(),
-    },
-  });
-
-  if (response.status === 401 && retry) {
-    const refreshed = await refreshTokenIfNeeded();
-    if (refreshed) {
-      return get<T>(url, false); // Retry once
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 401 && retry) {
+      const refreshed = await refreshTokenIfNeeded();
+      if (refreshed) {
+        return get<T>(url, false); // Retry once
+      }
     }
-  }
 
-  if (!response.ok) {
-    throw new Error(await response.text());
+    const errorMessage = error.response?.data || error.message || 'An error occurred';
+    throw new Error(errorMessage);
   }
-
-  return response.json() as Promise<T>;
 }
 
 async function write<T>(method: string, url: string, body: Record<string, unknown>, retry = true): Promise<T> {
-  const fullUrl = buildUrl(process.env.NEXT_PUBLIC_API_URL, url);
+  try {
+    const config: AxiosRequestConfig = {
+      method: method.toLowerCase() as any,
+      url,
+      headers: {
+        ...authorizationHeader(),
+        "Content-Type": "application/json",
+      },
+      data: body,
 
-  const response = await fetch(fullUrl, {
-    method,
-    headers: {
-      ...authorizationHeader(),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+      // transformRequest: [(data, headers) => {
+      //   console.log("Axios body before send:", data);
+      //   console.log(headers)
+      //   return JSON.stringify(data);
+      // }],
+    };
 
-  if (response.status === 401 && retry) {
-    const refreshed = await refreshTokenIfNeeded();
-    if (refreshed) {
-      return write<T>(method, url, body, false); // Retry once
+    const response: AxiosResponse<T> = await apiClient.request(config);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 401 && retry) {
+      const refreshed = await refreshTokenIfNeeded();
+      if (refreshed) {
+        return write<T>(method, url, body, false); // Retry once
+      }
     }
-  }
 
-  if (!response.ok) {
-    throw new Error(await response.text());
+    const errorMessage = error.response?.data || error.message || 'An error occurred';
+    throw new Error(errorMessage);
   }
-
-  return response.json() as Promise<T>;
 }
 
 export async function post<T>(url: string, body: Record<string, unknown> = {}) {

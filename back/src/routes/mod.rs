@@ -49,8 +49,10 @@ pub async fn handle_routes(
     match true {
         _ if ctx.match_route("GET", "/user") => auth::handle_get_user(conn, &ctx).await,
         _ if ctx.match_route("GET", "/user/:id") => auth::handle_get_user(conn, &ctx).await,
-        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx, auth_service).await,
-        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx, auth_service).await,
+        _ if ctx.match_route("PUT", "/user") => auth::handle_update_user(conn, &ctx).await,
+        _ if ctx.match_route("DELETE", "/user") => auth::handle_delete_user(conn, &ctx).await,
+        _ if ctx.match_route("GET", "/users/guests") => auth::handle_get_guests(conn, &ctx).await,
+        _ if ctx.match_route("GET", "/users/clients") => auth::handle_get_clients(conn, &ctx).await,
         
         // Routes realty
         _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service).await,
