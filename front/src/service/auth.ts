@@ -1,5 +1,5 @@
 
-import { User, UserUpdate } from "@/types/users";
+import { User, UserLabelRoleIds, UserUpdate } from "@/types/users";
 import { delete_, get, post, put } from "@/utils/api";
 import { LoginPayload } from "thirdweb/auth";
 
@@ -64,7 +64,7 @@ export async function getUser() {
     }
 
     const response = await get<User>(`/user`);
-
+    response.role = UserLabelRoleIds[response.role]
     return response
   } catch (error) {
     console.error("Erreur lors de la récupération de l'utilisateur:", error);
