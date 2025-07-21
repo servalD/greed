@@ -39,7 +39,15 @@ pub fn update_realty(
         .set((
             name.eq(&updated_realty.name),
             user_id.eq(&updated_realty.user_id),
+            street_number.eq(&updated_realty.street_number),
+            street_name.eq(&updated_realty.street_name),
+            complement_address.eq(&updated_realty.complement_address),
+            city.eq(&updated_realty.city),
+            zip_code.eq(&updated_realty.zip_code),
+            region.eq(&updated_realty.region),
+            country.eq(&updated_realty.country),
             address.eq(&updated_realty.address),
+            image_url.eq(&updated_realty.image_url),
         ))
         .get_result(conn)
 }
