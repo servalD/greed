@@ -164,19 +164,24 @@ export default function Navbar() {
           try {
             setIsSwitchingChain(true);
             if (!user) throw new Error("Utilisateur non connecté");
-            await updateUserProfile({
-              id: user.id,
-              eth_address: user.eth_address,
-              first_name: form.first_name,
-              last_name: form.last_name,
-              email: form.email,
-              is_setup: true,
-            });
+            try {
+              await updateUserProfile({
+                id: user.id,
+                eth_address: user.eth_address,
+                first_name: form.first_name,
+                last_name: form.last_name,
+                email: form.email,
+                is_setup: true,
+              });
+            } catch (err) {
+              setIsSwitchingChain(false);
+              alert("Erreur lors de l'enregistrement de votre profil. Veuillez réessayer.");
+              return;
+            }
             setOpenGuestDialog(false);
             await switchChain(sepolia);
             await becomeClient();
           } catch (e) {
-            // Gérer l'erreur
             setIsSwitchingChain(false);
           } finally {
             setIsSwitchingChain(false);

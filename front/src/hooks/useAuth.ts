@@ -93,8 +93,8 @@ export const useAuth = () => {
     logoutMutation.mutate();
   };
 
-  const updateUserProfile = (userData: UserUpdate) => {
-    updateUserMutation.mutate(userData);
+  const updateUserProfile = async (userData: UserUpdate) => {
+    return updateUserMutation.mutateAsync(userData);
   };
 
   const deleteUserAccount = (id: number, password: string) => {
