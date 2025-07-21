@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
 import { getUser, updateUser, deleteUser, logout as s_logout } from '@/service/auth';
 import { useAccount } from 'wagmi';
-import { useReadManagerGetRole } from '@/contracts/generatedContracts';
+import { useReadAgencyGuests, useReadManagerGetRole } from '@/contracts/generatedContracts';
 import { UserUpdate, UserRoleIds, UserRoleIdLabels } from '@/types/users';
 import { useActiveWalletConnectionStatus } from 'thirdweb/react';
 import { useEffect } from 'react';
@@ -27,6 +27,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const { address } = useAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
+  const { data: guests } = useReadAgencyGuests();
 
   // Role verification
   const { data: userRole, refetch: refetchUserRole } = useReadManagerGetRole({
