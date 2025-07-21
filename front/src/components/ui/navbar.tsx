@@ -21,7 +21,6 @@ export default function Navbar() {
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
   const [openGuestDialog, setOpenGuestDialog] = useState(false);
   const switchChain = useSwitchActiveWalletChain();
-  const account = useActiveAccount();
   const { user, isAuthenticated, updateUserProfile } = useAuth();
   const { guestEntrance: becomeClient } = useAgency();
 
