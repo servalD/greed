@@ -31,7 +31,7 @@ export default function GuestOrClient() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <List images={coproAddress.map((_: Address, index: number) => images[index])} />
+                        <List images={coproAddress.map((_: Address, index: number) => images[index % 6])} />
                     </motion.div>
                 ) : (
                     <div className="flex justify-center items-center min-h-[400px]">
