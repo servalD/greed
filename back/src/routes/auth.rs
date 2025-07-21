@@ -80,46 +80,20 @@ pub async fn handle_logout(
     }
 }
 
-pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext, 
-    auth_service: &AuthService) -> HttpResponse {
+pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
     let payload = match ctx.parse_body::<UpdateUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    let (user, valid) = match auth_service.validate_password(conn, payload.id, &payload.password) {
-        Ok(rep) => rep,
-        Err(err) => return HttpResponse::bad_request(err),
-    };
-
-    let mut password_hash= None;
-    // Si le mdp n'est pas valid
-    if !valid {
-        // l'utilisateur en a un, on refuse
-        if user.password_hash.is_some() {
-            return HttpResponse::unauthorized();
-            // le new mdp est vide, on ne le met pas à jour
-        } else if payload.new_password.is_none() || payload.new_password.as_ref().unwrap().is_empty() {
-            return HttpResponse::bad_request("New password is required");
-        } else {
-            password_hash = match payload.new_password {
-                Some(p) => match hash(p, DEFAULT_COST) {
-                        Ok(h) => Some(h),
-                        Err(_) => return HttpResponse::internal_server_error(),
-                    },
-                None => None,
-            };
-        }
-    }
-
     let update = UpdateUserData {
         email: payload.email,
         first_name: payload.first_name,
         last_name: payload.last_name,
-        password_hash: password_hash.clone(),
+        // password_hash: Some("".to_string()),
         eth_address: payload.eth_address,
         role: payload.role,
-        is_setup: valid || password_hash.is_some(), // Si le mot de passe est valide ou mis à jour, on marque l'utilisateur comme setup
+        // is_setup: true, // Si le mot de passe est valide ou mis à jour, on marque l'utilisateur comme setup
     };
 
     match user_repo::update_user(conn, payload.id, update) {
@@ -131,16 +105,10 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext,
     }
 }
 
-pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext, 
-    auth_service: &AuthService) -> HttpResponse {
+pub async fn handle_delete_user(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
     let payload = match ctx.parse_body::<DeleteUserPayload>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
-    };
-
-    match auth_service.validate_password(conn, payload.id, &payload.password) {
-        Ok(user) => user,
-        Err(err) => return HttpResponse::bad_request(err),
     };
 
     match user_repo::delete_user(conn, payload.id) {
@@ -205,7 +173,6 @@ pub async fn handle_siwe_generate(
 
     // Configurer les paramètres SIWE
     
-
     match siwe_service.generate_siwe_nonce(&payload.eth_address, &payload.chain_id.to_string()) {
         Ok(response) => {
             
@@ -256,7 +223,7 @@ pub async fn handle_siwe_login(
                 email: None,
                 first_name: None,
                 last_name: None,
-                password_hash: None,
+                // password_hash: None,
                 eth_address: eth_address.clone(),
                 role: crate::models::user::Role::Guest,
             };

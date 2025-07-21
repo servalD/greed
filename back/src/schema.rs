@@ -77,9 +77,7 @@ diesel::table! {
         first_name -> Nullable<Text>,
         last_name -> Nullable<Text>,
         eth_address -> Text,
-        password_hash -> Nullable<Text>,
         role -> Role,
-        is_setup -> Bool,
     }
 }
 

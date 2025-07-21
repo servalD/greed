@@ -8,10 +8,10 @@ use chrono::{Utc, Duration};
 
 use crate::config::Config;
 use crate::models::refresh_token::{NewRefreshToken, RefreshToken};
-use crate::models::user::User;
+// use crate::models::user::User;
 use crate::repositories::{refresh_token_repo as rt_repo, user_repo};
 use crate::utils::logger;
-use bcrypt::{verify};
+// use bcrypt::{verify};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -134,30 +134,30 @@ impl AuthService {
             })
     }
 
-    pub fn validate_password(
-        &self,
-        conn: &mut PgConnection,
-        user_id: i32,
-        password: &str,
-    ) -> Result<(User, bool), &str> {
+    // pub fn validate_password(
+    //     &self,
+    //     conn: &mut PgConnection,
+    //     user_id: i32,
+    //     password: &str,
+    // ) -> Result<(User, bool), &str> {
     
-        let user = user_repo::find_user(conn, Some(user_id), None, None)
-            .map_err(|_| "db error")?
-            .ok_or("User not found")?;
+    //     let user = user_repo::find_user(conn, Some(user_id), None, None)
+    //         .map_err(|_| "db error")?
+    //         .ok_or("User not found")?;
 
-        if password.is_empty() {
-            return Ok((user, false));
-        }
+    //     if password.is_empty() {
+    //         return Ok((user, false));
+    //     }
 
-        let hash = match user.password_hash.clone() {
-            Some(h) => h,
-            None => return Ok((user, false)),
-        };
+    //     let hash = match user.password_hash.clone() {
+    //         Some(h) => h,
+    //         None => return Ok((user, false)),
+    //     };
 
-        if verify(password, &hash).map_err(|_| "Verify failed")? {
-            Ok((user, true))
-        } else {
-            Ok((user, false))
-        }
-    }
+    //     if verify(password, &hash).map_err(|_| "Verify failed")? {
+    //         Ok((user, true))
+    //     } else {
+    //         Ok((user, false))
+    //     }
+    // }
 }

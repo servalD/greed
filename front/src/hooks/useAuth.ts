@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getUser, updateUser, deleteUser, logout as s_logout } from '@/service/auth';
 import { useAccount } from 'wagmi';
 import { useReadManagerGetRole } from '@/contracts/generatedContracts';
-import { UserUpdate, UserRoleIds } from '@/types/users';
+import { UserUpdate, UserRoleIds, UserRoleIdLabels } from '@/types/users';
 import { useActiveWalletConnectionStatus } from 'thirdweb/react';
 import { useEffect } from 'react';
 
@@ -105,18 +105,15 @@ export const useAuth = () => {
   const isAuthenticated = !!user && !error && connectionStatus === 'connected';
   // console.log(isAuthenticated, user, error, connectionStatus);
   // Met a jour le user si le role du back est différent de selui du front
-  // useEffect(() => {
-  //   // if (user && userRole && user.role !== Number(userRole)) {
-  //   //   updateUserProfile({
-  //   //     ...user,
-  //   //     role: Number(userRole),
-  //   //   });
-  //   // }
-  //
-  //   if (user && userRole && user.role !== Number(userRole)) {
-
-  //   }
-  // }, [userRole]);
+  useEffect(() => {
+    if (user && userRole && user.role !== Number(userRole)) {
+      updateUserProfile({
+        ...user,
+        role: UserRoleIdLabels[Number(userRole)],
+      });
+    }
+  
+  }, [userRole]);
 
   // As we are unable to update the user without a password, we will not update the user role on the backend (use the onchain one)
   if (user) user.role = userRole ? Number(userRole) : user?.role;
