@@ -10,6 +10,7 @@ import { CustomDataTable } from './ui/Datatable';
 import { RealtyService } from '@/service/realty.service';
 import { useReadAgencyGetCoproByName } from '@/contracts/generatedContracts';
 import { useWaitForTransactionReceipt } from 'wagmi';
+import { useAuth } from '@/hooks/useAuth';
 
 const darkTheme = createTheme({
   palette: {
@@ -46,6 +47,7 @@ const AgentOrAgency = () => {
 
   const { createCopro, isPendingCopro } = useAgency();
   const { guests, clients } = useReadDataContract();
+  const { user } = useAuth();
 
   const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -90,15 +92,17 @@ const AgentOrAgency = () => {
   };
 
   useEffect(() => {
+    console.log("USER", user)
     if (isConfirmed && contractAddress && pendingBackendPayload) {
       const sendToBackend = async () => {
-        const user = localStorage.getItem("user");
-        const user_id = user ? JSON.parse(user).id : 0;
+        const { imageUrl, flatCount, street_number, ...rest } = pendingBackendPayload;
         await RealtyService.createRealty({
-          ...pendingBackendPayload,
-          user_id,
-          image_url: pendingBackendPayload.imageUrl,
+          ...rest,
+          user_id: user?.id ?? 0,
+          image_url: imageUrl,
           address: contractAddress,
+          flatCount: flatCount?.toString?.() ?? '',
+          street_number: street_number?.toString?.() ?? '',
         });
         setPropertyData({
           name: '',
@@ -121,7 +125,7 @@ const AgentOrAgency = () => {
       };
       sendToBackend();
     }
-  }, [isConfirmed, contractAddress, pendingBackendPayload]);
+  }, [isConfirmed, contractAddress, pendingBackendPayload, user]);
 
   const handleSubmit = async () => {
     try {

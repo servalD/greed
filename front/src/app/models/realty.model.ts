@@ -2,7 +2,7 @@ export interface IRealty {
     id?: number;
     name: string;
     user_id: number;
-    street_number: number;
+    street_number: string;
     street_name: string;
     complement_address?: string;
     city: string;
