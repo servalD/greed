@@ -13,6 +13,7 @@ import { generatePayload, getUser, login, logout } from "@/service/auth";
 import { UserRoleIds } from "@/types/users";
 import { useAuth } from "@/hooks/useAuth";
 import GuestEntranceDialog from '../dialog/GuestEntranceDialog';
+import { ErrorService } from "@/service/error.service";
 
 export default function Navbar() {
   const router = useRouter();
@@ -171,11 +172,10 @@ export default function Navbar() {
                 first_name: form.first_name,
                 last_name: form.last_name,
                 email: form.email,
-                is_setup: true,
               });
             } catch (err) {
               setIsSwitchingChain(false);
-              alert("Erreur lors de l'enregistrement de votre profil. Veuillez réessayer.");
+              ErrorService.errorMessage("Erreur lors de l'enregistrement de votre profil. Veuillez réessayer.", err as string);
               return;
             }
             setOpenGuestDialog(false);
