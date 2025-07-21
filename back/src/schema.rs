@@ -11,14 +11,6 @@ diesel::table! {
         id -> Int4,
         realty_id -> Int4,
         name -> Text,
-        street_number -> Text,
-        street_name -> Text,
-        complement_address -> Nullable<Text>,
-        city -> Text,
-        zip_code -> Text,
-        region -> Text,
-        country -> Text,
-        address -> Text,
         image_url -> Text,
     }
 }
@@ -28,7 +20,15 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         user_id -> Int4,
+        street_number -> Text,
+        street_name -> Text,
+        complement_address -> Nullable<Text>,
+        city -> Text,
+        zip_code -> Text,
+        region -> Text,
+        country -> Text,
         address -> Text,
+        image_url -> Text,
     }
 }
 

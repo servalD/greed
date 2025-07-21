@@ -67,7 +67,6 @@ pub async fn handle_routes(
         _ if ctx.match_route("GET", "/realty/:realty_id/apartments") => apartment::handle_get_apartments_by_realty(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("PUT", "/apartments/:id") => apartment::handle_update_apartment(conn, &ctx, &apartment_service).await,
         _ if ctx.match_route("DELETE", "/apartments/:id") => apartment::handle_delete_apartment(conn, &ctx, &apartment_service).await,
-        _ if ctx.match_route("GET", "/apartments/search") => apartment::handle_search_apartments(conn, &ctx, &apartment_service).await,
         
         _ => {
             logger::warning("Route non reconnue");
