@@ -139,7 +139,14 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
             { field: "name", label: "Nom de la propriété", type: "text", placeholder: "Ex: Résidence Les Jardins" },
             { field: "symbol", label: "Symbole", type: "text", placeholder: "Ex: RJ" },
             { field: "flatCount", label: "Nombre d'appartements", type: "number", placeholder: "Ex: 12" },
-            { field: "promoter", label: "Adresse du promoteur", type: "text", placeholder: "0x..." }
+            { field: "street_number", label: "Numéro de rue", type: "number", placeholder: "Ex: 12" },
+            { field: "street_name", label: "Nom de la rue", type: "text", placeholder: "Ex: Avenue des Champs-Élysées" },
+            { field: "complement_address", label: "Complément d'adresse", type: "text", placeholder: "Bâtiment, étage, etc." },
+            { field: "city", label: "Ville", type: "text", placeholder: "Ex: Paris" },
+            { field: "zip_code", label: "Code postal", type: "text", placeholder: "Ex: 75008" },
+            { field: "region", label: "Région", type: "text", placeholder: "Ex: Île-de-France" },
+            { field: "country", label: "Pays", type: "text", placeholder: "Ex: France" },
+            { field: "promoter", label: "Adresse du promoteur", type: "text", placeholder: "0x..." },
           ].map(({ field, label, type, placeholder }, index) => (
             <motion.div
               key={field}

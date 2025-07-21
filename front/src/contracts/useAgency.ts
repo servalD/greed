@@ -42,12 +42,13 @@ export const useAgency = () => {
 
     try {
       const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter, imageUrl] })
-        console.log("Transaction envoyée:", tx);
-        setTxHash(tx);
+      console.log("Transaction envoyée:", tx);
+      setTxHash(tx);
+      return tx;
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
+      throw err;
     }
-
   }
 
   return { guestEntrance, isPendingGuest, createCopro, isPendingCopro };
