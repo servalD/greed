@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use crate::models::user::{User, NewUser, UpdateUserData};
+use crate::models::user::{User, NewUser, UpdateUserData, Role};
 use back::schema::users::dsl::*;
 
 pub fn create_user(conn: &mut PgConnection, new: &NewUser) -> QueryResult<usize> {
@@ -37,4 +37,12 @@ pub fn update_user(
 
 pub fn delete_user(conn: &mut PgConnection, user_id: i32) -> QueryResult<usize> {
     diesel::delete(users.filter(id.eq(&user_id))).execute(conn)
+}
+
+pub fn find_users_by_role(conn: &mut PgConnection, user_role: Role) -> QueryResult<Vec<User>> {
+    users.filter(role.eq(user_role)).load::<User>(conn)
+}
+
+pub fn find_all_users(conn: &mut PgConnection) -> QueryResult<Vec<User>> {
+    users.load::<User>(conn)
 }

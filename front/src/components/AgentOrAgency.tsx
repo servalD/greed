@@ -8,9 +8,11 @@ import { useReadDataContract } from '@/contracts/useReadDataContract';
 import { motion } from 'framer-motion';
 import { CustomDataTable } from './ui/Datatable';
 import { RealtyService } from '@/service/realty.service';
+import { UserService } from '@/service/user.service';
 import { useReadAgencyGetCoproByName } from '@/contracts/generatedContracts';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useAuth } from '@/hooks/useAuth';
+import { User, UserRoleIds } from '@/types/users';
 
 const darkTheme = createTheme({
   palette: {
@@ -44,32 +46,78 @@ const AgentOrAgency = () => {
   });
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
   const [pendingBackendPayload, setPendingBackendPayload] = useState<any>(null);
+  const [guestData, setGuestData] = useState<any[]>([]);
+  const [clientData, setClientData] = useState<any[]>([]);
+  const [loadingGuests, setLoadingGuests] = useState(true);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [acceptingClientId, setAcceptingClientId] = useState<number | null>(null);
 
-  const { createCopro, isPendingCopro } = useAgency();
+  const { createCopro, isPendingCopro, acceptClient, isPendingAcceptCLient } = useAgency();
   const { guests, clients } = useReadDataContract();
   const { user } = useAuth();
 
   const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: txHash });
+  const { isSuccess: isAcceptClientConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   const { data: contractAddress } = useReadAgencyGetCoproByName({
     args: pendingBackendPayload?.name ? [pendingBackendPayload.name] : undefined,
   });
 
+  // Fonction pour transformer les données User en format attendu par CustomDataTable
+  const transformUserData = (users: User[]) => {
+    return users.map(user => ({
+      id: user.id,
+      name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Non renseigné',
+      email: user.email || 'Non renseigné',
+      eth_address: user.eth_address,
+    }));
+  };
+
+  // Charger les données des guests
+  const loadGuests = async () => {
+    try {
+      setLoadingGuests(true);
+      const result = await UserService.getGuests();
+      if (result.errorCode === 0) { // ServiceErrorCode.success
+        setGuestData(transformUserData(result.result || []));
+      } else {
+        ErrorService.errorMessage('Erreur', 'Impossible de charger la liste des invités');
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des guests:', error);
+      ErrorService.errorMessage('Erreur', 'Impossible de charger la liste des invités');
+    } finally {
+      setLoadingGuests(false);
+    }
+  };
+
+  // Charger les données des clients
+  const loadClients = async () => {
+    try {
+      setLoadingClients(true);
+      const result = await UserService.getClients();
+      if (result.errorCode === 0) { // ServiceErrorCode.success
+        setClientData(transformUserData(result.result || []));
+      } else {
+        ErrorService.errorMessage('Erreur', 'Impossible de charger la liste des clients');
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des clients:', error);
+      ErrorService.errorMessage('Erreur', 'Impossible de charger la liste des clients');
+    } finally {
+      setLoadingClients(false);
+    }
+  };
+
+  // Charger les données au montage du composant
+  useEffect(() => {
+    loadGuests();
+    loadClients();
+  }, []);
+
   useEffect(() => {
     console.log("GUESTS :", guests, "CLIENTS", clients)
   })
-
-  // todo : Récupérer les vrais guest entrance
-  const guestData = [
-    { id: 1, name: 'Alice Dupont', email: 'alice.dupont@example.com' },
-    { id: 2, name: 'Bob Martin', email: 'bob.martin@example.com' },
-  ];
-
-  // todo : récupérer les vrais clients
-  const clientData = [
-    { id: 1, name: 'Charlie Durand', email: 'charlie.durand@example.com' },
-    { id: 2, name: 'Diane Petit', email: 'diane.petit@example.com' },
-  ];
 
   const guestColumns = [
     { name: 'name', label: 'Nom' },
@@ -126,6 +174,59 @@ const AgentOrAgency = () => {
     }
   }, [isConfirmed, contractAddress, pendingBackendPayload, user]);
 
+  // Gérer l'acceptation d'un client
+  const handleAcceptClient = async (userId: number) => {
+    try {
+      setAcceptingClientId(userId);
+      
+      // Trouver l'utilisateur dans les données
+      const userToAccept = guestData.find(u => u.id === userId);
+      if (!userToAccept) {
+        ErrorService.errorMessage('Erreur', 'Utilisateur non trouvé');
+        return;
+      }
+
+      // Appel blockchain
+      await acceptClient(userToAccept.eth_address as Address);
+      
+      // Attendre la confirmation de la transaction
+      // La mise à jour en base se fera dans le useEffect qui surveille isAcceptClientConfirmed
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'acceptation du client:', error);
+      ErrorService.errorMessage('Erreur', 'Impossible d\'accepter le client');
+      setAcceptingClientId(null);
+    }
+  };
+
+  // Surveiller la confirmation de la transaction d'acceptation
+  useEffect(() => {
+    if (isAcceptClientConfirmed && acceptingClientId) {
+      const updateUserInBackend = async () => {
+        try {
+          // Mettre à jour le rôle en base de données
+          const result = await UserService.updateUserRole(acceptingClientId, UserRoleIds.CLIENT);
+          
+          if (result.errorCode === 0) { // ServiceErrorCode.success
+            ErrorService.successMessage('Succès', 'Client accepté avec succès');
+            // Recharger les données
+            await loadGuests();
+            await loadClients();
+          } else {
+            ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour du rôle:', error);
+          ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
+        } finally {
+          setAcceptingClientId(null);
+        }
+      };
+      
+      updateUserInBackend();
+    }
+  }, [isAcceptClientConfirmed, acceptingClientId]);
+
   const handleSubmit = async () => {
     try {
       const tx = await createCopro(
@@ -146,7 +247,15 @@ const AgentOrAgency = () => {
   const handleAction = (id: number, action: string) => {
     switch (action) {
       case 'accept':
-        ErrorService.mixinMessage("L'invité a été accepté", "success");
+        if (acceptingClientId === id) {
+          ErrorService.infoMessage('En cours', 'Acceptation en cours...');
+          return;
+        }
+        if (isPendingAcceptCLient) {
+          ErrorService.infoMessage('En cours', 'Une acceptation est déjà en cours...');
+          return;
+        }
+        handleAcceptClient(id);
         break;
       case 'deny':
         ErrorService.mixinMessage("L'invité a été refusé", "error");
@@ -217,10 +326,18 @@ const AgentOrAgency = () => {
             >
               <CustomDataTable
                 title="Liste d'attente des invités"
-                data={guestData}
+                data={loadingGuests ? [] : guestData}
                 columns={guestColumns}
                 onAction={handleAction}
               />
+              {loadingGuests && (
+                <div className="mt-4 text-center">
+                  <div className="inline-flex items-center text-blue-400">
+                    <div className="w-4 h-4 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mr-2"></div>
+                    Chargement des invités...
+                  </div>
+                </div>
+              )}
             </motion.div>
 
             <motion.div
@@ -230,10 +347,18 @@ const AgentOrAgency = () => {
             >
               <CustomDataTable
                 title="Liste des clients"
-                data={clientData}
+                data={loadingClients ? [] : clientData}
                 columns={clientColumns}
                 onAction={handleAction}
               />
+              {loadingClients && (
+                <div className="mt-4 text-center">
+                  <div className="inline-flex items-center text-blue-400">
+                    <div className="w-4 h-4 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mr-2"></div>
+                    Chargement des clients...
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
         </div>

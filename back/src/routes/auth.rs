@@ -294,3 +294,47 @@ pub async fn handle_siwe_login(
     logger::debug(&format!("Login SIWE réussi pour l'utilisateur {}", user.id));
     HttpResponse::ok(Some(json))
 }
+
+pub async fn handle_get_guests(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    match user_repo::find_users_by_role(conn, crate::models::user::Role::Guest) {
+        Ok(users) => {
+            let safe_users: Result<Vec<String>, _> = users.iter()
+                .map(|user| user.safe_json())
+                .collect();
+            
+            match safe_users {
+                Ok(json_strings) => {
+                    let json_array = format!("[{}]", json_strings.join(","));
+                    HttpResponse::ok(Some(json_array))
+                },
+                Err(_) => HttpResponse::internal_server_error(),
+            }
+        },
+        Err(e) => {
+            logger::error(&format!("Erreur récupération invités: {}", e));
+            HttpResponse::internal_server_error()
+        }
+    }
+}
+
+pub async fn handle_get_clients(conn: &mut PgConnection, ctx: &RequestContext) -> HttpResponse {
+    match user_repo::find_users_by_role(conn, crate::models::user::Role::Client) {
+        Ok(users) => {
+            let safe_users: Result<Vec<String>, _> = users.iter()
+                .map(|user| user.safe_json())
+                .collect();
+            
+            match safe_users {
+                Ok(json_strings) => {
+                    let json_array = format!("[{}]", json_strings.join(","));
+                    HttpResponse::ok(Some(json_array))
+                },
+                Err(_) => HttpResponse::internal_server_error(),
+            }
+        },
+        Err(e) => {
+            logger::error(&format!("Erreur récupération clients: {}", e));
+            HttpResponse::internal_server_error()
+        }
+    }
+}
