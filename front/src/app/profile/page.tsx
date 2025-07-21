@@ -16,7 +16,7 @@ import {
   CardContent,
   Divider
 } from '@mui/material';
-import { Visibility, VisibilityOff, Person, Lock, Email } from '@mui/icons-material';
+import { Person, Email } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { getUser, updateUser } from '@/service/auth';
 import { ErrorService } from '@/service/error.service';
@@ -27,16 +27,11 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    email: ''
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,10 +49,7 @@ export default function ProfilePage() {
         setFormData({
           firstName: userData.first_name || '',
           lastName: userData.last_name || '',
-          email: userData.email || '',
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
+          email: userData.email || ''
         });
       }
     } catch (error: any) {
@@ -100,29 +92,6 @@ export default function ProfilePage() {
       newErrors.email = 'Format d\'email invalide';
     }
 
-    // Si l'utilisateur n'est pas configuré, le mot de passe est obligatoire
-    if (!user?.is_setup) {
-      if (!formData.newPassword) {
-        newErrors.newPassword = 'Le mot de passe est requis pour la première configuration';
-      } else if (formData.newPassword.length < 8) {
-        newErrors.newPassword = 'Le mot de passe doit contenir au moins 8 caractères';
-      }
-    } else {
-      // Si l'utilisateur veut changer son mot de passe
-      if (formData.newPassword) {
-        if (!formData.currentPassword) {
-          newErrors.currentPassword = 'Le mot de passe actuel est requis';
-        }
-        if (formData.newPassword.length < 8) {
-          newErrors.newPassword = 'Le nouveau mot de passe doit contenir au moins 8 caractères';
-        }
-      }
-    }
-
-    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -138,33 +107,18 @@ export default function ProfilePage() {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
-        role: UserRoleIdLabels[user.role],
-        password: formData.currentPassword,
-        new_password: formData.newPassword,
+        role: UserRoleIdLabels[user.role]
       };
-
-      // Si c'est un changement de mot de passe
-      if (formData.newPassword && user.is_setup) {
-        updateData.new_password = formData.newPassword;
-      }
 
       await updateUser(updateData);
       
       ErrorService.successMessage(
         'Profil mis à jour',
-        user.is_setup ? 'Vos informations ont été mises à jour avec succès' : 'Votre profil a été configuré avec succès'
+        'Vos informations ont été mises à jour avec succès'
       );
       
       // Refresh user data
       await fetchUser();
-      
-      // Clear password fields
-      setFormData(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
       
     } catch (error: any) {
       console.error('Error updating user:', error);
@@ -213,26 +167,9 @@ export default function ProfilePage() {
                 Mon Profil
               </Typography>
               <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-                {!user?.is_setup 
-                  ? "Configurez votre profil pour commencer" 
-                  : "Gérez vos informations personnelles"
-                }
+                Gérez vos informations personnelles
               </Typography>
             </Box>
-
-            {!user?.is_setup && (
-              <Alert 
-                severity="warning" 
-                sx={{ 
-                  mb: 3, 
-                  backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                  color: 'white',
-                  '& .MuiAlert-icon': { color: '#ffc107' }
-                }}
-              >
-                Votre profil n'est pas encore configuré. Veuillez remplir tous les champs pour activer votre compte.
-              </Alert>
-            )}
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {/* Informations utilisateur */}
@@ -308,104 +245,6 @@ export default function ProfilePage() {
 
               <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} />
 
-              {/* Section mot de passe */}
-              <Card sx={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Lock /> 
-                    {!user?.is_setup ? "Créer un mot de passe" : "Modifier le mot de passe"}
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                    {user?.is_setup && (
-                      <TextField
-                        fullWidth
-                        label="Mot de passe actuel"
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.currentPassword}
-                        onChange={handleInputChange('currentPassword')}
-                        error={!!errors.currentPassword}
-                        helperText={errors.currentPassword}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          )
-                        }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                          }
-                        }}
-                      />
-                    )}
-
-                    <TextField
-                      fullWidth
-                      label={!user?.is_setup ? "Mot de passe" : "Nouveau mot de passe"}
-                      type={showPassword ? 'text' : 'password'}
-                      value={formData.newPassword}
-                      onChange={handleInputChange('newPassword')}
-                      error={!!errors.newPassword}
-                      helperText={errors.newPassword}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                        }
-                      }}
-                    />
-
-                    <TextField
-                      fullWidth
-                      label="Confirmer le mot de passe"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange('confirmPassword')}
-                      error={!!errors.confirmPassword}
-                      helperText={errors.confirmPassword}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              edge="end"
-                            >
-                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                        }
-                      }}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-
               {/* Bouton de soumission */}
               <Box textAlign="center" mt={3}>
                 <Button
@@ -432,7 +271,7 @@ export default function ProfilePage() {
                       Enregistrement...
                     </>
                   ) : (
-                    !user?.is_setup ? 'Configurer mon profil' : 'Mettre à jour'
+                    'Mettre à jour'
                   )}
                 </Button>
               </Box>
