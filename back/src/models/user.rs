@@ -23,9 +23,7 @@ pub struct User {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub eth_address: String,
-    pub password_hash: Option<String>,
     pub role: Role,
-    pub is_setup: bool,
 }
 
 #[derive(Serialize)]
@@ -36,10 +34,9 @@ pub struct UserSafe {
     pub last_name: Option<String>,
     pub email: Option<String>,
     pub role: Role,
-    pub is_setup: bool,
 }
 impl User {
-    pub fn safe_json(&self) -> Result<String, serde_json::Error> {
+    pub fn safe_json(&self) -> Result<String, serde_json::Error> {// Ensure no password is included in the JSON response
         let user_safe = UserSafe {
             id: self.id,
             eth_address: self.eth_address.clone(),
@@ -47,7 +44,6 @@ impl User {
             last_name: self.last_name.clone(),
             email: self.email.clone(),
             role: self.role.clone(),
-            is_setup: self.is_setup.clone(),
         };
         serde_json::to_string(&user_safe)
     }
@@ -59,7 +55,6 @@ pub struct NewUser {
     pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password_hash: Option<String>,
     pub eth_address: String,
     pub role: Role,
 }
@@ -70,10 +65,8 @@ pub struct UpdateUserData {
     pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password_hash: Option<String>,
     pub eth_address: String,
     pub role: Option<Role>,
-    pub is_setup: bool,
 }
 
 #[derive(Deserialize, Debug)]
@@ -82,8 +75,6 @@ pub struct UpdateUserPayload {
     pub email: Option<String>,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub password: String,
-    pub new_password: Option<String>,
     pub eth_address: String,
     pub role: Option<Role>,
 }
@@ -97,6 +88,5 @@ pub struct FindUserPayload {
 
 #[derive(Deserialize)]
 pub struct DeleteUserPayload {
-    pub id: i32,
-    pub password: String
+    pub id: i32
 }

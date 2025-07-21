@@ -43,8 +43,7 @@ export interface User {
   first_name: string,
   last_name: string,
   email: string,
-  role: UserRoleIds,
-  is_setup: boolean,
+  role: UserRoleIds
 }
 
 export interface UserUpdate {
@@ -54,6 +53,4 @@ export interface UserUpdate {
   last_name?: string,
   email?: string,
   role?: string,
-  password: string,
-  new_password?: string,
 }

@@ -57,20 +57,34 @@ async fn main() -> std::io::Result<()> {
         let db_pool = db_pool.clone();
 
         tokio::spawn(async move {
-            let mut buffer = [0; 1024];
-            let n = match socket.read(&mut buffer).await {
-                Ok(n) if n == 0 => {
-                    logger::debug("Connexion fermée proprement");
-                    return;
-                }
-                Ok(n) => n,
-                Err(e) => {
-                    logger::error(&format!("Erreur de lecture : {}", e));
-                    return;
-                }
-            };
+            let mut buf = Vec::new();
+            let mut temp = [0u8; 1024];
 
-            let request = String::from_utf8_lossy(&buffer[..n]).to_string();
+            loop {
+                let n = socket.read(&mut temp).await.ok()?; if n == 0 { return None; }
+                buf.extend_from_slice(&temp[..n]);
+
+                if let Some(h_end) = buf.windows(4).position(|w| w == b"\r\n\r\n") {
+                    let headers = &buf[..h_end + 4];
+                    let body_start = h_end + 4;
+
+                    let len = String::from_utf8_lossy(headers)
+                        .lines()
+                        .find(|l| l.to_ascii_lowercase().starts_with("content-length:"))
+                        .and_then(|l| l.split(':').nth(1)?.trim().parse::<usize>().ok())
+                        .unwrap_or(0);
+
+                    let missing = len.saturating_sub(buf.len().saturating_sub(body_start));
+                    if missing > 0 {
+                        let mut rest = vec![0u8; missing];
+                        socket.read_exact(&mut rest).await.ok()?;
+                        buf.extend(rest);
+                    }
+                    break;
+                }
+            }
+
+            let request = String::from_utf8_lossy(&buf).to_string();
             let first_line = request.lines().next().unwrap_or("");
             logger::debug(&format!("Requête brute : {}", first_line));
             let mut conn = db_pool.get().unwrap();
@@ -78,7 +92,9 @@ async fn main() -> std::io::Result<()> {
 
             if let Err(e) = socket.write_all(response.to_string().as_bytes()).await {
                 logger::error(&format!("Erreur d'écriture dans le socket : {}", e));
+                return None;
             }
+            Some(())
         });
     }
 }
