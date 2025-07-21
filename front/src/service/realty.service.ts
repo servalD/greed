@@ -5,13 +5,29 @@ export interface Realty {
   id: number;
   name: string;
   user_id: number; // promoter
+  street_number: string;
+  street_name: string;
+  complement_address?: string;
+  city: string;
+  zip_code: string;
+  region: string;
+  country: string;
   address: string;
+  image_url: string;
 }
 
 export interface NewRealty {
   name: string;
   user_id: number;
+  street_number: string;
+  street_name: string;
+  complement_address?: string;
+  city: string;
+  zip_code: string;
+  region: string;
+  country: string;
   address: string;
+  image_url: string;
 }
 
 // API Functions
@@ -29,6 +45,11 @@ export class RealtyAPI {
   // Récupérer tous les biens immobiliers
   static async getAll(): Promise<Realty[]> {
     return get<Realty[]>("/realty");
+  }
+
+  // Récupérer les biens immobiliers par utilisateur
+  static async getByUser(userId: number): Promise<Realty[]> {
+    return get<Realty[]>(`/user/${userId}/realty`);
   }
 
   // Mettre à jour un bien immobilier
@@ -64,6 +85,14 @@ export const useRealty = (id: number) => {
   });
 };
 
+export const useRealitiesByUser = (userId: number) => {
+  return useQuery({
+    queryKey: ['realties', 'user', userId],
+    queryFn: () => RealtyAPI.getByUser(userId),
+    enabled: !!userId,
+  });
+};
+
 export const useSearchRealties = (query: string) => {
   return useQuery({
     queryKey: ['realties', 'search', query],
@@ -77,8 +106,9 @@ export const useCreateRealty = () => {
 
   return useMutation({
     mutationFn: RealtyAPI.create,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['realties'] });
+      queryClient.invalidateQueries({ queryKey: ['realties', 'user', data.user_id] });
     },
   });
 };
@@ -92,6 +122,7 @@ export const useUpdateRealty = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['realties'] });
       queryClient.invalidateQueries({ queryKey: ['realty', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['realties', 'user', data.user_id] });
     },
   });
 };

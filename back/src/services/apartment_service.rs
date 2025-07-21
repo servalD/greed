@@ -66,25 +66,9 @@ impl ApartmentService {
             })
     }
 
-    pub fn search(&self, conn: &mut PgConnection, query: &str) -> Result<Vec<Apartment>, String> {
-        if query.trim().is_empty() {
-            return Err("Requête de recherche vide".to_string());
-        }
-        repo::search_apartments(conn, query).map_err(|e| {
-            logger::error(&format!("Erreur recherche appartements: {}", e));
-            "Erreur lors de la recherche".to_string()
-        })
-    }
-
     fn validate(&self, apartment: &NewApartment) -> Result<(), String> {
         if apartment.name.trim().is_empty() {
             return Err("Le nom est requis".to_string());
-        }
-        if apartment.address.trim().is_empty() {
-            return Err("L'adresse est requise".to_string());
-        }
-        if apartment.city.trim().is_empty() {
-            return Err("La ville est requise".to_string());
         }
         Ok(())
     }
