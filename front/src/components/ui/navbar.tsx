@@ -12,14 +12,16 @@ import { useAgency } from "@/contracts/useAgency";
 import { generatePayload, getUser, login, logout } from "@/service/auth";
 import { UserRoleIds } from "@/types/users";
 import { useAuth } from "@/hooks/useAuth";
+import GuestEntranceDialog from '../dialog/GuestEntranceDialog';
 
 export default function Navbar() {
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSwitchingChain, setIsSwitchingChain] = useState(false);
+  const [openGuestDialog, setOpenGuestDialog] = useState(false);
   const switchChain = useSwitchActiveWalletChain();
   const account = useActiveAccount();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUserProfile } = useAuth();
   const { guestEntrance: becomeClient } = useAgency();
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function Navbar() {
                   className="px-4 py-2 text-sm font-medium rounded-lg bg-gray-800/50 text-white hover:bg-gray-700/50 
                     border border-gray-700/50 hover:border-blue-500/50 transition-all duration-200
                     disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={guestEntrance}
+                  onClick={() => setOpenGuestDialog(true)}
                   disabled={isSwitchingChain}
                 >
                   {isSwitchingChain ? (
@@ -155,6 +157,32 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <GuestEntranceDialog
+        open={openGuestDialog}
+        onClose={() => setOpenGuestDialog(false)}
+        onSubmit={async (form) => {
+          try {
+            setIsSwitchingChain(true);
+            if (!user) throw new Error("Utilisateur non connecté");
+            await updateUserProfile({
+              id: user.id,
+              eth_address: user.eth_address,
+              first_name: form.first_name,
+              last_name: form.last_name,
+              email: form.email,
+              is_setup: true,
+            });
+            setOpenGuestDialog(false);
+            await switchChain(sepolia);
+            await becomeClient();
+          } catch (e) {
+            // Gérer l'erreur
+            setIsSwitchingChain(false);
+          } finally {
+            setIsSwitchingChain(false);
+          }
+        }}
+      />
     </motion.nav>
   );
 }

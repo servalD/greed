@@ -92,7 +92,6 @@ const AgentOrAgency = () => {
   };
 
   useEffect(() => {
-    console.log("USER", user)
     if (isConfirmed && contractAddress && pendingBackendPayload) {
       const sendToBackend = async () => {
         const { imageUrl, flatCount, street_number, ...rest } = pendingBackendPayload;
