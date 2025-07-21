@@ -1,5 +1,4 @@
 'use client'
-import { images } from "@/constants/moke/list";
 import List from "./ui/list";
 import { useReadAgencyGetCopros, useReadCopro, useReadCoproBaseImageUrl } from "../contracts/generatedContracts";
 import { Address } from "viem";
