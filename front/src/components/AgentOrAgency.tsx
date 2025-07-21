@@ -7,6 +7,9 @@ import { useAgency } from '@/contracts/useAgency';
 import { useReadDataContract } from '@/contracts/useReadDataContract';
 import { motion } from 'framer-motion';
 import { CustomDataTable } from './ui/Datatable';
+import { RealtyService } from '@/service/realty.service';
+import { useReadAgencyGetCoproByName } from '@/contracts/generatedContracts';
+import { useWaitForTransactionReceipt } from 'wagmi';
 
 const darkTheme = createTheme({
   palette: {
@@ -29,10 +32,26 @@ const AgentOrAgency = () => {
     flatCount: 0,
     promoter: '',
     imageUrl: '',
+    street_number: 0,
+    street_name: '',
+    complement_address: '',
+    city: '',
+    zip_code: '',
+    region: '',
+    country: '',
+    address: '',
   });
+  const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [pendingBackendPayload, setPendingBackendPayload] = useState<any>(null);
 
   const { createCopro, isPendingCopro } = useAgency();
   const { guests, clients } = useReadDataContract();
+
+  const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: txHash });
+
+  const { data: contractAddress } = useReadAgencyGetCoproByName({
+    args: pendingBackendPayload?.name ? [pendingBackendPayload.name] : undefined,
+  });
 
   useEffect(() => {
     console.log("GUESTS :", guests, "CLIENTS", clients)
@@ -70,18 +89,51 @@ const AgentOrAgency = () => {
     setPropertyData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  useEffect(() => {
+    if (isConfirmed && contractAddress && pendingBackendPayload) {
+      const sendToBackend = async () => {
+        const user = localStorage.getItem("user");
+        const user_id = user ? JSON.parse(user).id : 0;
+        await RealtyService.createRealty({
+          ...pendingBackendPayload,
+          user_id,
+          image_url: pendingBackendPayload.imageUrl,
+          address: contractAddress,
+        });
+        setPropertyData({
+          name: '',
+          symbol: '',
+          flatCount: 0,
+          promoter: '',
+          imageUrl: '',
+          street_number: 0,
+          street_name: '',
+          complement_address: '',
+          city: '',
+          zip_code: '',
+          region: '',
+          country: '',
+          address: '',
+        });
+        setPendingBackendPayload(null);
+        setTxHash(undefined);
+        handleClose();
+      };
+      sendToBackend();
+    }
+  }, [isConfirmed, contractAddress, pendingBackendPayload]);
+
   const handleSubmit = async () => {
     try {
-      await createCopro(
+      const tx = await createCopro(
         propertyData.name,
         propertyData.symbol,
         Number(propertyData.flatCount),
         propertyData.promoter as Address,
         propertyData.imageUrl
       );
-
-      setPropertyData({ name: '', symbol: '', flatCount: 0, promoter: '', imageUrl: '' });
-      handleClose();
+      setTxHash(tx);
+      setPendingBackendPayload(propertyData);
     } catch (error) {
       ErrorService.mixinMessage('Erreur lors de la création du bien', 'error');
       console.error(error);
