@@ -48,7 +48,11 @@ export default function GuestOrClient() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <List images={realties.map((realty, index: number) => ({id: index, src: realty.image_url}))} />
+                        <List images={realties.map((realty) => ({
+                          id: realty.id ?? 0,
+                          src: realty.image_url,
+                          name: realty.name
+                        }))} />
                     </motion.div>
                 ) : (
                     <div className="flex justify-center items-center min-h-[400px]">
