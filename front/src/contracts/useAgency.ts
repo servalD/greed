@@ -16,8 +16,6 @@ export const useAgency = () => {
   const { isSuccess: isConfirmedClient } = useWaitForTransactionReceipt({ hash: acceptClientTx });
   const { isSuccess: isConfirmedRevoke } = useWaitForTransactionReceipt({ hash: revokeClientTx });
 
-  console.log(guestEntranceStatus, guestTx, isConfirmedGuest);
-
   useEffect(() => {
     if (guestEntranceStatus === "success") {
       ErrorService.infoMessage("Rejoindre", "Votre demande a bien été soumise");

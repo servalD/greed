@@ -145,6 +145,19 @@ export const agencyAbi = [
     anonymous: false,
     inputs: [
       {
+        name: 'agent',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'AgentHired',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: 'authority',
         internalType: 'address',
         type: 'address',
@@ -165,6 +178,51 @@ export const agencyAbi = [
       },
     ],
     name: 'ClientAccepted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'client',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'ClientRevoked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'copro',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'symbol',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'flatCount',
+        internalType: 'uint96',
+        type: 'uint96',
+        indexed: false,
+      },
+      {
+        name: 'promoter',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'CoproCreated',
   },
   {
     type: 'event',
@@ -217,7 +275,7 @@ export const agencyAbi = [
 ] as const
 
 export const agencyAddress =
-  '0x44a3216232b2BE8f312Aa6FF9156911B715C7067' as const
+  '0xBE73efA59cfc59E03003e97062F7C507D5996e39' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -796,7 +854,7 @@ export const coproAbi = [
 ] as const
 
 export const coproAddress =
-  '0x6ef77cfd3F3631059C6ff983a253BDD76288d63e' as const
+  '0x13C5365D8691142A3C50Ed6Be0d883607c9C1Ced' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
@@ -1808,7 +1866,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0xe70f03BCda0A8371e1589E50BeB68d67e19bDd6d' as const
+  '0x9464E5b52997C34802bA00661090Bc2C53f878Df' as const
 
 export const managerConfig = {
   address: managerAddress,
@@ -2065,6 +2123,16 @@ export const useWatchAgencyEvent = /*#__PURE__*/ createUseWatchContractEvent({
 })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link agencyAbi}__ and `eventName` set to `"AgentHired"`
+ */
+export const useWatchAgencyAgentHiredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: agencyAbi,
+    address: agencyAddress,
+    eventName: 'AgentHired',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link agencyAbi}__ and `eventName` set to `"AuthorityUpdated"`
  */
 export const useWatchAgencyAuthorityUpdatedEvent =
@@ -2082,6 +2150,26 @@ export const useWatchAgencyClientAcceptedEvent =
     abi: agencyAbi,
     address: agencyAddress,
     eventName: 'ClientAccepted',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link agencyAbi}__ and `eventName` set to `"ClientRevoked"`
+ */
+export const useWatchAgencyClientRevokedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: agencyAbi,
+    address: agencyAddress,
+    eventName: 'ClientRevoked',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link agencyAbi}__ and `eventName` set to `"CoproCreated"`
+ */
+export const useWatchAgencyCoproCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: agencyAbi,
+    address: agencyAddress,
+    eventName: 'CoproCreated',
   })
 
 /**

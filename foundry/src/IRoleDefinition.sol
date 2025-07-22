@@ -7,4 +7,5 @@ library IRoleDefinition {
     uint64 public constant AGENT_ROLE = 2;
     uint64 public constant CLIENT_ROLE = 3;
     uint64 public constant CO_OWNER_ROLE = 4;
+    uint64 public constant GUEST_ROLE = 5;
 }

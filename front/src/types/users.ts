@@ -1,13 +1,14 @@
 import { Address } from "thirdweb";
 
-export type UserRole = 'agency' | 'guest' | 'client' | 'co_owner' | 'admin' | 'agent';
+export type UserRole = 'agency' | 'guest' | 'client' | 'co_owner' | 'admin' | 'agent' | 'nobody';
 export enum UserRoleIds {
-  GUEST = 0,
+  NOBODY = 0,
   AGENCY = 1,
   AGENT = 2,
   CLIENT = 3,
   CO_OWNER = 4,
-  ADMIN = 5,
+  GUEST = 5,
+  ADMIN = 6,
 }
 
 export const UserRoleLabels: Record<UserRole, string> = {
@@ -17,6 +18,7 @@ export const UserRoleLabels: Record<UserRole, string> = {
   co_owner: "Co-Owner",
   admin: "Admin",
   agent: "Agent",
+  nobody: "Nobody",
 };
 
 export const UserRoleIdLabels: Record<UserRoleIds, string> = {
@@ -26,6 +28,7 @@ export const UserRoleIdLabels: Record<UserRoleIds, string> = {
   [UserRoleIds.CLIENT]: "Client",
   [UserRoleIds.CO_OWNER]: "Co_owner",
   [UserRoleIds.ADMIN]: "Admin",
+  [UserRoleIds.NOBODY]: "Nobody",
 };
 
 export const UserLabelRoleIds: Record<string, UserRoleIds> = {
@@ -35,6 +38,7 @@ export const UserLabelRoleIds: Record<string, UserRoleIds> = {
   "Client": UserRoleIds.CLIENT,
   "Co-Owner": UserRoleIds.CO_OWNER,
   "Admin": UserRoleIds.ADMIN,
+  "Nobody": UserRoleIds.NOBODY,
 };
 
 export interface User {

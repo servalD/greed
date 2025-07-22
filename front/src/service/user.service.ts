@@ -1,6 +1,7 @@
 import { get, put } from "../utils/api";
 import { User, UserRoleIdLabels, UserRoleIds } from "@/types/users";
 import { ServiceResult } from "./service.result";
+import { deleteUser } from "./auth";
 
 export class UserService {
     static async getGuests(): Promise<ServiceResult<User[] | undefined>> {
@@ -29,6 +30,16 @@ export class UserService {
                 id: userId,
                 role: UserRoleIdLabels[newRole],
             } as unknown as Record<string, unknown>);
+            return ServiceResult.success(res);
+        } catch (err) {
+            console.log(err);
+            return ServiceResult.failed();
+        }
+    }
+
+    static async deleteUser(id: number): Promise<ServiceResult<string | undefined>> {
+        try {
+            const res = await deleteUser(id);
             return ServiceResult.success(res);
         } catch (err) {
             console.log(err);

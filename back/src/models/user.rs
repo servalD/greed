@@ -6,12 +6,13 @@ use diesel_derive_enum::DbEnum;
 #[derive(Debug, DbEnum, Serialize, Clone, PartialEq, Eq, Deserialize)]
 #[db_enum(existing_type_path = "back::schema::sql_types::Role")]
 pub enum Role {
-    Guest = 0,
+    Nobody = 0,
     Agency = 1,
     Agent = 2,
     Client = 3,
     Co_owner = 4,
-    Admin = 5,
+    Guest = 5,
+    Admin = 6,
 }
 
 #[derive(Queryable, Selectable, Serialize)]
