@@ -32,7 +32,7 @@ const AgentOrAgency = () => {
   const [propertyData, setPropertyData] = useState({
     name: '',
     symbol: '',
-    flatCount: 0,
+    flat_count: 0,
     promoter: '',
     imageUrl: '',
     street_number: 0,
@@ -143,19 +143,19 @@ const AgentOrAgency = () => {
   useEffect(() => {
     if (isConfirmed && contractAddress && pendingBackendPayload) {
       const sendToBackend = async () => {
-        const { imageUrl, flatCount, street_number, ...rest } = pendingBackendPayload;
+        const { imageUrl, flat_count, street_number, ...rest } = pendingBackendPayload;
         await RealtyService.createRealty({
           ...rest,
           user_id: user?.id ?? 0,
           image_url: imageUrl,
           address: contractAddress,
-          flatCount: flatCount?.toString?.() ?? '',
+          flat_count: flat_count?.toString?.() ?? '',
           street_number: street_number?.toString?.() ?? '',
         });
         setPropertyData({
           name: '',
           symbol: '',
-          flatCount: 0,
+          flat_count: 0,
           promoter: '',
           imageUrl: '',
           street_number: 0,
@@ -235,7 +235,7 @@ const AgentOrAgency = () => {
       const tx = await createCopro(
         propertyData.name,
         propertyData.symbol,
-        Number(propertyData.flatCount),
+        Number(propertyData.flat_count),
         propertyData.promoter as Address,
         propertyData.imageUrl
       );

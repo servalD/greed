@@ -1,6 +1,7 @@
 use crate::models::apartment::{Apartment, NewApartment};
 use crate::repositories::apartment_repo as repo;
 use crate::utils::logger;
+use diesel::dsl::count;
 use diesel::PgConnection;
 
 #[derive(Clone)]
@@ -17,6 +18,26 @@ impl ApartmentService {
             logger::error(&format!("Erreur création appartement: {}", e));
             "Erreur lors de la création".to_string()
         })
+    }
+
+    pub fn create_multiple(
+        &self,
+        conn: &mut PgConnection,
+        new_apartment: NewApartment,
+        count: i32,
+    ) -> Result<Vec<Apartment>, String> {
+        self.validate(&new_apartment)?;
+        let mut apartments = Vec::new();
+        for i in 0..count {
+            let mut app = new_apartment.clone();
+            app.token_id = i;
+            let apartment = repo::create_apartment(conn, &app).map_err(|e| {
+                logger::error(&format!("Erreur création appartement: {}", e));
+                "Erreur lors de la création".to_string()
+            })?;
+            apartments.push(apartment);
+        }
+        Ok(apartments)
     }
 
     pub fn get_by_id(&self, conn: &mut PgConnection, id: i32) -> Result<Option<Apartment>, String> {
