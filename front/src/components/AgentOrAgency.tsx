@@ -44,7 +44,8 @@ const AgentOrAgency = () => {
     country: '',
     address: '',
   });
-  const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [coproTxHash, setCoproTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [clientTxHash, setClientTxHash] = useState<`0x${string}` | undefined>(undefined);
   const [pendingBackendPayload, setPendingBackendPayload] = useState<any>(null);
   const [guestData, setGuestData] = useState<any[]>([]);
   const [clientData, setClientData] = useState<any[]>([]);
@@ -56,8 +57,8 @@ const AgentOrAgency = () => {
   const { guests, clients } = useReadDataContract();
   const { user } = useAuth();
 
-  const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: txHash });
-  const { isSuccess: isAcceptClientConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: coproTxHash });
+  const { isSuccess: isAcceptClientConfirmed } = useWaitForTransactionReceipt({ hash: clientTxHash });
 
   const { data: contractAddress } = useReadAgencyGetCoproByName({
     args: pendingBackendPayload?.name ? [pendingBackendPayload.name] : undefined,
@@ -167,7 +168,7 @@ const AgentOrAgency = () => {
           address: '',
         });
         setPendingBackendPayload(null);
-        setTxHash(undefined);
+        setCoproTxHash(undefined);
         handleClose();
       };
       sendToBackend();
@@ -187,8 +188,8 @@ const AgentOrAgency = () => {
       }
 
       // Appel blockchain
-      await acceptClient(userToAccept.eth_address as Address);
-      
+      const tx = await acceptClient(userToAccept.eth_address as Address);
+      setClientTxHash(tx);
       // Attendre la confirmation de la transaction
       // La mise à jour en base se fera dans le useEffect qui surveille isAcceptClientConfirmed
       
@@ -202,6 +203,7 @@ const AgentOrAgency = () => {
   // Surveiller la confirmation de la transaction d'acceptation
   useEffect(() => {
     if (isAcceptClientConfirmed && acceptingClientId) {
+      console.log("Acceptation confirmée pour l'utilisateur ID:", acceptingClientId);
       const updateUserInBackend = async () => {
         try {
           // Mettre à jour le rôle en base de données
@@ -220,6 +222,7 @@ const AgentOrAgency = () => {
           ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
         } finally {
           setAcceptingClientId(null);
+          setClientTxHash(undefined);
         }
       };
       
@@ -236,7 +239,7 @@ const AgentOrAgency = () => {
         propertyData.promoter as Address,
         propertyData.imageUrl
       );
-      setTxHash(tx);
+      setCoproTxHash(tx);
       setPendingBackendPayload(propertyData);
     } catch (error) {
       ErrorService.mixinMessage('Erreur lors de la création du bien', 'error');
