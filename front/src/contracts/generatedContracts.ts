@@ -119,6 +119,13 @@ export const agencyAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: '_guest', internalType: 'address', type: 'address' }],
+    name: 'refuseCLient',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: '_client', internalType: 'address', type: 'address' }],
     name: 'revokeClient',
     outputs: [],
@@ -160,6 +167,19 @@ export const agencyAbi = [
     name: 'ClientAccepted',
   },
   {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'guest',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'GuestRefused',
+  },
+  {
     type: 'error',
     inputs: [{ name: 'authority', internalType: 'address', type: 'address' }],
     name: 'AccessManagedInvalidAuthority',
@@ -193,10 +213,11 @@ export const agencyAbi = [
     inputs: [{ name: '', internalType: 'string', type: 'string' }],
     name: 'COLLECTION_SYMBOL_ALREADY_EXISTS',
   },
+  { type: 'error', inputs: [], name: 'NotInGuestList' },
 ] as const
 
 export const agencyAddress =
-  '0xb93bc5dca936373D689B43E69531dc146B85e465' as const
+  '0x44a3216232b2BE8f312Aa6FF9156911B715C7067' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -775,7 +796,7 @@ export const coproAbi = [
 ] as const
 
 export const coproAddress =
-  '0xbb8714eEA41A93b5690a40083b0F69449Eb5C503' as const
+  '0x6ef77cfd3F3631059C6ff983a253BDD76288d63e' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
@@ -1787,7 +1808,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0x204bc79b54180af9355ef09AC4851F814Dd4eE3e' as const
+  '0xe70f03BCda0A8371e1589E50BeB68d67e19bDd6d' as const
 
 export const managerConfig = {
   address: managerAddress,
@@ -1931,6 +1952,15 @@ export const useWriteAgencyHireAgent = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"refuseCLient"`
+ */
+export const useWriteAgencyRefuseCLient = /*#__PURE__*/ createUseWriteContract({
+  abi: agencyAbi,
+  address: agencyAddress,
+  functionName: 'refuseCLient',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"revokeClient"`
  */
 export const useWriteAgencyRevokeClient = /*#__PURE__*/ createUseWriteContract({
@@ -1997,6 +2027,16 @@ export const useSimulateAgencyHireAgent =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"refuseCLient"`
+ */
+export const useSimulateAgencyRefuseCLient =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: agencyAbi,
+    address: agencyAddress,
+    functionName: 'refuseCLient',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link agencyAbi}__ and `functionName` set to `"revokeClient"`
  */
 export const useSimulateAgencyRevokeClient =
@@ -2042,6 +2082,16 @@ export const useWatchAgencyClientAcceptedEvent =
     abi: agencyAbi,
     address: agencyAddress,
     eventName: 'ClientAccepted',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link agencyAbi}__ and `eventName` set to `"GuestRefused"`
+ */
+export const useWatchAgencyGuestRefusedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: agencyAbi,
+    address: agencyAddress,
+    eventName: 'GuestRefused',
   })
 
 /**
