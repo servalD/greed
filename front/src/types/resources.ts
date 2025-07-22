@@ -1,1 +1,5 @@
-export type Images = { id: number; src: string }
+export interface Images {
+  id: number;
+  src: string;
+  name?: string;
+}
