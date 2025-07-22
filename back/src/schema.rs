@@ -10,6 +10,8 @@ diesel::table! {
     apartments (id) {
         id -> Int4,
         realty_id -> Int4,
+        token_id -> Int4,
+        owner_id -> Int4,
         name -> Text,
         image_url -> Text,
     }
@@ -28,7 +30,9 @@ diesel::table! {
         region -> Text,
         country -> Text,
         address -> Text,
+        promoter -> Int4,
         image_url -> Text,
+        apartment_count -> Int4,
     }
 }
 
@@ -82,7 +86,7 @@ diesel::table! {
 }
 
 diesel::joinable!(apartments -> realties (realty_id));
-diesel::joinable!(realties -> users (user_id));
+diesel::joinable!(apartments -> users (owner_id));
 diesel::joinable!(refresh_tokens -> users (user_id));
 diesel::joinable!(tokens -> apartments (apartment_id));
 diesel::joinable!(user_apartment -> apartments (apartment_id));

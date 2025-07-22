@@ -6,7 +6,7 @@ export interface AddCoproDialogProps {
     propertyData: {
       name: string;
       symbol: string;
-      flatCount: number;
+      flat_count: number;
       promoter: string;
       imageUrl: string;
       street_number: number;
