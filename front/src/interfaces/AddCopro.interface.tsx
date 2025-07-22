@@ -1,21 +1,21 @@
 export interface AddCoproDialogProps {
-    open: boolean;
-    handleClose: () => void;
-    handleSubmit: () => void;
-    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    propertyData: {
-      name: string;
-      symbol: string;
-      flat_count: number;
-      promoter: string;
-      imageUrl: string;
-      street_number: number;
-      street_name: string;
-      complement_address?: string;
-      city: string;
-      zip_code: string;
-      region: string;
-      country: string;
-      address: string;
-    };
+  open: boolean;
+  handleClose: () => void;
+  handleSubmit: () => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  propertyData: {
+    name: string;
+    symbol: string;
+    apartment_count: number;
+    promoter: string;
+    imageUrl: string;
+    street_number: number;
+    street_name: string;
+    complement_address?: string;
+    city: string;
+    zip_code: string;
+    region: string;
+    country: string;
+    address: string;
+  };
 }

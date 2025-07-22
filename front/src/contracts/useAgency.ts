@@ -1,26 +1,34 @@
 import { useState, useEffect } from "react";
 import { useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { ErrorService } from "@/service/error.service";
-import { useWriteAgencyGuestEntrance, useWriteAgencyCreateCopro, useWriteAgencyAcceptClient } from "./generatedContracts";
+import { useWriteAgencyGuestEntrance, useWriteAgencyCreateCopro, useWriteAgencyAcceptClient, useWriteAgencyRevokeClient } from "./generatedContracts";
 import { Address, UnknownNodeError } from "viem";
 
 export const useAgency = () => {
   const { isConnected, connector } = useAccount();
-  const { writeContractAsync: WriteGuest, data: hashGuest, isPending: isPendingGuest } = useWriteAgencyGuestEntrance();
-  const { writeContractAsync: WriteCreateCopro, data: hashCopro, isPending: isPendingCopro } = useWriteAgencyCreateCopro();
-  const { writeContractAsync: WriteAcceptClient, data: hashAcceptClient, isPending: isPendingAcceptCLient } = useWriteAgencyAcceptClient();
-  const { isSuccess: isConfirmedGuest } = useWaitForTransactionReceipt({ hash: hashGuest });
-  const { isSuccess: isConfirmedCopro } = useWaitForTransactionReceipt({ hash: hashCopro });
+  const { writeContractAsync: WriteGuest, status: guestEntranceStatus, data: guestTx } = useWriteAgencyGuestEntrance();
+  const { writeContractAsync: WriteCreateCopro, status: createCoproStatus, data: coproTx } = useWriteAgencyCreateCopro();
+  const { writeContractAsync: WriteAcceptClient, status: acceptClientStatus, data: acceptClientTx } = useWriteAgencyAcceptClient();
+  const { writeContractAsync: WriteRevokeClient, status: revokeClientStatus, data: revokeClientTx } = useWriteAgencyRevokeClient();
 
-  const [txHash, setTxHash] = useState<string | null>(null);
+  const { isSuccess: isConfirmedGuest } = useWaitForTransactionReceipt({ hash: guestTx });
+  const { isSuccess: isConfirmedCopro } = useWaitForTransactionReceipt({ hash: coproTx });
+  const { isSuccess: isConfirmedClient } = useWaitForTransactionReceipt({ hash: acceptClientTx });
+  const { isSuccess: isConfirmedRevoke } = useWaitForTransactionReceipt({ hash: revokeClientTx });
+
+  console.log(guestEntranceStatus, guestTx, isConfirmedGuest);
 
   useEffect(() => {
-    if (txHash && isConfirmedGuest) {
+    if (guestEntranceStatus === "success") {
       ErrorService.infoMessage("Rejoindre", "Votre demande a bien été soumise");
-    } else if (txHash && isConfirmedCopro) {
-        ErrorService.infoMessage("Creation", "Copro créée");
+    } else if (createCoproStatus === "success") {
+      ErrorService.infoMessage("Creation", "Copro créée");
+    } else if (acceptClientStatus === "success") {
+      ErrorService.infoMessage("Acceptation", "Client accepté");
+    } else if (revokeClientStatus === "success") {
+      ErrorService.infoMessage("Révocation", "Client révoqué");
     }
-  }, [isConfirmedGuest, isConfirmedCopro, txHash]);
+  }, [isConfirmedGuest, isConfirmedCopro, isConfirmedClient, isConfirmedRevoke]);
 
   const guestEntrance = async () => {
     if (!isConnected) {
@@ -30,7 +38,6 @@ export const useAgency = () => {
     try {
       const tx = await WriteGuest({});
       console.log("Transaction envoyée:", tx);
-      setTxHash(tx);
       return tx
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
@@ -45,7 +52,6 @@ export const useAgency = () => {
     try {
       const tx = await WriteCreateCopro({ args: [name, symbol, BigInt(flatCount), promoter, imageUrl] })
       console.log("Transaction envoyée:", tx);
-      setTxHash(tx);
       return tx;
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
@@ -61,7 +67,6 @@ export const useAgency = () => {
     try {
       const tx = await WriteAcceptClient({ args: [client] })
       console.log("Transaction envoyée:", tx);
-      setTxHash(tx);
       return tx
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
@@ -69,5 +74,5 @@ export const useAgency = () => {
     }
   }
 
-  return { guestEntrance, isPendingGuest, createCopro, isPendingCopro, acceptClient, isPendingAcceptCLient };
+  return { guestEntrance, guestEntranceStatus, isConfirmedGuest, createCopro, createCoproStatus, isConfirmedCopro, acceptClient, acceptClientStatus, isConfirmedClient, WriteRevokeClient, revokeClientStatus, isConfirmedRevoke};
 };

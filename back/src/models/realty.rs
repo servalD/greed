@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
-use diesel::{Queryable, Insertable, Selectable};
 use back::schema::realties;
+use diesel::{Insertable, Queryable, Selectable};
+use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Selectable, Serialize)]
 #[diesel(table_name = realties)]
@@ -17,7 +17,7 @@ pub struct Realty {
     pub region: String,
     pub country: String,
     pub address: String,
-    pub promoter: i32,
+    pub promoter: String,
     pub image_url: String,
     pub apartment_count: i32,
 }
@@ -35,7 +35,7 @@ pub struct RealtySafe {
     pub region: String,
     pub country: String,
     pub address: String,
-    pub promoter: i32,
+    pub promoter: String,
     pub image_url: String,
     pub apartment_count: i32,
 }
@@ -75,7 +75,7 @@ pub struct NewRealty {
     pub region: String,
     pub country: String,
     pub address: String,
-    pub promoter: i32,
+    pub promoter: String,
     pub image_url: String,
-    pub apartment_count: i32, // Not used in the database, but can be used in the application logic
+    pub apartment_count: i32,
 }

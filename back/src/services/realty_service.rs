@@ -1,7 +1,9 @@
 use diesel::PgConnection;
 use crate::models::apartment::NewApartment;
 use crate::models::realty::{Realty, NewRealty};
+use crate::models::user::{Role as User_Role, NewUser};
 use crate::repositories::realty_repo as repo;
+use crate::repositories::user_repo;
 use crate::services::apartment_service::ApartmentService;
 use crate::utils::logger;
 
@@ -23,13 +25,29 @@ impl RealtyService {
             match result {
                 Ok(realty) => {
                     // Create apartments if apartment_count is greater than 0
+                    let promoter = match user_repo::find_user(conn, None, Some(&realty.promoter), None) {
+                        Ok(Some(user)) => user.id,
+                        _ => {
+                            _ = user_repo::create_user(conn, &NewUser{
+                                email: None,
+                                first_name: None,
+                                last_name: None,
+                                eth_address: realty.promoter.clone(), 
+                                role: User_Role::Co_owner
+                            });
+                            match user_repo::find_user(conn, None, Some(&realty.promoter), None) {
+                                Ok(Some(user)) => user.id,
+                                _ => return Err("Erreur lors de la création du promoteur".to_string()),
+                            }
+                        },
+                    };
                     if new.apartment_count > 0 {
                         let apartments = apart_service.create_multiple(conn, NewApartment{
-                            owner_id: realty.promoter, // Assuming promoter is the owner
+                            owner_id: promoter, 
                             realty_id: realty.id,
-                            token_id: 0, // Assuming token_id is not used here, adjust as necessary
-                            name: "Default Apartment".to_string(), // Placeholder, adjust as necessary
-                            image_url: "default_image_url".to_string(), // Placeholder, adjust as necessary
+                            token_id: 0, 
+                            name: "Default Apartment".to_string(), 
+                            image_url: "default_image_url".to_string(), 
                         }, realty.apartment_count);
                         logger::info(&format!("{} appartements créés pour le bien immobilier {}", apartments.unwrap().len(), realty.id));
                     }
