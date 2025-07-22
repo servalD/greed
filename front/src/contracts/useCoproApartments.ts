@@ -107,7 +107,7 @@ export const useCoproApartments = (realtyId: number) => {
       setApartments(apartmentsData);
       setLoading(false);
     }
-  }, [coproAddress, initialFlats, totalFlats, ...ownerResults, ...marketResults]);
+  }, [coproAddress, initialFlats, totalFlats]);
 
   return {
     apartments,
