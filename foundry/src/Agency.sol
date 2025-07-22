@@ -20,6 +20,7 @@ contract Agency is AccessManaged {
     error COLLECTION_NAME_ALREADY_EXISTS(string);
     error COLLECTION_SYMBOL_ALREADY_EXISTS(string);
     error AlreadyClient();
+    error NotInGuestList();
 
     // =============================================================
     //                          STATE VARIABLES
@@ -43,6 +44,7 @@ contract Agency is AccessManaged {
     // =============================================================
 
     event ClientAccepted(address indexed client); // guestList address converted to Client (through the access manager)
+    event GuestRefused(address indexed guest);
 
     // =============================================================
     //                          CONSTRUCTOR
@@ -103,6 +105,17 @@ contract Agency is AccessManaged {
         guestList.remove(_client);
         clientList.add(_client);
         emit ClientAccepted(_client);
+    }
+
+    /**
+     * @notice Refuses a guest as a client and remove them from the list.
+     * @dev Restricted to agents. Removes the guest from the guest list.
+     * @param _guest Address of the guest to be refused as a client.
+     */
+    function refuseCLient(address _guest) external restricted {
+        if (!guestList.contains(_guest)) revert NotInGuestList();
+        guestList.remove(_guest);
+        emit GuestRefused(_guest);
     }
 
     /**
