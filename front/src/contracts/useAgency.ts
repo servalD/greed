@@ -31,6 +31,7 @@ export const useAgency = () => {
       const tx = await WriteGuest({});
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
+      return tx
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
     }
@@ -61,6 +62,7 @@ export const useAgency = () => {
       const tx = await WriteAcceptClient({ args: [client] })
       console.log("Transaction envoyée:", tx);
       setTxHash(tx);
+      return tx
     } catch (err: unknown) {
       console.error("Erreur lors de la transaction:", err as string);
       throw err;

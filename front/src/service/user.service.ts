@@ -1,5 +1,5 @@
 import { get, put } from "../utils/api";
-import { User, UserRoleIds } from "@/types/users";
+import { User, UserRoleIdLabels, UserRoleIds } from "@/types/users";
 import { ServiceResult } from "./service.result";
 
 export class UserService {
@@ -27,7 +27,7 @@ export class UserService {
         try {
             const res = await put<User>(`/user`, {
                 id: userId,
-                role: newRole,
+                role: UserRoleIdLabels[newRole],
             } as unknown as Record<string, unknown>);
             return ServiceResult.success(res);
         } catch (err) {
