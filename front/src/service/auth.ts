@@ -84,9 +84,9 @@ export function updateUser(user: UserUpdate) {
 }
 
 // Supprime l'utilisateur (id et pw)
-export async function deleteUser(id: number, password: string) {
+export async function deleteUser(id: number) {
   try {
-    return delete_<string>(`/user`, { id, password } as unknown as Record<string, unknown>);
+    return delete_<string>(`/user`, { id } as unknown as Record<string, unknown>);
   } catch (error) {
     console.error("Erreur lors de la suppression de l'utilisateur:", error);
     throw error;

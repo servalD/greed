@@ -37,8 +37,7 @@ foundry-verify:## Vérifie le contrat Manager, Agency et Copro sur Etherscan Sep
 	forge verify-contract --watch --chain sepolia $$NEXT_PUBLIC_MANAGER src/Manager.sol:Manager --verifier etherscan --etherscan-api-key $$ETHERSCAN_API_KEY --num-of-optimizations 200 --compiler-version 0.8.25+commit.b61c2a91 --evm-version cancun --guess-constructor-args --rpc-url $$SEPOLIA_RPC_URL &&\
 	forge verify-contract --watch --chain sepolia $$NEXT_PUBLIC_AGENCY src/Agency.sol:Agency --verifier etherscan --etherscan-api-key $$ETHERSCAN_API_KEY --num-of-optimizations 200 --compiler-version 0.8.25+commit.b61c2a91 --evm-version cancun --guess-constructor-args --rpc-url $$SEPOLIA_RPC_URL
 
-back-up:## Clean, démarre les services backend et lance l'application
-	make back-clean
+back-up:## Démarre les services backend et lance l'application
 	cd ./back && \
 	source .env && \
 	docker compose up -d && sleep 4 &&\

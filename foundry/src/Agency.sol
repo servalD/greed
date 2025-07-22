@@ -45,6 +45,15 @@ contract Agency is AccessManaged {
 
     event ClientAccepted(address indexed client); // guestList address converted to Client (through the access manager)
     event GuestRefused(address indexed guest);
+    event CoproCreated(
+        address indexed copro,
+        string name,
+        string symbol,
+        uint96 flatCount,
+        address indexed promoter
+    );
+    event AgentHired(address indexed agent);
+    event ClientRevoked(address indexed client);
 
     // =============================================================
     //                          CONSTRUCTOR
@@ -70,6 +79,7 @@ contract Agency is AccessManaged {
     function hireAgent(address _agent) external restricted {
         // Only deployer
         manager.addAgent(_agent);
+        emit AgentHired(_agent);
     }
 
     /**
@@ -85,6 +95,11 @@ contract Agency is AccessManaged {
             revert AlreadyClient();
         }
         guestList.add(msg.sender);
+        manager.grantRole(
+            IRoleDefinition.GUEST_ROLE,
+            msg.sender,
+            0
+        ); // Grant GUEST_ROLE to the caller
     }
 
     /**
@@ -103,6 +118,7 @@ contract Agency is AccessManaged {
     function acceptClient(address _client) external restricted {
         manager.grantRole(IRoleDefinition.CLIENT_ROLE, _client, 0);
         guestList.remove(_client);
+        manager.revokeRole(IRoleDefinition.GUEST_ROLE, _client);
         clientList.add(_client);
         emit ClientAccepted(_client);
     }
@@ -115,6 +131,7 @@ contract Agency is AccessManaged {
     function refuseCLient(address _guest) external restricted {
         if (!guestList.contains(_guest)) revert NotInGuestList();
         guestList.remove(_guest);
+        manager.revokeRole(IRoleDefinition.GUEST_ROLE, _guest);
         emit GuestRefused(_guest);
     }
 
@@ -126,6 +143,7 @@ contract Agency is AccessManaged {
     function revokeClient(address _client) external restricted {
         manager.revokeRole(IRoleDefinition.CLIENT_ROLE, _client);
         clientList.remove(_client);
+        emit ClientRevoked(_client);
     }
 
     /**
@@ -164,6 +182,20 @@ contract Agency is AccessManaged {
 
         // Role assignment
         manager.addCopro(address(copro));
+        if (!clientList.contains(promoter)){
+            manager.grantRole(IRoleDefinition.CLIENT_ROLE, promoter, 0);
+            guestList.remove(promoter);// If exists
+            clientList.add(promoter);
+            emit ClientAccepted(promoter);
+        }
+        
+        emit CoproCreated(
+            address(copro),
+            name,
+            symbol,
+            flatCount,
+            promoter
+        );
 
         return copro;
     }

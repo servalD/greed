@@ -165,6 +165,8 @@ const AgentOrAgency = () => {
         });
         setPendingBackendPayload(null);
         handleClose();
+        loadClients();
+        loadGuests();
       };
       sendToBackend();
     }
@@ -206,8 +208,8 @@ const AgentOrAgency = () => {
           if (result.errorCode === 0) { // ServiceErrorCode.success
             ErrorService.successMessage('Succès', 'Client accepté avec succès');
             // Recharger les données
-            await loadGuests();
-            await loadClients();
+            loadGuests();
+            loadClients();
           } else {
             ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
           }
@@ -251,13 +253,14 @@ const AgentOrAgency = () => {
       const updateUserInBackend = async () => {
         try {
           // Mettre à jour le rôle en base de données
-          const result = await UserService.updateUserRole(revokingClientId, UserRoleIds.GUEST);
+          
+          const result = await UserService.updateUserRole(revokingClientId, UserRoleIds.NOBODY);
 
           if (result.errorCode === 0) { // ServiceErrorCode.success
             ErrorService.successMessage('Succès', 'Client révoqué avec succès');
             // Recharger les données
-            await loadGuests();
-            await loadClients();
+            loadGuests();
+            loadClients();
           } else {
             ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
           }
@@ -349,12 +352,12 @@ const AgentOrAgency = () => {
             <Button
               variant="contained"
               onClick={handleClickOpen}
-              disabled={createCoproStatus === 'pending'}
+              disabled={createCoproStatus === 'pending' || createCoproStatus === "success" && !isConfirmedCopro}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
                 text-white font-medium px-6 py-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all duration-200
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {createCoproStatus === 'pending' ? (
+              {createCoproStatus === 'pending' || createCoproStatus === "success" && !isConfirmedCopro ? (
                 <div className="flex items-center">
                   <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
                   Création en cours...

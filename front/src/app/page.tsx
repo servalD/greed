@@ -57,7 +57,7 @@ export default function Home() {
                         localStorage.setItem("user", data.user);
                         localStorage.setItem("access_token", data.token);
                         localStorage.setItem("refresh_token", data.refresh_token);
-                        // refetch();
+                        refetch();
                       },
                       isLoggedIn: async () => {
                         // Vérifie si l'utilisateur est connecté

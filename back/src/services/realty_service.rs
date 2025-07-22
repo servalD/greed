@@ -33,7 +33,7 @@ impl RealtyService {
                                 first_name: None,
                                 last_name: None,
                                 eth_address: realty.promoter.clone(), 
-                                role: User_Role::Co_owner
+                                role: User_Role::Client
                             });
                             match user_repo::find_user(conn, None, Some(&realty.promoter), None) {
                                 Ok(Some(user)) => user.id,

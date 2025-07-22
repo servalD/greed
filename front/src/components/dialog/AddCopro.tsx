@@ -95,8 +95,6 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
       setUploadedImageUrl('');
       setImagePreview('');
       setIsUploading(false);
-
-      ErrorService.successMessage('Succès', 'Propriété créée avec succès');
       handleClose();
     } catch (error) {
       setIsUploading(false);
