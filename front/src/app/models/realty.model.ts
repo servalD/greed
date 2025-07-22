@@ -12,5 +12,5 @@ export interface IRealty {
     address: string;
     promoter: number;
     image_url: string;
-    flat_count: number;
+    apartment_count: number;
 }

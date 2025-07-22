@@ -10,7 +10,7 @@ CREATE TABLE realties (
     region TEXT NOT NULL,
     country TEXT NOT NULL,
     address TEXT NOT NULL,
-    promoter INT NOT NULL REFERENCES users(id),
+    promoter TEXT NOT NULL,
     image_url TEXT NOT NULL,
     apartment_count INT NOT NULL
 );
