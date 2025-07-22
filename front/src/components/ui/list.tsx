@@ -28,7 +28,7 @@ export default function List({ images }: { images: Images[] }) {
           
           <div className="p-6">
             <h3 className="text-xl font-semibold text-white mb-2">
-              Propriété Premium #{image.id}
+              {image.name || `Propriété Premium #${image.id}`}
             </h3>
             <p className="text-gray-400 mb-4">
               Une opportunité unique d'investissement immobilier sur la blockchain
