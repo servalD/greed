@@ -17,6 +17,7 @@ contract AgencyTest is Test {
     address guest = address(3);
     address promoter = address(5);
     address safeAddress = address(6);
+    address nonRoleUser = address(7);
 
     function setUp() public {
         vm.deal(admin, 100 ether);
@@ -123,4 +124,84 @@ contract AgencyTest is Test {
         assertEq(allCopros.length, 1); // Il doit y avoir 1 copro
         assertEq(address(allCopros[0]), address(created)); // La copro récupéré doit correspondre à celui créé
     }
+
+    function testRefuseClient() public {
+        vm.prank(admin);
+        agency.hireAgent(agent);
+
+        // Add a guest
+        vm.prank(guest);
+        agency.GuestEntrance();
+
+        // Refuse the guest
+        vm.prank(agent);
+        agency.refuseCLient(guest);
+
+        // Verify guest is removed from list
+        address[] memory gs = agency.guests();
+        bool found = false;
+        for (uint256 i = 0; i < gs.length; i++) {
+            if (gs[i] == guest) {
+                found = true;
+                break;
+            }
+        }
+        assertFalse(found);
+
+        // Verify guest role is revoked
+        (bool isGuest, ) = manager.hasRole(IRoleDefinition.GUEST_ROLE, guest);
+        assertFalse(isGuest);
+    }
+
+    function testRefuseClientNotInGuestList() public {
+        vm.prank(admin);
+        agency.hireAgent(agent);
+
+        // Try to refuse someone not in guest list
+        vm.prank(agent);
+        vm.expectRevert(Agency.NotInGuestList.selector);
+        agency.refuseCLient(guest);
+    }
+
+    function testRevokeClient() public {
+        vm.prank(admin);
+        agency.hireAgent(agent);
+
+        // Add and accept a client
+        vm.prank(guest);
+        agency.GuestEntrance();
+        vm.prank(agent);
+        agency.acceptClient(guest);
+
+        // Verify client is in list
+        address[] memory clients = agency.clients();
+        bool found = false;
+        for (uint256 i = 0; i < clients.length; i++) {
+            if (clients[i] == guest) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+
+        // Revoke the client
+        vm.prank(agent);
+        agency.revokeClient(guest);
+
+        // Verify client is removed from list
+        clients = agency.clients();
+        found = false;
+        for (uint256 i = 0; i < clients.length; i++) {
+            if (clients[i] == guest) {
+                found = true;
+                break;
+            }
+        }
+        assertFalse(found);
+
+        // Verify client role is revoked
+        (bool isClient, ) = manager.hasRole(IRoleDefinition.CLIENT_ROLE, guest);
+        assertFalse(isClient);
+    }
+
 }

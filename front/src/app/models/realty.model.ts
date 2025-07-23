@@ -10,5 +10,7 @@ export interface IRealty {
     region: string;
     country: string;
     address: string;
+    promoter: number;
     image_url: string;
+    apartment_count: number;
 }

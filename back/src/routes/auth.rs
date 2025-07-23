@@ -87,6 +87,7 @@ pub async fn handle_update_user(conn: &mut PgConnection, ctx: &RequestContext) -
     };
 
     let update = UpdateUserData {
+        id: payload.id,
         email: payload.email,
         first_name: payload.first_name,
         last_name: payload.last_name,

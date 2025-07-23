@@ -23,6 +23,7 @@ contract Manager is AccessManager {
             IRoleDefinition.AGENCY_ROLE
         );
         _setRoleAdmin(IRoleDefinition.AGENT_ROLE, IRoleDefinition.AGENCY_ROLE);
+        _setRoleAdmin(IRoleDefinition.GUEST_ROLE, IRoleDefinition.AGENCY_ROLE);
     }
 
     // =============================================================
@@ -51,6 +52,16 @@ contract Manager is AccessManager {
             Agency.createCopro.selector,
             IRoleDefinition.AGENT_ROLE
         ); // Agent can create copro
+        _setTargetFunctionRole(
+            agency,
+            Agency.revokeClient.selector,
+            IRoleDefinition.AGENT_ROLE
+        ); // Agent can revoke client
+        _setTargetFunctionRole(
+            agency,
+            Agency.refuseCLient.selector,
+            IRoleDefinition.AGENT_ROLE
+        ); // Agent can refuse guest
     }
 
     /**
@@ -78,12 +89,15 @@ contract Manager is AccessManager {
         (bool isAgent, ) = hasRole(IRoleDefinition.AGENT_ROLE, account);
         (bool isClient, ) = hasRole(IRoleDefinition.CLIENT_ROLE, account);
         (bool isCoOwner, ) = hasRole(IRoleDefinition.CO_OWNER_ROLE, account);
+        (bool isGuest, ) = hasRole(IRoleDefinition.GUEST_ROLE, account);
         if (isAgency) {
             return IRoleDefinition.AGENCY_ROLE;
         } else if (isAgent) {
             return IRoleDefinition.AGENT_ROLE;
         } else if (isClient) {
             return IRoleDefinition.CLIENT_ROLE;
+        } else if (isGuest) {
+            return IRoleDefinition.GUEST_ROLE;
         } else if (isCoOwner) {
             return IRoleDefinition.CO_OWNER_ROLE;
         } else {
