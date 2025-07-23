@@ -1,282 +1,150 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Box, 
-  Alert,
-  CircularProgress,
-  InputAdornment,
-  IconButton,
-  Card,
-  CardContent,
-  Divider
-} from '@mui/material';
-import { Person, Email } from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import { getUser, updateUser } from '@/service/auth';
-import { ErrorService } from '@/service/error.service';
-import { User, UserUpdate, UserRoleIdLabels, UserLabelRoleIds } from '@/types/users';
 import Navbar from '@/components/ui/navbar';
+import { Container, Box, Paper, Typography, Divider, Grid, Button, Avatar } from '@mui/material';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { RealtyService } from '@/service/realty.service';
+import { IRealty } from '@/app/models/realty.model';
+import { useRouter } from 'next/navigation';
 
-export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: ''
-  });
-  
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export default function ClientDashboard() {
+  const { user } = useAuth();
+  const [realties, setRealties] = useState<IRealty[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
-    try {
-      setLoading(true);
-      const userData = await getUser();
-      if (userData) {
-        setUser(userData);
-        setFormData({
-          firstName: userData.first_name || '',
-          lastName: userData.last_name || '',
-          email: userData.email || ''
-        });
+    const fetchRealties = async () => {
+      const result = await RealtyService.getAllRealties();
+      if (result.errorCode === 0 && result.result) {
+        // Filtrer les realty dont l'adresse du promoteur correspond à l'adresse du user connecté
+        setRealties(result.result.filter(r => {
+          const promoter = String(r.promoter).toLowerCase();
+          const userAddress = typeof user?.eth_address === 'string' ? user.eth_address.toLowerCase() : '';
+          return promoter === userAddress;
+        }));
       }
-    } catch (error: any) {
-      console.error('Error fetching user:', error);
-      ErrorService.errorMessage('Erreur', 'Impossible de charger les informations utilisateur');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: event.target.value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'Le prénom est requis';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Le nom est requis';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'L\'email est requis';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Format d\'email invalide';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm() || !user) return;
-
-    setSaving(true);
-    try {
-      const updateData: UserUpdate = {
-        id: user.id,
-        eth_address: user.eth_address,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        role: UserRoleIdLabels[user.role]
-      };
-
-      await updateUser(updateData);
-      
-      ErrorService.successMessage(
-        'Profil mis à jour',
-        'Vos informations ont été mises à jour avec succès'
-      );
-      
-      // Refresh user data
-      await fetchUser();
-      
-    } catch (error: any) {
-      console.error('Error updating user:', error);
-      ErrorService.errorMessage(
-        'Erreur de mise à jour',
-        error.message || 'Une erreur est survenue lors de la mise à jour'
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-        <Navbar />
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-            <CircularProgress size={60} />
-          </Box>
-        </Container>
-      </div>
-    );
-  }
+    };
+    if (user?.eth_address) fetchRealties();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
       <Navbar />
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Paper 
-            elevation={6}
-            sx={{ 
-              p: 4, 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              borderRadius: 3
-            }}
-          >
-            <Box textAlign="center" mb={4}>
-              <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-                Mon Profil
-              </Typography>
-              <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-                Gérez vos informations personnelles
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Informations utilisateur */}
-              <Card sx={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Person /> Informations personnelles
+          <Grid container spacing={4} mb={4}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={6}
+                className="rounded-2xl p-6 shadow-lg border border-gray-700/50"
+                sx={{ backgroundColor: "rgba(17, 24, 39, 0.9)" }}
+              >
+                <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                  <Avatar sx={{ width: 64, height: 64, bgcolor: '#6366f1', fontSize: 32 }}>
+                    {(user?.first_name?.[0] || '?')}{(user?.last_name?.[0] || '?')}
+                  </Avatar>
+                  <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
+                    {user?.first_name || 'Non renseigné'} {user?.last_name || ''}
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <TextField
-                        fullWidth
-                        label="Prénom"
-                        value={formData.firstName}
-                        onChange={handleInputChange('firstName')}
-                        error={!!errors.firstName}
-                        helperText={errors.firstName}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                          }
-                        }}
-                      />
-                      <TextField
-                        fullWidth
-                        label="Nom"
-                        value={formData.lastName}
-                        onChange={handleInputChange('lastName')}
-                        error={!!errors.lastName}
-                        helperText={errors.lastName}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                          }
-                        }}
-                      />
-                    </Box>
+                  <Typography variant="body2" sx={{ color: '#d1d5db' }}>
+                    {user?.email || 'Non renseigné'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#9ca3af', wordBreak: 'break-all' }}>
+                    {user?.eth_address || 'Non renseigné'}
+                  </Typography>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
 
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange('email')}
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Email />
-                          </InputAdornment>
-                        )
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.3)' }
-                        }
-                      }}
-                    />
-
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <Typography variant="body2">Rôle:</Typography>
-                      <Typography variant="body1" fontWeight="bold">
-                        {user?.role !== undefined ? UserRoleIdLabels[user.role] : 'Non défini'}
+          <Grid container spacing={4} mb={4}>
+            <Grid item xs={12} md={12}>
+              <Paper elevation={6}
+                className="rounded-2xl p-6 shadow-lg border border-gray-700/50"
+                sx={{ backgroundColor: "rgba(17, 24, 39, 0.9)" }}
+              >
+                <Typography variant="h5" fontWeight="bold" sx={{ color: 'white' }} gutterBottom>
+                  Mes propriétés
+                </Typography>
+                <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 2 }} />
+                <Grid container spacing={3}>
+                  {realties.length === 0 && (
+                    <Grid item xs={12}>
+                      <Typography variant="body1" sx={{ color: '#9ca3af' }}>
+                        Vous ne possédez aucune propriété pour le moment.
                       </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-
-              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.2)' }} />
-
-              {/* Bouton de soumission */}
-              <Box textAlign="center" mt={3}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  sx={{
-                    minWidth: 200,
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '&:disabled': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      color: 'rgba(255, 255, 255, 0.5)'
-                    }
-                  }}
-                >
-                  {saving ? (
-                    <>
-                      <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
-                      Enregistrement...
-                    </>
-                  ) : (
-                    'Mettre à jour'
+                    </Grid>
                   )}
-                </Button>
-              </Box>
-            </Box>
-          </Paper>
+                  {realties.map((realty) => (
+                    <Grid item xs={12} sm={6} md={3} key={realty.id}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="group relative bg-gray-800/90 rounded-2xl overflow-hidden border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300"
+                        onClick={() => router.push(`/copro/${realty.id}`)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="relative overflow-hidden aspect-[4/3]">
+                          <img
+                            src={realty.image_url}
+                            alt={realty.name}
+                            className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-semibold" style={{ color: 'white' }}>
+                            {realty.name}
+                          </h3>
+                          <p
+                            className="mb-2"
+                            style={{ color: '#d1d5db', maxHeight: 60, overflowY: 'auto' }}
+                          >
+                            {realty.address}, {realty.city}, {realty.zip_code}, {realty.region}, {realty.country}
+                          </p>
+                          <Button
+                            variant="contained"
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg mt-2"
+                            fullWidth
+                            onClick={e => { e.stopPropagation(); router.push(`/copro/${realty.id}`); }}
+                          >
+                            Voir les détails
+                          </Button>
+                        </div>
+                      </motion.div>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Paper>
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={4} mb={4}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={6}
+                className="rounded-2xl p-6 shadow-lg border border-gray-700/50"
+                sx={{ backgroundColor: "rgba(17, 24, 39, 0.9)" }}
+              >
+                <Typography variant="h5" fontWeight="bold" sx={{ color: 'white' }} gutterBottom>
+                  Dernières activités
+                </Typography>
+                <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 2 }} />
+                <Box className="text-gray-400">
+                  <ul className="space-y-2">
+                    <li>• Achat de 20 tokens sur <span className="text-blue-300">Résidence Les Jardins</span></li>
+                    <li>• Reçu un dividende de 500 €</li>
+                    <li>• Nouvelle propriété ajoutée : <span className="text-purple-300">Loft Lumière</span></li>
+                  </ul>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
         </motion.div>
       </Container>
     </div>

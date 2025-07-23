@@ -1,4 +1,4 @@
-CREATE TYPE role AS ENUM ('guest', 'agency', 'agent', 'client', 'co_owner', 'admin');
+CREATE TYPE role AS ENUM ('nobody', 'agency', 'agent', 'client', 'co_owner', 'guest', 'admin');
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,

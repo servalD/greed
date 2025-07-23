@@ -55,7 +55,7 @@ pub async fn handle_routes(
         _ if ctx.match_route("GET", "/users/clients") => auth::handle_get_clients(conn, &ctx).await,
         
         // Routes realty
-        _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service).await,
+        _ if ctx.match_route("POST", "/realty") => realty::handle_create_realty(conn, &ctx, &realty_service, &apartment_service).await,
         _ if ctx.match_route("GET", "/realty/:id") => realty::handle_get_realty(conn, &ctx, &realty_service).await,
         _ if ctx.match_route("GET", "/realty") => realty::handle_get_all_realties(conn, &ctx, &realty_service).await,
         _ if ctx.match_route("PUT", "/realty/:id") => realty::handle_update_realty(conn, &ctx, &realty_service).await,

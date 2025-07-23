@@ -25,14 +25,14 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
       const file = files[0];
       if (file.type.startsWith('image/')) {
         setSelectedFile(file);
         setUploadedImageUrl(''); // Reset uploaded URL when new file is selected
-        
+
         // Create preview
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -52,7 +52,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
       if (file.type.startsWith('image/')) {
         setSelectedFile(file);
         setUploadedImageUrl(''); // Reset uploaded URL when new file is selected
-        
+
         // Create preview
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -85,18 +85,16 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
       setIsUploading(true);
       const imageUrl = await PinataService.uploadImage(selectedFile);
       setUploadedImageUrl(imageUrl);
-      
+
       propertyData.imageUrl = imageUrl; // Update propertyData with the uploaded image URL
       // Call the original handleSubmit after successful upload
       await handleSubmit();
-      
+
       // Reset states after successful submission
       setSelectedFile(null);
       setUploadedImageUrl('');
       setImagePreview('');
       setIsUploading(false);
-      
-      ErrorService.successMessage('Succès', 'Propriété créée avec succès');
       handleClose();
     } catch (error) {
       setIsUploading(false);
@@ -106,9 +104,9 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleCloseModal} 
+    <Dialog
+      open={open}
+      onClose={handleCloseModal}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -138,7 +136,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
           {[
             { field: "name", label: "Nom de la propriété", type: "text", placeholder: "Ex: Résidence Les Jardins" },
             { field: "symbol", label: "Symbole", type: "text", placeholder: "Ex: RJ" },
-            { field: "flatCount", label: "Nombre d'appartements", type: "number", placeholder: "Ex: 12" },
+            { field: "apartment_count", label: "Nombre d'appartements", type: "number", placeholder: "Ex: 12" },
             { field: "street_number", label: "Numéro de rue", type: "number", placeholder: "Ex: 12" },
             { field: "street_name", label: "Nom de la rue", type: "text", placeholder: "Ex: Avenue des Champs-Élysées" },
             { field: "complement_address", label: "Complément d'adresse", type: "text", placeholder: "Bâtiment, étage, etc." },
@@ -195,7 +193,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
               />
             </motion.div>
           ))}
-          
+
           {/* Zone de glisser-déposer pour l'image */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -211,10 +209,10 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
               onDrop={handleDrop}
               className={`
                 relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer
-                ${isDragOver 
-                  ? 'border-blue-500 bg-blue-500/10' 
-                  : selectedFile 
-                    ? 'border-green-500 bg-green-500/10' 
+                ${isDragOver
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : selectedFile
+                    ? 'border-green-500 bg-green-500/10'
                     : 'border-gray-600 hover:border-gray-500 bg-gray-700/30'
                 }
               `}
@@ -225,7 +223,7 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
                 onChange={handleFileSelect}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              
+
               {isUploading ? (
                 <div className="flex flex-col items-center">
                   <div className="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mb-4"></div>
@@ -234,9 +232,9 @@ const AddCoproDialog: React.FC<AddCoproDialogProps> = ({ open, handleClose, hand
               ) : selectedFile && imagePreview ? (
                 <div className="flex flex-col items-center">
                   <div className="relative mb-4">
-                    <img 
-                      src={imagePreview} 
-                      alt="Aperçu" 
+                    <img
+                      src={imagePreview}
+                      alt="Aperçu"
                       className="w-32 h-32 object-cover rounded-lg border-2 border-gray-600"
                     />
                     <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">

@@ -32,7 +32,7 @@ const AgentOrAgency = () => {
   const [propertyData, setPropertyData] = useState({
     name: '',
     symbol: '',
-    flatCount: 0,
+    apartment_count: 0,
     promoter: '',
     imageUrl: '',
     street_number: 0,
@@ -44,20 +44,17 @@ const AgentOrAgency = () => {
     country: '',
     address: '',
   });
-  const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
   const [pendingBackendPayload, setPendingBackendPayload] = useState<any>(null);
   const [guestData, setGuestData] = useState<any[]>([]);
   const [clientData, setClientData] = useState<any[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(true);
   const [loadingClients, setLoadingClients] = useState(true);
   const [acceptingClientId, setAcceptingClientId] = useState<number | null>(null);
+  const [revokingClientId, setRevokingClientId] = useState<number | null>(null);
 
-  const { createCopro, isPendingCopro, acceptClient, isPendingAcceptCLient } = useAgency();
+  const { createCopro, isConfirmedCopro, createCoproStatus, acceptClient, isConfirmedClient, acceptClientStatus, WriteRevokeClient, revokeClientStatus, isConfirmedRevoke } = useAgency();
   const { guests, clients } = useReadDataContract();
   const { user } = useAuth();
-
-  const { isSuccess: isConfirmed, isLoading: isTxLoading } = useWaitForTransactionReceipt({ hash: txHash });
-  const { isSuccess: isAcceptClientConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   const { data: contractAddress } = useReadAgencyGetCoproByName({
     args: pendingBackendPayload?.name ? [pendingBackendPayload.name] : undefined,
@@ -115,10 +112,6 @@ const AgentOrAgency = () => {
     loadClients();
   }, []);
 
-  useEffect(() => {
-    console.log("GUESTS :", guests, "CLIENTS", clients)
-  })
-
   const guestColumns = [
     { name: 'name', label: 'Nom' },
     { name: 'email', label: 'Email' },
@@ -134,27 +127,27 @@ const AgentOrAgency = () => {
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e : any) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setPropertyData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   useEffect(() => {
-    if (isConfirmed && contractAddress && pendingBackendPayload) {
+    if (isConfirmedCopro && contractAddress && pendingBackendPayload) {
       const sendToBackend = async () => {
-        const { imageUrl, flatCount, street_number, ...rest } = pendingBackendPayload;
+        const { imageUrl, apartment_count, street_number, ...rest } = pendingBackendPayload;
         await RealtyService.createRealty({
           ...rest,
           user_id: user?.id ?? 0,
           image_url: imageUrl,
           address: contractAddress,
-          flatCount: flatCount?.toString?.() ?? '',
+          apartment_count: Number(apartment_count),
           street_number: street_number?.toString?.() ?? '',
         });
         setPropertyData({
           name: '',
           symbol: '',
-          flatCount: 0,
+          apartment_count: 0,
           promoter: '',
           imageUrl: '',
           street_number: 0,
@@ -167,18 +160,19 @@ const AgentOrAgency = () => {
           address: '',
         });
         setPendingBackendPayload(null);
-        setTxHash(undefined);
         handleClose();
+        loadClients();
+        loadGuests();
       };
       sendToBackend();
     }
-  }, [isConfirmed, contractAddress, pendingBackendPayload, user]);
+  }, [isConfirmedCopro, contractAddress, pendingBackendPayload, user]);
 
   // Gérer l'acceptation d'un client
   const handleAcceptClient = async (userId: number) => {
     try {
       setAcceptingClientId(userId);
-      
+
       // Trouver l'utilisateur dans les données
       const userToAccept = guestData.find(u => u.id === userId);
       if (!userToAccept) {
@@ -187,11 +181,10 @@ const AgentOrAgency = () => {
       }
 
       // Appel blockchain
-      await acceptClient(userToAccept.eth_address as Address);
-      
+      const tx = await acceptClient(userToAccept.eth_address as Address);
       // Attendre la confirmation de la transaction
       // La mise à jour en base se fera dans le useEffect qui surveille isAcceptClientConfirmed
-      
+
     } catch (error) {
       console.error('Erreur lors de l\'acceptation du client:', error);
       ErrorService.errorMessage('Erreur', 'Impossible d\'accepter le client');
@@ -201,17 +194,18 @@ const AgentOrAgency = () => {
 
   // Surveiller la confirmation de la transaction d'acceptation
   useEffect(() => {
-    if (isAcceptClientConfirmed && acceptingClientId) {
+    if (isConfirmedClient && acceptingClientId) {
+      console.log("Acceptation confirmée pour l'utilisateur ID:", acceptingClientId);
       const updateUserInBackend = async () => {
         try {
           // Mettre à jour le rôle en base de données
           const result = await UserService.updateUserRole(acceptingClientId, UserRoleIds.CLIENT);
-          
+
           if (result.errorCode === 0) { // ServiceErrorCode.success
             ErrorService.successMessage('Succès', 'Client accepté avec succès');
             // Recharger les données
-            await loadGuests();
-            await loadClients();
+            loadGuests();
+            loadClients();
           } else {
             ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
           }
@@ -222,21 +216,71 @@ const AgentOrAgency = () => {
           setAcceptingClientId(null);
         }
       };
-      
+
       updateUserInBackend();
     }
-  }, [isAcceptClientConfirmed, acceptingClientId]);
+  }, [isConfirmedClient, acceptingClientId]);
+
+  // Gérer la révocation d'un client
+  const handleRevokeClient = async (userId: number) => {
+    try {
+      setRevokingClientId(userId);
+      // Trouver l'utilisateur dans les données
+      const userToRevoke = clientData.find(u => u.id === userId);
+      if (!userToRevoke) {
+        ErrorService.errorMessage('Erreur', 'Utilisateur non trouvé');
+        return;
+      }
+      // Appel blockchain
+      const tx = await WriteRevokeClient({ args: [userToRevoke.eth_address as Address] });
+      // Attendre la confirmation de la transaction
+      // La mise à jour en base se fera dans le useEffect qui surveille isConfirmedRevoke
+    } catch (error) {
+      console.error('Erreur lors de la révocation du client:', error);
+      ErrorService.errorMessage('Erreur', 'Impossible de révoquer le client');
+      setRevokingClientId(null);
+    }
+  };
+
+  // Surveiller la confirmation de la transaction de révocation
+  useEffect(() => {
+    if (isConfirmedRevoke && revokingClientId) {
+      console.log("Révocation confirmée pour l'utilisateur ID:", revokingClientId);
+      const updateUserInBackend = async () => {
+        try {
+          // Mettre à jour le rôle en base de données
+          
+          const result = await UserService.updateUserRole(revokingClientId, UserRoleIds.NOBODY);
+
+          if (result.errorCode === 0) { // ServiceErrorCode.success
+            ErrorService.successMessage('Succès', 'Client révoqué avec succès');
+            // Recharger les données
+            loadGuests();
+            loadClients();
+          } else {
+            ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour du rôle:', error);
+          ErrorService.errorMessage('Erreur', 'Impossible de mettre à jour le rôle en base de données');
+        } finally {
+          setRevokingClientId(null);
+        }
+      };
+
+      updateUserInBackend();
+    }
+  }, [isConfirmedRevoke, revokingClientId]);
 
   const handleSubmit = async () => {
     try {
       const tx = await createCopro(
         propertyData.name,
         propertyData.symbol,
-        Number(propertyData.flatCount),
+        Number(propertyData.apartment_count),
         propertyData.promoter as Address,
         propertyData.imageUrl
       );
-      setTxHash(tx);
       setPendingBackendPayload(propertyData);
     } catch (error) {
       ErrorService.mixinMessage('Erreur lors de la création du bien', 'error');
@@ -251,7 +295,7 @@ const AgentOrAgency = () => {
           ErrorService.infoMessage('En cours', 'Acceptation en cours...');
           return;
         }
-        if (isPendingAcceptCLient) {
+        if (acceptClientStatus === 'pending') {
           ErrorService.infoMessage('En cours', 'Une acceptation est déjà en cours...');
           return;
         }
@@ -261,8 +305,18 @@ const AgentOrAgency = () => {
         ErrorService.mixinMessage("L'invité a été refusé", "error");
         break;
       case 'ban':
-        ErrorService.mixinMessage("Le client a été banni", "info");
+        if (revokeClientStatus === 'pending') {
+          ErrorService.infoMessage('En cours', 'Une révocation est déjà en cours...');
+          return;
+        }
+        if (revokingClientId === id) {
+          ErrorService.infoMessage('En cours', 'Révocation en cours...');
+          return;
+        }
+        handleRevokeClient(id);
         break;
+      // ErrorService.mixinMessage("Le client a été banni", "info");
+      // break;
     }
   };
 
@@ -291,15 +345,15 @@ const AgentOrAgency = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-8"
           >
-            <Button 
-              variant="contained" 
-              onClick={handleClickOpen} 
-              disabled={isPendingCopro}
+            <Button
+              variant="contained"
+              onClick={handleClickOpen}
+              disabled={createCoproStatus === 'pending' || createCoproStatus === "success" && !isConfirmedCopro}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
                 text-white font-medium px-6 py-3 rounded-lg shadow-lg shadow-blue-500/20 transition-all duration-200
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPendingCopro ? (
+              {createCoproStatus === 'pending' || createCoproStatus === "success" && !isConfirmedCopro ? (
                 <div className="flex items-center">
                   <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
                   Création en cours...

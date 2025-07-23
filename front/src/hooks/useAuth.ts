@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import { useReadAgencyGuests, useReadManagerGetRole } from '@/contracts/generatedContracts';
 import { UserUpdate, UserRoleIds, UserRoleIdLabels } from '@/types/users';
 import { useActiveWalletConnectionStatus } from 'thirdweb/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface User {
   id: number;
@@ -27,7 +27,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const { address } = useAccount();
   const connectionStatus = useActiveWalletConnectionStatus();
-  const { data: guests } = useReadAgencyGuests();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Role verification
   const { data: userRole, refetch: refetchUserRole } = useReadManagerGetRole({
@@ -42,7 +42,7 @@ export const useAuth = () => {
   } = useQuery({
     queryKey: ['auth', 'user'],
     queryFn: getUser,
-    enabled: typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('access_token') && connectionStatus === 'connected',
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -102,8 +102,6 @@ export const useAuth = () => {
     deleteUserMutation.mutate({ id, password });
   };
 
-  // Vérifier si l'utilisateur est connecté
-  const isAuthenticated = !!user && !error && connectionStatus === 'connected';
   // console.log(isAuthenticated, user, error, connectionStatus);
   // Met a jour le user si le role du back est différent de selui du front
   useEffect(() => {
@@ -116,15 +114,22 @@ export const useAuth = () => {
   
   }, [userRole]);
 
-  // As we are unable to update the user without a password, we will not update the user role on the backend (use the onchain one)
   if (user) user.role = userRole ? Number(userRole) : user?.role;
 
-  useEffect(() => {
+  useEffect(() => {// sync role when address changes
     if (address) {
       refetchUserRole();
       refetch();
     }
   }, [address, refetchUserRole]);
+
+  useEffect(() => {
+    if (user && !error && connectionStatus === 'connected') {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, [user, error, connectionStatus]);
 
   return {
     user,

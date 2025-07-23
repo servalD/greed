@@ -1,4 +1,5 @@
 use crate::http::{HttpResponse, RequestContext};
+use crate::services::apartment_service::ApartmentService;
 use crate::services::realty_service::RealtyService;
 use crate::models::realty::NewRealty;
 use crate::utils::logger;
@@ -8,13 +9,14 @@ pub async fn handle_create_realty(
     conn: &mut PgConnection,
     ctx: &RequestContext,
     service: &RealtyService,
+    apart_service: &ApartmentService,
 ) -> HttpResponse {
     let payload = match ctx.parse_body::<NewRealty>() {
         Some(p) => p,
         None => return HttpResponse::bad_request("Invalid body format"),
     };
 
-    match service.create(conn, payload) {
+    match service.create(conn, payload, apart_service) {
         Ok(realty) => match realty.safe_json() {
             Ok(json) => HttpResponse::created(Some(json)),
             Err(_) => HttpResponse::internal_server_error(),

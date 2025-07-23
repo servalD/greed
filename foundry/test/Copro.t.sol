@@ -16,6 +16,7 @@ contract CoproTest is Test {
     address safeAddress = address(6);
 
     event ApartmentsAdded(uint256 startTokenId, uint256 additionalCount);
+    event Fractionalized(uint256 indexed tokenId, address fractionalTokenAddress);
 
     function setUp() public {
         vm.deal(admin, 100 ether);
@@ -58,6 +59,20 @@ contract CoproTest is Test {
         );
     }
 
+    function testCoproConstructorExceedsMaxBatchSize() public {
+        vm.prank(admin);
+        vm.expectRevert(Copro.ExceedsMaxBatchSize.selector);
+        new Copro(
+            manager,
+            promoter,
+            "CoproTest",
+            "CT",
+            5001, // Assuming max batch size is 5000
+            payable(safeAddress),
+            "fakeurl"
+        );
+    }
+
     function testSellAndCancelSale() public {
         uint96 flatCount = 5;
         Copro localCopro = deployCopro(flatCount);
@@ -70,6 +85,29 @@ contract CoproTest is Test {
         vm.prank(promoter);
         localCopro.cancelSale(0);
         assertEq(localCopro.market(0), 0); // Le token 0 ne doit plus être en vente
+    }
+
+    function testSellNotOwner() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+        uint256 price = 1 ether;
+        
+        vm.prank(buyer);
+        vm.expectRevert(Copro.NotFlatOwner.selector);
+        localCopro.sell(0, price);
+    }
+
+    function testCancelSaleNotOwner() public {
+        uint96 flatCount = 5;
+        Copro localCopro = deployCopro(flatCount);
+        uint256 price = 1 ether;
+        
+        vm.prank(promoter);
+        localCopro.sell(0, price);
+        
+        vm.prank(buyer);
+        vm.expectRevert(Copro.NotFlatOwner.selector);
+        localCopro.cancelSale(0);
     }
 
     function testBuyStandard() public {
@@ -239,4 +277,18 @@ contract CoproTest is Test {
         vm.expectRevert(Copro.MustBeGreaterThan0.selector);
         localCopro.addApartments(0);
     }
+
+    function testGetMarketByOwnersInitial() public {
+        uint96 flatCount = 3;
+        Copro localCopro = deployCopro(flatCount);
+        
+        Copro.Market[] memory markets = localCopro.getMarketByOwners();
+        assertEq(markets.length, flatCount);
+        
+        for (uint256 i = 0; i < flatCount; i++) {
+            assertEq(markets[i].price, 0);
+            assertEq(markets[i].owner, promoter);
+        }
+    }
+
 }
