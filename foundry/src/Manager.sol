@@ -57,6 +57,11 @@ contract Manager is AccessManager {
             Agency.revokeClient.selector,
             IRoleDefinition.AGENT_ROLE
         ); // Agent can revoke client
+        _setTargetFunctionRole(
+            agency,
+            Agency.refuseCLient.selector,
+            IRoleDefinition.AGENT_ROLE
+        ); // Agent can refuse guest
     }
 
     /**
