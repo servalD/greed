@@ -275,7 +275,7 @@ export const agencyAbi = [
 ] as const
 
 export const agencyAddress =
-  '0xBE73efA59cfc59E03003e97062F7C507D5996e39' as const
+  '0x64f181F7875e28FE5F094B2E3F29CE47f936cC24' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -389,6 +389,23 @@ export const coproAbi = [
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'getApproved',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getMarketByOwners',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct Copro.Market[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'price', internalType: 'uint256', type: 'uint256' },
+          { name: 'owner', internalType: 'address', type: 'address' },
+        ],
+      },
+    ],
     stateMutability: 'view',
   },
   {
@@ -854,7 +871,7 @@ export const coproAbi = [
 ] as const
 
 export const coproAddress =
-  '0x13C5365D8691142A3C50Ed6Be0d883607c9C1Ced' as const
+  '0x569386783b183038E23b547414B044b85768b337' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
@@ -1866,7 +1883,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0x9464E5b52997C34802bA00661090Bc2C53f878Df' as const
+  '0x8f66B94236a96f973dFC8Da38A354Fd9245AD59e' as const
 
 export const managerConfig = {
   address: managerAddress,
@@ -2253,6 +2270,16 @@ export const useReadCoproGetApproved = /*#__PURE__*/ createUseReadContract({
   address: coproAddress,
   functionName: 'getApproved',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"getMarketByOwners"`
+ */
+export const useReadCoproGetMarketByOwners =
+  /*#__PURE__*/ createUseReadContract({
+    abi: coproAbi,
+    address: coproAddress,
+    functionName: 'getMarketByOwners',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link coproAbi}__ and `functionName` set to `"history"`

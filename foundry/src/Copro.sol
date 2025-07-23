@@ -49,6 +49,11 @@ contract Copro is ERC721Consecutive, AccessManaged {
         uint256 amount;
     }
 
+    struct Market {
+        uint256 price; // Price of the flat
+        address owner; // Owner of the flat
+    }
+
     // =============================================================
     //                          EVENTS
     // =============================================================
@@ -218,7 +223,17 @@ contract Copro is ERC721Consecutive, AccessManaged {
         emit ApartmentsAdded(startTokenId, additionalCount);
     }
 
-    // No getter for market and history as it's public so th'ey can be accessed directly (to lower gas cost at deployment)
+    /**
+     * @notice Returns the market information for all flats, including their owners.
+     * @return An array of Market structs containing price and owner information for each flat.
+     */
+    function getMarketByOwners() external view returns (Market[] memory) {
+        Market[] memory markets = new Market[](initialFlats + additionalFlats);
+        for (uint256 i = 0; i < initialFlats + additionalFlats; i++) {
+            markets[i] = Market(market[i], ownerOf(i));
+        }
+        return markets;
+    }
 
     // Disabled code (in prod and before audits, I'll decide to comment out unneeded code in sources which is cleaner and gas free. For now it's more explicit.)
     // function safeTransferFrom(address from, address to, uint256 tokenId) public override {revert("disabled");} // Not virtual

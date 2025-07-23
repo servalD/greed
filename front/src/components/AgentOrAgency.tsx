@@ -112,10 +112,6 @@ const AgentOrAgency = () => {
     loadClients();
   }, []);
 
-  useEffect(() => {
-    console.log("GUESTS :", guests, "CLIENTS", clients)
-  })
-
   const guestColumns = [
     { name: 'name', label: 'Nom' },
     { name: 'email', label: 'Email' },

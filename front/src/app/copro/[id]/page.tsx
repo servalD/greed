@@ -6,13 +6,16 @@ import { useCoproApartments } from '@/contracts/useCoproApartments';
 import { useCoproInteractions } from '@/hooks/useCoproInteractions';
 import { useParams } from 'next/navigation';
 import { ApartmentCard } from '@/components/ui/ApartmentCard';
+import { useEffect } from 'react';
 
 export default function CoproDetailPage() {
   const params = useParams();
   const realtyId = Number(params.id);
   
-  const { apartments, loading, error, coproAddress, totalFlats } = useCoproApartments(realtyId);
+  const { apartments, loading, error, coproAddress, refetch: refetchApartments } = useCoproApartments(realtyId);
   const { 
+    cancelSale,
+    sellApartment,
     buyApartment, 
     isProcessing, 
     isConfirmed, 
@@ -27,9 +30,28 @@ export default function CoproDetailPage() {
     if (!apartment.isForSale || !apartment.price) {
       return;
     }
-    
+    console.log(apartment.price)
     await buyApartment(apartment.id, apartment.price);
   };
+
+  const handleSell = async (apartment: any) => {
+    if (apartment.isForSale) {
+      return;
+    }
+    
+    await sellApartment(apartment.id, apartment.price);
+  };
+
+  const handleCancel = async (apartment: any) => {
+    if (!apartment.isForSale) {
+      return;
+    }
+    await cancelSale(apartment.id);
+  };
+
+  useEffect(() => {
+    isConfirmed && refetchApartments();
+  }, [isConfirmed, refetchApartments]);
 
   if (loading) {
     return (
@@ -79,7 +101,7 @@ export default function CoproDetailPage() {
           {/* Informations sur les appartements */}
           <Box sx={{ mb: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Chip 
-              label={`Total d'appartements: ${totalFlats}`} 
+              label={`Total d'appartements: ${apartments.length}`} 
               color="primary" 
               variant="outlined"
             />
@@ -109,6 +131,8 @@ export default function CoproDetailPage() {
                     apartment={apartment}
                     userAddress={userAddress}
                     onBuy={handleBuy}
+                    onSell={handleSell}
+                    onCancel={handleCancel}
                     isProcessing={isProcessingBuy}
                     isBought={isBought}
                   />
@@ -123,7 +147,7 @@ export default function CoproDetailPage() {
                 Aucun appartement minté pour cette copropriété
               </Typography>
               <Typography variant="body2" sx={{ color: '#6b7280', mt: 2 }}>
-                {totalFlats > 0 ? `${totalFlats} appartements sont configurés mais aucun n'a encore été minté.` : 'Aucun appartement configuré pour cette copropriété.'}
+                {apartments.length > 0 ? `${apartments.length} appartements sont configurés mais aucun n'a encore été minté.` : 'Aucun appartement configuré pour cette copropriété.'}
               </Typography>
             </Box>
           )}
