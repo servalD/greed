@@ -275,7 +275,7 @@ export const agencyAbi = [
 ] as const
 
 export const agencyAddress =
-  '0x64f181F7875e28FE5F094B2E3F29CE47f936cC24' as const
+  '0x8a7A93609F259f3DFE36671c9f50FB3CCE944fB5' as const
 
 export const agencyConfig = { address: agencyAddress, abi: agencyAbi } as const
 
@@ -871,7 +871,7 @@ export const coproAbi = [
 ] as const
 
 export const coproAddress =
-  '0x569386783b183038E23b547414B044b85768b337' as const
+  '0x8dE3C56C128919147a0F6FfFD5FBD9fD2881B632' as const
 
 export const coproConfig = { address: coproAddress, abi: coproAbi } as const
 
@@ -1883,7 +1883,7 @@ export const managerAbi = [
 ] as const
 
 export const managerAddress =
-  '0x8f66B94236a96f973dFC8Da38A354Fd9245AD59e' as const
+  '0x501561ECD17c50B77ee7Ec09DafB8B7BFd7CF1C8' as const
 
 export const managerConfig = {
   address: managerAddress,
