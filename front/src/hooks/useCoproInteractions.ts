@@ -21,7 +21,8 @@ export const useCoproInteractions = (coproAddress?: Address) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const { writeContractAsync, data: hash, isPending } = useWriteContract();
-  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
+  const { isSuccess: isConfirmed, refetch, status, error, isError } = useWaitForTransactionReceipt({ hash });
 
   // Gérer les transactions confirmées
   useEffect(() => {
@@ -35,8 +36,20 @@ export const useCoproInteractions = (coproAddress?: Address) => {
       );
       setIsProcessing(false);
       ErrorService.successMessage("Transaction", "Transaction confirmée avec succès !");
+    } else if (hash && isError) {
+      
+      const errorMessage = CoproService.getErrorMessage(error);
+      setTransactions(prev => 
+        prev.map(tx => 
+          tx.hash === hash 
+            ? { ...tx, status: 'error' as const, error: errorMessage }
+            : tx
+        )
+      );
+      setIsProcessing(false);
+      ErrorService.errorMessage("Transaction", `Erreur lors de la transaction: ${errorMessage}`);
     }
-  }, [hash, isConfirmed]);
+  }, [hash, isConfirmed, isError, error, status]);
 
   // Fonction d'achat d'appartement
   const buyApartment = useCallback(async (tokenId: number, price: bigint) => {
@@ -71,7 +84,7 @@ export const useCoproInteractions = (coproAddress?: Address) => {
     setIsProcessing(true);
 
     try {
-      ErrorService.mixinMessage(`Achat de l'appartement #${tokenId + 1}`, "info");
+      ErrorService.mixinMessage(`Achat de l'appartement #${tokenId + 1} for ${price}`, "info");
 
       const tx = await writeContractAsync({
         address: coproAddress,
@@ -88,7 +101,7 @@ export const useCoproInteractions = (coproAddress?: Address) => {
             : t
         )
       );
-
+      refetch();
     } catch (err: unknown) {
       const errorMessage = CoproService.getErrorMessage(err);
       ErrorService.errorMessage("Erreur lors de l'achat:", errorMessage);
@@ -148,7 +161,7 @@ export const useCoproInteractions = (coproAddress?: Address) => {
             : t
         )
       );
-
+      refetch();
     } catch (err: unknown) {
       const errorMessage = CoproService.getErrorMessage(err);
       ErrorService.errorMessage("Erreur lors de la mise en vente:", errorMessage);
@@ -207,7 +220,7 @@ export const useCoproInteractions = (coproAddress?: Address) => {
             : t
         )
       );
-
+      refetch();
     } catch (err: unknown) {
       const errorMessage = CoproService.getErrorMessage(err);
       ErrorService.errorMessage("Erreur lors de l'annulation:", errorMessage);
